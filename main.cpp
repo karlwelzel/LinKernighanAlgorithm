@@ -43,10 +43,10 @@ private:
     //bool fillMatrix();
     bool interpretKeyword(const std::string &, const std::string &);
 
-    bool readProblem(std::ifstream &);
-
 public:
-    explicit TsplibProblem(std::ifstream &);
+    TsplibProblem();
+
+    bool readProblem(std::ifstream &);
 
     const std::string &getName() const;
 
@@ -160,11 +160,7 @@ bool TsplibProblem::readProblem(std::ifstream &inputFile) {
     return true;
 }
 
-TsplibProblem::TsplibProblem(std::ifstream &inputFile) {
-    if (!readProblem(inputFile)) {
-        std::cerr << "The TSPLIB file has an invalid format or contains unsupported keywords.";
-    }
-}
+TsplibProblem::TsplibProblem() = default;
 
 const std::string &TsplibProblem::getName() const {
     return name;
@@ -356,7 +352,7 @@ Tour simpleHeuristic(TsplibProblem &tsplibProblem) {
     for (std::pair<unsigned int, unsigned int> edge : edges) {
         int root = tourParts.join(edge.first, edge.second);
         if (root != -1 and tourParts.getTourPartAt(root).size() == tsplibProblem.getDimension()) {
-            return Tour(tourParts.getTourPartAt(tourParts.find(edge.first)));
+            return Tour(tourParts.getTourPartAt(root));
         }
     }
 }
@@ -366,18 +362,23 @@ int main(int argc, char *argv[]) {
     if (argc < 2) {
         std::cout << "No file supplied" << std::endl;
         // return 1;
-        inputFile.open(R"(D:\Windows 10\Downloads\berlin52.tsp)");
+        inputFile.open(R"(D:\Windows 10\Downloads\bays29.tsp)");
     } else {
         inputFile.open(argv[1]);
     }
 
-    TsplibProblem problem(inputFile);
-    inputFile.close();
+    TsplibProblem problem;
+    if (!problem.readProblem(inputFile)) {
+        std::cerr << "The TSPLIB file has an invalid format or contains unsupported keywords." << std::endl;
+        inputFile.close();
+    } else {
+        inputFile.close();
 
-    Tour tour = simpleHeuristic(problem);
-    std::cout << "This is the shortest route found:" << std::endl;
-    std::cout << tour;
-    std::cout << "It is " << tour.length(problem) << " units long." << std::endl;
+        Tour tour = simpleHeuristic(problem);
+        std::cout << "This is the shortest route found:" << std::endl;
+        std::cout << tour;
+        std::cout << "It is " << tour.length(problem) << " units long." << std::endl;
+    }
 
     return 0;
 }
