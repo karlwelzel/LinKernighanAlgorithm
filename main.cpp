@@ -181,19 +181,88 @@ unsigned int TsplibProblem::getDimension() const {
 int TsplibProblem::dist(unsigned int i, unsigned int j) const {
     if (edgeWeightType == "EUC_2D") {
         double d = std::hypot(coordinates.at(i).at(0) - coordinates.at(j).at(0),
-                              coordinates.at(i).at(1) - coordinates.at(j).at(0));
+                              coordinates.at(i).at(1) - coordinates.at(j).at(1));
         return std::lround(d);
     } else if (edgeWeightType == "CEIL_2D") {
         double d = std::hypot(coordinates.at(i).at(0) - coordinates.at(j).at(0),
-                              coordinates.at(i).at(1) - coordinates.at(j).at(0));
+                              coordinates.at(i).at(1) - coordinates.at(j).at(1));
         return std::ceil(d);
     }
     return 0;
 }
 
-// ========================================== TourParts class =================================================
-class TourParts { // Enhanced UnionFind structure
+// =================================================== Tour class ======================================================
+
+class Tour {
 private:
+    std::list<unsigned int> vertices; // The vertices of this tour in the correct order
+
+public:
+    explicit Tour(const std::list<unsigned int> &tour) : vertices(tour) {};
+
+    const std::list<unsigned int> &getVertices() const;
+
+    const std::list<unsigned int>::iterator iteratorOf(unsigned int vertex);
+
+    const std::list<unsigned int>::iterator after(std::list<unsigned int>::iterator it);
+
+    const std::list<unsigned int>::iterator before(std::list<unsigned int>::iterator it);
+
+    const unsigned int length(TsplibProblem &tsplibProblem);
+};
+
+
+const std::list<unsigned int> &Tour::getVertices() const {
+    return vertices;
+}
+
+const std::list<unsigned int>::iterator Tour::iteratorOf(unsigned int vertex) {
+    for (auto it = vertices.begin(); it != vertices.end(); ++it) {
+        if (*it == vertex) {
+            return it;
+        }
+    }
+}
+
+const std::list<unsigned int>::iterator Tour::after(std::list<unsigned int>::iterator it) {
+    if (it == vertices.end()) {
+        return vertices.begin();
+    } else {
+        return std::next(it);
+    }
+}
+
+const std::list<unsigned int>::iterator Tour::before(std::list<unsigned int>::iterator it) {
+    if (it == vertices.begin()) {
+        return vertices.end();
+    } else {
+        return std::prev(it);
+    }
+}
+
+const unsigned int Tour::length(TsplibProblem &tsplibProblem) {
+    unsigned int sum = 0;
+    for (auto it = vertices.begin(); it != vertices.end(); ++it) {
+        if (std::next(it) == vertices.end()) {
+            sum += tsplibProblem.dist(*it, vertices.front());
+        } else {
+            sum += tsplibProblem.dist(*it, *std::next(it));
+        }
+    }
+    return sum;
+}
+
+std::ostream &operator<<(std::ostream &out, const Tour &tour) {
+    std::string output;
+    for (unsigned int vertex : tour.getVertices()) {
+        output += std::to_string(vertex) + ", ";
+    }
+    out << output.substr(0, output.length() - 2) << std::endl;
+    return out;
+}
+
+// ============================================== TourParts class ======================================================
+class TourParts { // Enhanced UnionFind structure
 private:
     std::vector<unsigned int> parent;
     std::vector<unsigned int> rank;
@@ -201,10 +270,10 @@ private:
 
 public:
     explicit TourParts(unsigned int dimension) {
-        for (unsigned int i = 0; i < dimension; i++) {
+        for (unsigned int i = 0; i < dimension; ++i) {
             parent.push_back(i); // parent[i] = i
             rank.push_back(0);   // rank[i] = 0
-            // The tour consisting only of the vertex i
+            // The tour only consists of the vertex i
             tourPart.push_back(std::list<unsigned int>{i});
         }
     }
@@ -220,12 +289,12 @@ public:
         return parent.at(x);
     }
 
-    bool join(unsigned int x, unsigned int y) {
+    int join(unsigned int x, unsigned int y) {
         // Join the parts of a tour that x and y are part of by adding the edge (x, y)
         unsigned int xr = find(x); // root of x
         unsigned int yr = find(y); // root of y
         if (xr == yr) {
-            return false; // A tour part cannot be joined with itself, this would lead to non-Hamiltonian tours
+            return -1; // A tour part cannot be joined with itself, this would lead to non-Hamiltonian tours
         }
         if (x == tourPart.at(xr).front() and y == tourPart.at(yr).front()) {
             tourPart.at(xr).reverse();
@@ -236,31 +305,34 @@ public:
         } else if (x == tourPart.at(xr).back() and y == tourPart.at(yr).back()) {
             tourPart.at(yr).reverse();
         } else {
-            return false; // x and y cannot be joined, because one of them is not an end of its tour part
+            return -1; // x and y cannot be joined, because one of them is not an end of its tour part
         }
         // The tour parts can now be joined by adding tourPart.at(yr) at the end of tourPart.at(xr) or by adding
         // tourPart.at(xr) at the beginning of tourPart.at(yr)
+        unsigned int newRoot;
         if (rank.at(xr) > rank.at(yr)) {
+            newRoot = xr;
             parent.at(yr) = xr;
             tourPart.at(xr).splice(tourPart.at(xr).end(), tourPart.at(yr));
         } else {
+            newRoot = yr;
             parent.at(xr) = yr;
             tourPart.at(yr).splice(tourPart.at(yr).begin(), tourPart.at(xr));
         }
         if (rank.at(xr) == rank.at(yr)) {
             rank.at(yr)++;
         }
-        return true;
+        return newRoot;
     }
 };
 
 // Introduction Assignment
-class EdgeComparator {
+class EdgeCostComparator {
 private:
     TsplibProblem tsplibProblem;
 
 public:
-    explicit EdgeComparator(TsplibProblem &tsplibProblem) : tsplibProblem(tsplibProblem) {}
+    explicit EdgeCostComparator(TsplibProblem &tsplibProblem) : tsplibProblem(tsplibProblem) {}
 
     bool operator()(const std::pair<unsigned int, unsigned int> edge1,
                     const std::pair<unsigned int, unsigned int> edge2) const {
@@ -269,44 +341,43 @@ public:
 };
 
 
-void simpleHeuristic(TsplibProblem &tsplibProblem) {
+Tour simpleHeuristic(TsplibProblem &tsplibProblem) {
     std::vector<std::pair<unsigned int, unsigned int>> edges;
-    for (int i = 0; i < tsplibProblem.getDimension(); i++) {
-        for (int j = i + 1; j < tsplibProblem.getDimension(); j++) {
+    for (int i = 0; i < tsplibProblem.getDimension(); ++i) {
+        for (int j = i + 1; j < tsplibProblem.getDimension(); ++j) {
             edges.emplace_back(i, j);
         }
     }
 
-    EdgeComparator edgeComparator(tsplibProblem);
+    EdgeCostComparator edgeComparator(tsplibProblem);
     std::sort(edges.begin(), edges.end(), edgeComparator);
 
-    unsigned int distanceSum = 0;
     TourParts tourParts(tsplibProblem.getDimension());
     for (std::pair<unsigned int, unsigned int> edge : edges) {
-        if (tourParts.join(edge.first, edge.second)) {
-            std::cout << "Added edge (" << edge.first << ", " << edge.second << ")" << std::endl;
-            std::cout << "New tour part: ";
-            for (unsigned int v : tourParts.getTourPartAt(tourParts.find(edge.first))) {
-                std::cout << v << ", ";
-            }
-            std::cout << "with length " << tourParts.getTourPartAt(tourParts.find(edge.first)).size() << std::endl;
-            distanceSum += tsplibProblem.dist(edge.first, edge.second);
-        } else {
-            std::cout << "Skipped edge (" << edge.first << ", " << edge.second << ")" << std::endl;
-        }
-        if (tourParts.getTourPartAt(tourParts.find(edge.first)).size() == tsplibProblem.getDimension()) {
-            break;
+        int root = tourParts.join(edge.first, edge.second);
+        if (root != -1 and tourParts.getTourPartAt(root).size() == tsplibProblem.getDimension()) {
+            return Tour(tourParts.getTourPartAt(tourParts.find(edge.first)));
         }
     }
-    std::cout << "The shortest route found is " << distanceSum << " units long." << std::endl;
 }
 
-int main() {
-    std::ifstream inputFile(R"(D:\Windows 10\Downloads\ch130.tsp)");
+int main(int argc, char *argv[]) {
+    std::ifstream inputFile;
+    if (argc < 2) {
+        std::cout << "No file supplied" << std::endl;
+        // return 1;
+        inputFile.open(R"(D:\Windows 10\Downloads\berlin52.tsp)");
+    } else {
+        inputFile.open(argv[1]);
+    }
+
     TsplibProblem problem(inputFile);
     inputFile.close();
-    std::cout << "This is the distance between node 1 and 2: " << problem.dist(1, 2) << ".";
 
-    simpleHeuristic(problem);
+    Tour tour = simpleHeuristic(problem);
+    std::cout << "This is the shortest route found:" << std::endl;
+    std::cout << tour;
+    std::cout << "It is " << tour.length(problem) << " units long." << std::endl;
+
     return 0;
 }
