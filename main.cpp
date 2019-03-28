@@ -6,6 +6,7 @@
 #include <fstream>
 #include <sstream>
 #include <algorithm>
+#include <regex>
 
 
 // ============================================ TsplibProblem class ====================================================
@@ -34,19 +35,18 @@ private:
     std::string nodeCoordType = "TWOD_COORDS";
 
     // if EDGE_WEIGHT_TYPE is EXPLICIT
-    std::vector<int> numbers;              // All numbers in the TSPLIB file as they appear in EDGE_WEIGHT_SECTION
     std::vector<std::vector<int>> matrix;  // The matrix described in the TSPLIB file
 
     // if EDGE_WEIGHT_TYPE is *_2D
     std::vector<std::vector<double>> coordinates; // Every entry is a 2d coordinate
 
     //bool fillMatrix();
-    bool interpretKeyword(const std::string &, const std::string &);
+    std::string interpretKeyword(const std::string &keyword, const std::string &value);
 
 public:
     TsplibProblem();
 
-    bool readProblem(std::ifstream &);
+    std::string readProblem(std::ifstream &inputFile);
 
     const std::string &getName() const;
 
@@ -58,106 +58,177 @@ public:
     int dist(unsigned int, unsigned int) const;
 };
 
-bool TsplibProblem::interpretKeyword(const std::string &keyword, const std::string &value) {
+std::string TsplibProblem::interpretKeyword(const std::string &keyword, const std::string &value) {
     if (keyword == "NAME") {
         name = value;
     } else if (keyword == "TYPE") {
         type = value;
         if (value != "TSP") {
-            return false;
+            return "TYPE must be TSP";
         }
 
     } else if (keyword == "COMMENT") {
     } else if (keyword == "DIMENSION") {
         dimension = static_cast<unsigned int>(stoi(value));
-        if (coordinates.size() != dimension) {
-            coordinates.clear();
-            while (coordinates.size() < dimension) {
-                coordinates.emplace_back(); // Adds an empty vector at the of coordinates
-            }
-        }
     } else if (keyword == "EDGE_WEIGHT_TYPE") {
         edgeWeightType = value;
-        if (edgeWeightType != "EUC_2D" and edgeWeightType != "CEIL_2D") {
-            return false;
+        if (edgeWeightType != "EUC_2D" and edgeWeightType != "CEIL_2D" and edgeWeightType != "EXPLICIT") {
+            return "EDGE_WEIGHT_TYPE must be one of: EUC_2D, CEIL_2D, EXPLICIT";
         }
     } else if (keyword == "EDGE_WEIGHT_FORMAT") {
         edgeWeightFormat = value;
+        if (edgeWeightFormat != "FULL_MATRIX" and edgeWeightFormat != "LOWER_DIAG_ROW" and
+            edgeWeightFormat != "UPPER_DIAG_ROW" and edgeWeightFormat != "UPPER_DIAG") {
+            return "EDGE_WEIGHT_FORMAT must be one of: FULL_MATRIX, LOWER_DIAG_ROW, UPPER_DIAG_ROW, UPPER_DIAG";
+        }
     } else if (keyword == "NODE_COORD_TYPE") {
         nodeCoordType = value;
         if (nodeCoordType != "TWOD_COORDS") {
-            return false;
+            return "NODE_COORD_TYPE must be TWOD_COORDS";
         }
     }
-    return true;
+    return "";
 }
 
-bool TsplibProblem::readProblem(std::ifstream &inputFile) {
+std::string TsplibProblem::readProblem(std::ifstream &inputFile) {
     std::string line;
-    bool isMatrixInput = false;
-    bool isCoordsInput = false;
+    std::string lastDataKeyword;
     unsigned int delimiterIndex;
+    std::vector<int> numbers; // All numbers in the TSPLIB file as they appear in EDGE_WEIGHT_SECTION
 
     while (inputFile) {
         getline(inputFile, line);
         line = trim(line);
-        if ((delimiterIndex = line.find(delimiter)) != std::string::npos) {
+        if (line.empty()) {
+            // ignore this line
+        } else if ((delimiterIndex = line.find(delimiter)) != std::string::npos) {
+            // The specification part with entries of the form <keyword> : <value>
             std::string keyword = trim(line.substr(0, delimiterIndex));
             std::string value = trim(line.substr(delimiterIndex + 1, std::string::npos));
-            if (!interpretKeyword(keyword, value)) {
-                return false;
+            std::string errorMessage = interpretKeyword(keyword, value);
+            if (!errorMessage.empty()) {
+                return errorMessage;
             }
-        } else if (line == "EOF") {
-            break;
-        } else if (line == "NODE_COORD_SECTION") {
-            isCoordsInput = true;
-            /* } else if (line == "EDGE_WEIGHT_SECTION") {
-                isMatrixInput = true; */
-        } else if (isCoordsInput) {
-            if (nodeCoordType == "TWOD_COORDS") {
-                std::stringstream stream(line);
-                unsigned int n;
-                double x, y;
-                stream >> n >> x >> y;
-                coordinates.at(n - 1) = std::vector<double>{x, y};
-            } else {
-                return false;
-            }
-            /*} else if (isMatrixInput) {
-                std::stringstream stream(line);
-                int n;
-                while (stream >> n) {
-                    numbers.push_back(n);
-                } */
         } else {
-            return false;
+            // The data part or an invalid part of the file
+            if (std::regex_match(line, std::regex("[A-Z_]+"))) {
+                // line is some kind of keyword, because all keywords have the UPPERCASE_WITH_UNDERSCORES format.
+                // This is the end of a block of data belonging to some previous keyword
+                lastDataKeyword = line;
+                if (line == "EOF") {
+                    break;
+                } else if (line == "NODE_COORD_SECTION") {
+                    if (edgeWeightType != "EUC_2D" and edgeWeightType != "EUC_3D" and edgeWeightType != "MAX_2D" and
+                        edgeWeightType != "MAX_3D" and edgeWeightType != "MAN_2D" and edgeWeightType != "MAN_3D" and
+                        edgeWeightType != "CEIL_2D" and edgeWeightType != "GEO") {
+                        return "NODE_COORD_SECTION encountered, but EDGE_WEIGHT_TYPE is not on of: EUC_2D, EUC_3D, "
+                               "MAX_2D, MAX_3D, MAN_2D, MAN_3D, CEIL_2D, GEO";
+                    }
+                    // Initialize the coordinates vector with empty vectors until coordinates.size() == dimension
+                    while (coordinates.size() < dimension) {
+                        coordinates.emplace_back();
+                    }
+                } else if (line == "EDGE_WEIGHT_SECTION") {
+                    if (edgeWeightType != "EXPLICIT") {
+                        return "EDGE_WEIGHT_SECTION encountered, but EDGE_WEIGHT_TYPE is not EXPLICIT";
+                    }
+                }
+            } else {
+                if (lastDataKeyword == "NODE_COORD_SECTION") {
+                    // Already checked: nodeCoordType == "TWOD_COORDS"
+                    std::stringstream stream(line);
+                    unsigned int n;
+                    double x, y;
+                    stream >> n >> x >> y;
+                    try {
+                        coordinates.at(n - 1) = std::vector<double>{x, y};
+                    } catch (std::out_of_range &error) {
+                        return "One of the coordinates has a number outside of the range [1, DIMENSION]";
+                    }
+                } else if (lastDataKeyword == "EDGE_WEIGHT_SECTION") {
+                    std::stringstream stream(line);
+                    int n;
+                    while (stream >> n) {
+                        numbers.push_back(n);
+                    }
+                } else if (!lastDataKeyword.empty()) {
+                    // lastDataKeyword is unknown, so this block of data will be skipped
+                } else {
+                    return "Encountered data when expecting a keyword";
+                }
+            }
         }
     }
 
     // Error checking
-    if (dimension == 0 or edgeWeightType.empty()) {
-        return false;
+    if (dimension == 0) {
+        return "The dimension cannot be 0";
+    }
+    if (edgeWeightType.empty()) {
+        return "EDGE_WEIGHT_TYPE must be specified";
+    }
+
+    if (edgeWeightType == "EXPLICIT" and edgeWeightFormat.empty()) {
+        return "When EDGE_WEIGHT_TYPE is EXPLICIT, EDGE_WEIGHT_FORMAT must be specified";
     }
 
     if (edgeWeightType == "EUC_2D" or edgeWeightType == "MAX_2D" or edgeWeightType == "MAN_2D"
         or edgeWeightType == "CEIL_2D") {
-        if (!isCoordsInput or isMatrixInput) {
-            return false;
-        }
         for (const std::vector<double> &coord : coordinates) {
             if (coord.size() != 2) {
-                return false;
+                return "Too few coordinates were specified or the coordinates have the wrong dimension (3D instead of 2D)";
             }
         }
     }
-    /* if (edgeWeightType == "EXPLICIT") {
-        if (!isMatrixInput or isCoordsInput) {
-            return false;
-        }
-        fillMatrix();
-    } */
 
-    return true;
+    // Fill the matrix of distances properly
+    if (edgeWeightType == "EXPLICIT") {
+        // Initialize the matrix with zeros
+        matrix = std::vector<std::vector<int>>(dimension, std::vector<int>(dimension));
+        try {
+            unsigned int numbersIndex = 0;
+            if (edgeWeightFormat == "FULL_MATRIX") {
+                for (int i = 0; i < dimension; ++i) {
+                    for (int j = 0; j < dimension; ++j) {
+                        matrix[i][j] = numbers.at(numbersIndex);
+                        numbersIndex++;
+                    }
+                }
+            } else if (edgeWeightFormat == "LOWER_DIAG_ROW") {
+                for (int i = 0; i < dimension; ++i) {
+                    for (int j = 0; j <= i; ++j) {
+                        matrix[i][j] = numbers.at(numbersIndex);
+                        matrix[j][i] = numbers.at(numbersIndex);
+                        numbersIndex++;
+                    }
+                }
+            } else if (edgeWeightFormat == "UPPER_DIAG_ROW") {
+                for (int i = 0; i < dimension; ++i) {
+                    for (int j = i; j < dimension; ++j) {
+                        matrix[i][j] = numbers.at(numbersIndex);
+                        matrix[j][i] = numbers.at(numbersIndex);
+                        numbersIndex++;
+                    }
+                }
+            } else if (edgeWeightFormat == "UPPER_ROW") {
+                // The diagonal is never touched, so it is filled with zeros from the initialization
+                for (int i = 0; i < dimension; ++i) {
+                    for (int j = i + 1; j < dimension; ++j) {
+                        matrix[i][j] = numbers.at(numbersIndex);
+                        matrix[j][i] = numbers.at(numbersIndex);
+                        numbersIndex++;
+                    }
+                }
+            }
+            if (numbersIndex < numbers.size()) {
+                return "Too many numbers were specified under EDGE_WEIGHT_SECTION";
+            }
+        } catch (std::out_of_range &error) {
+            return "Too few numbers were specified under EDGE_WEIGHT_SECTION";
+        }
+    }
+
+    return "";
 }
 
 TsplibProblem::TsplibProblem() = default;
@@ -183,8 +254,11 @@ int TsplibProblem::dist(unsigned int i, unsigned int j) const {
         double d = std::hypot(coordinates.at(i).at(0) - coordinates.at(j).at(0),
                               coordinates.at(i).at(1) - coordinates.at(j).at(1));
         return std::ceil(d);
+    } else if (edgeWeightType == "EXPLICIT") {
+        return matrix.at(i).at(j);
+    } else {
+        throw std::runtime_error("The EDGE_WEIGHT_TYPE '" + edgeWeightType + "' is not supported.");
     }
-    return 0;
 }
 
 // =================================================== Tour class ======================================================
@@ -351,7 +425,7 @@ Tour simpleHeuristic(TsplibProblem &tsplibProblem) {
     TourParts tourParts(tsplibProblem.getDimension());
     for (std::pair<unsigned int, unsigned int> edge : edges) {
         int root = tourParts.join(edge.first, edge.second);
-        if (root != -1 and tourParts.getTourPartAt(root).size() == tsplibProblem.getDimension()) {
+        if (root >= 0 and tourParts.getTourPartAt(root).size() == tsplibProblem.getDimension()) {
             return Tour(tourParts.getTourPartAt(root));
         }
     }
@@ -368,12 +442,13 @@ int main(int argc, char *argv[]) {
     }
 
     TsplibProblem problem;
-    if (!problem.readProblem(inputFile)) {
-        std::cerr << "The TSPLIB file has an invalid format or contains unsupported keywords." << std::endl;
-        inputFile.close();
-    } else {
-        inputFile.close();
+    std::string errorMessage = problem.readProblem(inputFile);
+    inputFile.close();
 
+    if (!errorMessage.empty()) {
+        std::cerr << "The TSPLIB file has an invalid format or contains unsupported keywords: " << errorMessage
+                  << std::endl;
+    } else {
         Tour tour = simpleHeuristic(problem);
         std::cout << "This is the shortest route found:" << std::endl;
         std::cout << tour;
