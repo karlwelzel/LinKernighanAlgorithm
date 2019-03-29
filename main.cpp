@@ -12,6 +12,7 @@
 // ============================================ TsplibProblem class ====================================================
 // consider moving TsplibProblem to its own file
 
+// Trim whitespaces from the start and end of str
 std::string trim(const std::string &str, const std::string &whitespace = " \t") {
     unsigned int start = str.find_first_not_of(whitespace);
     unsigned int end = str.find_last_not_of(whitespace);
@@ -40,13 +41,12 @@ private:
     // if EDGE_WEIGHT_TYPE is *_2D
     std::vector<std::vector<double>> coordinates; // Every entry is a 2d coordinate
 
-    //bool fillMatrix();
     std::string interpretKeyword(const std::string &keyword, const std::string &value);
 
 public:
     TsplibProblem();
 
-    std::string readProblem(std::ifstream &inputFile);
+    std::string readFile(std::ifstream &inputFile);
 
     const std::string &getName() const;
 
@@ -90,7 +90,7 @@ std::string TsplibProblem::interpretKeyword(const std::string &keyword, const st
     return "";
 }
 
-std::string TsplibProblem::readProblem(std::ifstream &inputFile) {
+std::string TsplibProblem::readFile(std::ifstream &inputFile) {
     std::string line;
     std::string lastDataKeyword;
     unsigned int delimiterIndex;
@@ -113,7 +113,6 @@ std::string TsplibProblem::readProblem(std::ifstream &inputFile) {
             // The data part or an invalid part of the file
             if (std::regex_match(line, std::regex("[A-Z_]+"))) {
                 // line is some kind of keyword, because all keywords have the UPPERCASE_WITH_UNDERSCORES format.
-                // This is the end of a block of data belonging to some previous keyword
                 lastDataKeyword = line;
                 if (line == "EOF") {
                     break;
@@ -136,6 +135,7 @@ std::string TsplibProblem::readProblem(std::ifstream &inputFile) {
             } else {
                 if (lastDataKeyword == "NODE_COORD_SECTION") {
                     // Already checked: nodeCoordType == "TWOD_COORDS"
+                    // Every line has the format <integer> <real> <real>
                     std::stringstream stream(line);
                     unsigned int n;
                     double x, y;
@@ -146,6 +146,7 @@ std::string TsplibProblem::readProblem(std::ifstream &inputFile) {
                         return "One of the coordinates has a number outside of the range [1, DIMENSION]";
                     }
                 } else if (lastDataKeyword == "EDGE_WEIGHT_SECTION") {
+                    // Every line is a sequence of integers separated by whitespaces
                     std::stringstream stream(line);
                     int n;
                     while (stream >> n) {
@@ -264,11 +265,13 @@ int TsplibProblem::dist(unsigned int i, unsigned int j) const {
 // =================================================== Tour class ======================================================
 
 class Tour {
-private:
+protected:
     std::list<unsigned int> vertices; // The vertices of this tour in the correct order
 
 public:
-    explicit Tour(const std::list<unsigned int> &tour) : vertices(tour) {};
+    Tour();
+
+    explicit Tour(const std::list<unsigned int> &tour);
 
     const std::list<unsigned int> &getVertices() const;
 
@@ -281,6 +284,9 @@ public:
     const unsigned int length(TsplibProblem &tsplibProblem);
 };
 
+Tour::Tour() = default;
+
+Tour::Tour(const std::list<unsigned int> &tour) : vertices(tour) {}
 
 const std::list<unsigned int> &Tour::getVertices() const {
     return vertices;
@@ -325,10 +331,110 @@ const unsigned int Tour::length(TsplibProblem &tsplibProblem) {
 std::ostream &operator<<(std::ostream &out, const Tour &tour) {
     std::string output;
     for (unsigned int vertex : tour.getVertices()) {
-        output += std::to_string(vertex) + ", ";
+        output += std::to_string(vertex + 1) + ", ";
     }
     out << output.substr(0, output.length() - 2) << std::endl;
     return out;
+}
+
+// ============================================== TsplibTour class =====================================================
+
+class TsplibTour : public Tour {
+private:
+    const char delimiter = ':';
+
+    std::string name;
+    std::string type;
+    unsigned int dimension = 0;
+
+    std::string interpretKeyword(const std::string &keyword, const std::string &value);
+
+public:
+    const std::string &getName() const;
+
+    const std::string &getType() const;
+
+    std::string readFile(std::ifstream &inputFile);
+};
+
+const std::string &TsplibTour::getName() const {
+    return name;
+}
+
+const std::string &TsplibTour::getType() const {
+    return type;
+}
+
+std::string TsplibTour::interpretKeyword(const std::string &keyword, const std::string &value) {
+    if (keyword == "NAME") {
+        name = value;
+    } else if (keyword == "TYPE") {
+        type = value;
+        if (value != "TOUR") {
+            return "TYPE must be TOUR";
+        }
+
+    } else if (keyword == "COMMENT") {
+    } else if (keyword == "DIMENSION") {
+        dimension = static_cast<unsigned int>(stoi(value));
+    }
+    return "";
+}
+
+std::string TsplibTour::readFile(std::ifstream &inputFile) {
+    std::string line;
+    std::string lastDataKeyword;
+    unsigned int delimiterIndex;
+
+    while (inputFile) {
+        getline(inputFile, line);
+        line = trim(line);
+        if (line.empty()) {
+            // ignore this line
+        } else if ((delimiterIndex = line.find(delimiter)) != std::string::npos) {
+            // The specification part with entries of the form <keyword> : <value>
+            std::string keyword = trim(line.substr(0, delimiterIndex));
+            std::string value = trim(line.substr(delimiterIndex + 1, std::string::npos));
+            std::string errorMessage = interpretKeyword(keyword, value);
+            if (!errorMessage.empty()) {
+                return errorMessage;
+            }
+        } else {
+            // The data part or an invalid part of the file
+            if (std::regex_match(line, std::regex("[A-Z_]+"))) {
+                // line is some kind of keyword, because all keywords have the UPPERCASE_WITH_UNDERSCORES format.
+                lastDataKeyword = line;
+                if (line == "EOF") {
+                    break;
+                }
+            } else {
+                if (lastDataKeyword == "TOUR_SECTION") {
+                    // Every line is one single integer
+                    std::stringstream stream(line);
+                    int n;
+                    while (stream >> n) {
+                        if (n >= 1) {
+                            vertices.push_back(n - 1);
+                        }
+                    }
+                } else if (!lastDataKeyword.empty()) {
+                    // lastDataKeyword is unknown, so this block of data will be skipped
+                } else {
+                    return "Encountered data when expecting a keyword";
+                }
+            }
+        }
+    }
+
+    // Error checking
+    if (dimension == 0) {
+        return "The dimension cannot be 0";
+    }
+    if (vertices.size() != dimension) {
+        return "The dimension does not fit to the number of vertices";
+    }
+
+    return "";
 }
 
 // ============================================== TourParts class ======================================================
@@ -432,27 +538,60 @@ Tour simpleHeuristic(TsplibProblem &tsplibProblem) {
 }
 
 int main(int argc, char *argv[]) {
-    std::ifstream inputFile;
+    std::ifstream problemFile;
     if (argc < 2) {
         std::cout << "No file supplied" << std::endl;
-        // return 1;
-        inputFile.open(R"(D:\Windows 10\Downloads\bays29.tsp)");
+        return 1;
     } else {
-        inputFile.open(argv[1]);
+        problemFile.open(argv[1]);
+    }
+
+    if (!problemFile.is_open() or !problemFile.good()) {
+        std::cerr << "Could not open the TSPLIB file '" << argv[1] << "'" << std::endl;
+        return 1;
     }
 
     TsplibProblem problem;
-    std::string errorMessage = problem.readProblem(inputFile);
-    inputFile.close();
+    std::string errorMessage = problem.readFile(problemFile);
+    problemFile.close();
+
+    std::cout << "Opened the " << problem.getName() << " TSPLIB file" << std::endl;
 
     if (!errorMessage.empty()) {
-        std::cerr << "The TSPLIB file has an invalid format or contains unsupported keywords: " << errorMessage
+        std::cerr << "The TSPLIB file has an invalid format: " << errorMessage
                   << std::endl;
-    } else {
-        Tour tour = simpleHeuristic(problem);
-        std::cout << "This is the shortest route found:" << std::endl;
-        std::cout << tour;
-        std::cout << "It is " << tour.length(problem) << " units long." << std::endl;
+        return 1;
+    }
+
+    Tour tour = simpleHeuristic(problem);
+    unsigned int length = tour.length(problem);
+    std::cout << "This is the shortest tour found:" << std::endl;
+    std::cout << tour;
+    std::cout << "It is " << length << " units long." << std::endl;
+
+    std::ifstream optimalTourFile;
+    if (argc >= 3) {
+        optimalTourFile.open(argv[2]);
+        if (!optimalTourFile.is_open() or !optimalTourFile.good()) {
+            std::cerr << "Could not open the TSPLIB tour file '" << argv[2] << "'" << std::endl;
+            return 1;
+        }
+
+        TsplibTour optimalTour;
+        std::string tourErrorMessage = optimalTour.readFile(optimalTourFile);
+        optimalTourFile.close();
+
+        if (!tourErrorMessage.empty()) {
+            std::cerr << "The TSPLIB tour file has an invalid format: " << tourErrorMessage << std::endl;
+            return 1;
+        }
+
+        unsigned int optimalLength = optimalTour.length(problem);
+        std::cout << "This is the optimal tour:" << std::endl;
+        std::cout << optimalTour;
+        std::cout << "It is " << optimalLength << " units long." << std::endl;
+        std::cout << "The best tour found by the heuristic is " << (length / (double) optimalLength - 1) * 100
+                  << "% above the optimum.";
     }
 
     return 0;
