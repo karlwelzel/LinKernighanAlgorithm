@@ -56,12 +56,6 @@ public:
     const std::list<unsigned int> &getVertices() const;
 
 
-    const std::list<unsigned int>::iterator iteratorOf(unsigned int vertex);
-
-    const std::list<unsigned int>::iterator after(std::list<unsigned int>::iterator it);
-
-    const std::list<unsigned int>::iterator before(std::list<unsigned int>::iterator it);
-
     const unsigned int length(TsplibProblem &tsplibProblem);
 };
 

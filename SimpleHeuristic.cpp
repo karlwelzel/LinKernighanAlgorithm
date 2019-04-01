@@ -2,6 +2,8 @@
 // Created by Karl Welzel on 29/03/2019.
 //
 
+// This library contains the code for the introduction assignment
+
 #include <utility>
 #include <iostream>
 #include <cmath>
@@ -14,7 +16,6 @@
 #include "TsplibUtils.h"
 #include "SimpleHeuristic.h"
 
-
 // ============================================== TourParts class ======================================================
 // Enhanced UnionFind structure
 
@@ -22,13 +23,13 @@ TourParts::TourParts(unsigned int dimension) {
     for (unsigned int i = 0; i < dimension; ++i) {
         parent.push_back(i); // parent[i] = i
         rank.push_back(0);   // rank[i] = 0
-        // The tour only consists of the vertex i
+        // The tour initially only consists of the vertex i
         tourPart.push_back(std::list<unsigned int>{i});
     }
 }
 
-const std::list<unsigned int> &TourParts::getTourPartAt(unsigned int i) const {
-    return tourPart.at(i);
+const std::list<unsigned int> &TourParts::getTourPartOf(unsigned int i) {
+    return tourPart.at(find(i));
 }
 
 unsigned int TourParts::find(unsigned int x) {
@@ -74,6 +75,7 @@ int TourParts::join(unsigned int x, unsigned int y) {
     return newRoot;
 }
 
+// Compare edges by edge cost/distance given by a TsplibProblem
 class EdgeCostComparator {
 private:
     TsplibProblem tsplibProblem;
@@ -88,6 +90,16 @@ public:
 };
 
 
+/*
+ * The assignment was to implement a simple heuristic that sorts all of the edges by length and then tries one-by-one
+ * to add them to a subgraph that is always a subgraph of a Hamiltonian tour. This implementation uses an enhanced
+ * version of a UnionFind structure called "TourParts" to manage the connected components. In this case every connected
+ * component is a path and a part of the final tour, so tourPart stores the current path as a std::list for every head
+ * of a component. The "join" function tries to join two vertices and returns whether this was possible (both vertices
+ * need to be at the end of a different path). In this way the algorithm tries to join every edge and stops when the
+ * new path (after successful joining) contains every vertex. In this case only one edge can be used to close up the
+ * tour and the result is returned.
+ */
 Tour simpleHeuristic(TsplibProblem &tsplibProblem) {
     std::vector<std::pair<unsigned int, unsigned int>> edges;
     for (int i = 0; i < tsplibProblem.getDimension(); ++i) {
@@ -97,13 +109,14 @@ Tour simpleHeuristic(TsplibProblem &tsplibProblem) {
     }
 
     EdgeCostComparator edgeComparator(tsplibProblem);
+    // Sort edges by edge cost/distance in ascending order
     std::sort(edges.begin(), edges.end(), edgeComparator);
 
     TourParts tourParts(tsplibProblem.getDimension());
     for (std::pair<unsigned int, unsigned int> edge : edges) {
         int root = tourParts.join(edge.first, edge.second);
-        if (root >= 0 and tourParts.getTourPartAt(root).size() == tsplibProblem.getDimension()) {
-            return Tour(tourParts.getTourPartAt(root));
+        if (root >= 0 and tourParts.getTourPartOf(root).size() == tsplibProblem.getDimension()) {
+            return Tour(tourParts.getTourPartOf(root));
         }
     }
 }

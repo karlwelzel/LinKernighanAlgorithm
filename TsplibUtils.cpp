@@ -2,6 +2,8 @@
 // Created by Karl Welzel on 29/03/2019.
 //
 
+// This library contains code for handling TSP problems from the TSPLIB project
+
 #include <utility>
 #include <iostream>
 #include <cmath>
@@ -241,30 +243,6 @@ Tour::Tour(const std::list<unsigned int> &tour) : vertices(tour) {}
 
 const std::list<unsigned int> &Tour::getVertices() const {
     return vertices;
-}
-
-const std::list<unsigned int>::iterator Tour::iteratorOf(unsigned int vertex) {
-    for (auto it = vertices.begin(); it != vertices.end(); ++it) {
-        if (*it == vertex) {
-            return it;
-        }
-    }
-}
-
-const std::list<unsigned int>::iterator Tour::after(std::list<unsigned int>::iterator it) {
-    if (it == vertices.end()) {
-        return vertices.begin();
-    } else {
-        return std::next(it);
-    }
-}
-
-const std::list<unsigned int>::iterator Tour::before(std::list<unsigned int>::iterator it) {
-    if (it == vertices.begin()) {
-        return vertices.end();
-    } else {
-        return std::prev(it);
-    }
 }
 
 const unsigned int Tour::length(TsplibProblem &tsplibProblem) {

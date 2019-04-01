@@ -14,7 +14,7 @@ private:
 public:
     explicit TourParts(unsigned int dimension);
 
-    const std::list<unsigned int> &getTourPartAt(unsigned int i) const;
+    const std::list<unsigned int> &getTourPartOf(unsigned int i);
 
     unsigned int find(unsigned int x);
 
