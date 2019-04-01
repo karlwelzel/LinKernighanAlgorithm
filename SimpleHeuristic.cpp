@@ -19,6 +19,7 @@
 // ============================================== TourParts class ======================================================
 // Enhanced UnionFind structure
 
+// TODO: Use TourVertex class to avoid unnecessary reverse operations
 TourParts::TourParts(unsigned int dimension) {
     for (unsigned int i = 0; i < dimension; ++i) {
         parent.push_back(i); // parent[i] = i

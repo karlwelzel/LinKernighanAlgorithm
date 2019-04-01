@@ -234,34 +234,115 @@ int TsplibProblem::dist(unsigned int i, unsigned int j) const {
     }
 }
 
+// ================================================ TourVertex class ===================================================
+
+TourVertex::TourVertex() {
+    neighbors = std::make_pair(NO_VERTEX, NO_VERTEX);
+}
+
+TourVertex::TourVertex(const std::pair<unsigned int, unsigned int> &neighbors) : neighbors(neighbors) {}
+
+TourVertex::TourVertex(unsigned int neighbor1, unsigned int neighbor2) :
+        TourVertex(std::make_pair(neighbor1, neighbor2)) {}
+
+
+const std::pair<unsigned int, unsigned int> &TourVertex::getNeighbors() const {
+    return neighbors;
+}
+
+void TourVertex::setNeighbors(const std::pair<unsigned int, unsigned int> &neighbors) {
+    TourVertex::neighbors = neighbors;
+}
+
+void TourVertex::setNeighbors(const unsigned int neighbor1, const unsigned int neighbor2) {
+    setNeighbors(std::make_pair(neighbor1, neighbor2));
+}
+
 
 // =================================================== Tour class ======================================================
 
 Tour::Tour() = default;
 
-Tour::Tour(const std::list<unsigned int> &tour) : vertices(tour) {}
+void Tour::setVertices(const std::list<unsigned int> &tourList) {
+    vertices.clear();
+    auto it = tourList.begin();
+    unsigned int previous = *it;
+    std::advance(it, 1);
+    unsigned int current = *it;
+    std::advance(it, 1);
+    unsigned int next;
+    vertices.emplace(previous, TourVertex(tourList.back(), current));
+    for (; it != tourList.end(); ++it) {
+        next = *it;
+        vertices.emplace(current, TourVertex(previous, next));
+        previous = current;
+        current = next;
+    }
+    vertices.emplace(current, TourVertex(previous, tourList.front()));
+}
 
-const std::list<unsigned int> &Tour::getVertices() const {
-    return vertices;
+
+// Create the TourVertex objects from a std::list (same order)
+// This expects a list containing the numbers from 0 to tour.size()-1
+Tour::Tour(const std::list<unsigned int> &tourList) {
+    setVertices(tourList);
+}
+
+const TourVertex Tour::tourVertexAt(const unsigned int &i) const {
+    return vertices.at(i);
+}
+
+// Which vertex comes after current, when previous comes before it?
+// previous is necessary to determine the direction
+const unsigned int Tour::next(unsigned int previous, unsigned int current) const {
+    std::pair<unsigned int, unsigned int> neighbors = vertices.at(current).getNeighbors();
+    if (previous != neighbors.first and previous != neighbors.second) {
+        throw std::runtime_error(
+                "Tour::next: previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
+                std::to_string(current) + ")");
+    } else if (previous == neighbors.first) {
+        return neighbors.second;
+    } else if (previous == neighbors.second) {
+        return neighbors.first;
+    }
+}
+
+// Set the vertex that comes after current, when previous comes before it?
+// previous is necessary to determine the direction
+void Tour::setNext(unsigned int previous, unsigned int current, unsigned int next) {
+    if (previous == next) {
+        throw std::runtime_error("Tour::setNext: You cannot set both neighbors to the same vertex.");
+    }
+    std::pair<unsigned int, unsigned int> neighbors = vertices.at(current).getNeighbors();
+    if (previous != neighbors.first and previous != neighbors.second) {
+        throw std::runtime_error(
+                "Tour::setNext: previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
+                std::to_string(current) + ")");
+    }
+    vertices.at(current).setNeighbors(previous, next);
 }
 
 const unsigned int Tour::length(TsplibProblem &tsplibProblem) {
     unsigned int sum = 0;
-    for (auto it = vertices.begin(); it != vertices.end(); ++it) {
-        if (std::next(it) == vertices.end()) {
-            sum += tsplibProblem.dist(*it, vertices.front());
-        } else {
-            sum += tsplibProblem.dist(*it, *std::next(it));
-        }
-    }
+    int previous = 0, current = vertices.at(0).getNeighbors().second, next;
+    do {
+        sum += tsplibProblem.dist(previous, current);
+        next = Tour::next(previous, current);
+        previous = current;
+        current = next;
+    } while (previous != 0);
     return sum;
 }
 
 std::ostream &operator<<(std::ostream &out, const Tour &tour) {
     std::string output;
-    for (unsigned int vertex : tour.getVertices()) {
-        output += std::to_string(vertex + 1) + ", ";
-    }
+    int previous = 0, current = tour.tourVertexAt(0).getNeighbors().second, next;
+    do {
+        output += std::to_string(previous + 1) + ", ";
+        next = tour.next(previous, current);
+        previous = current;
+        current = next;
+    } while (previous != 0);
     out << output.substr(0, output.length() - 2) << std::endl;
     return out;
 }
@@ -297,6 +378,7 @@ std::string TsplibTour::readFile(std::ifstream &inputFile) {
     std::string line;
     std::string lastDataKeyword;
     unsigned int delimiterIndex;
+    std::list<unsigned int> tourList;
 
     while (inputFile) {
         getline(inputFile, line);
@@ -326,7 +408,7 @@ std::string TsplibTour::readFile(std::ifstream &inputFile) {
                     int n;
                     while (stream >> n) {
                         if (n >= 1) {
-                            vertices.push_back(n - 1);
+                            tourList.push_back(n - 1);
                         }
                     }
                 } else if (!lastDataKeyword.empty()) {
@@ -342,6 +424,7 @@ std::string TsplibTour::readFile(std::ifstream &inputFile) {
     if (dimension == 0) {
         return "The dimension cannot be 0";
     }
+    setVertices(tourList);
     if (vertices.size() != dimension) {
         return "The dimension does not fit to the number of vertices";
     }

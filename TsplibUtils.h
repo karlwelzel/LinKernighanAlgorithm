@@ -42,19 +42,44 @@ public:
     int dist(unsigned int, unsigned int) const;
 };
 
+class TourVertex {
+private:
+    unsigned int NO_VERTEX = std::numeric_limits<unsigned int>::max();
 
+    std::pair<unsigned int, unsigned int> neighbors;
+
+public:
+    TourVertex();
+
+    TourVertex(unsigned int neighbor1, unsigned int neighbor2);
+
+    explicit TourVertex(const std::pair<unsigned int, unsigned int> &neighbors);
+
+    const std::pair<unsigned int, unsigned int> &getNeighbors() const;
+
+    void setNeighbors(const std::pair<unsigned int, unsigned int> &neighbors);
+
+    void setNeighbors(unsigned int neighbor1, unsigned int neighbor2);
+};
+
+// TODO: Refactor tour to be a map to individual TourVertex's that point to their neighbors
 class Tour {
 protected:
-    std::list<unsigned int> vertices; // The vertices of this tour in the correct order
+    // The vertices of this tour
+    std::map<unsigned int, TourVertex> vertices;
+
+    void setVertices(const std::list<unsigned int> &tourList);
 
 public:
     Tour();
 
-    explicit Tour(const std::list<unsigned int> &tour);
+    explicit Tour(const std::list<unsigned int> &tourList);
 
+    const TourVertex tourVertexAt(const unsigned int &i) const;
 
-    const std::list<unsigned int> &getVertices() const;
+    const unsigned int next(unsigned int previous, unsigned int current) const;
 
+    void setNext(unsigned int previous, unsigned int current, unsigned int next);
 
     const unsigned int length(TsplibProblem &tsplibProblem);
 };
