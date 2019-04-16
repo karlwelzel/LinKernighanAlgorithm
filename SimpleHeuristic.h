@@ -5,20 +5,23 @@
 #ifndef LINKERNINGHANALGORITHM_SIMPLEHEURISTIC_H
 #define LINKERNINGHANALGORITHM_SIMPLEHEURISTIC_H
 
-class TourParts { // Enhanced UnionFind structure
+class TourParts : public VertexList { // Enhanced UnionFind structure
 private:
+    unsigned int dimension;
     std::vector<unsigned int> parent;
-    std::vector<unsigned int> rank;
-    std::vector<std::list<unsigned int>> tourPart;
+    std::vector<unsigned int> size;
+    std::vector<std::pair<unsigned int, unsigned int>> pathEnds;
 
 public:
     explicit TourParts(unsigned int dimension);
 
-    const std::list<unsigned int> &getTourPartOf(unsigned int i);
-
     unsigned int find(unsigned int x);
 
-    int join(unsigned int x, unsigned int y);
+    void join(unsigned int x, unsigned int y);
+
+    bool isTourClosable();
+
+    Tour closeTour();
 };
 
 Tour simpleHeuristic(TsplibProblem &tsplibProblem);

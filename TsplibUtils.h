@@ -42,23 +42,33 @@ public:
     int dist(unsigned int, unsigned int) const;
 };
 
-class Tour {
+class VertexList {
 protected:
-    // The vertices of this tour
-    std::map<unsigned int, std::pair<unsigned int, unsigned int>> vertices;
+    std::map<unsigned int, std::pair<unsigned int, unsigned int>> neighbors;
 
-    void setVertices(const std::list<unsigned int> &tourList);
+    void setVertices(const std::list<unsigned int> &vertexList);
 
 public:
-    Tour();
+    unsigned int NO_VERTEX = std::numeric_limits<unsigned int>::max();
 
-    explicit Tour(const std::list<unsigned int> &tourList);
+    VertexList();
+
+    explicit VertexList(std::map<unsigned int, std::pair<unsigned int, unsigned int>> neighbors);
+
+    explicit VertexList(const std::list<unsigned int> &vertexList);
 
     const unsigned int next(unsigned int previous, unsigned int current) const;
 
     const unsigned int next(unsigned int current) const;
 
     void setNext(unsigned int previous, unsigned int current, unsigned int next);
+
+    bool addNeighbor(unsigned int current, unsigned int next);
+};
+
+class Tour : public VertexList {
+public:
+    using VertexList::VertexList;
 
     const unsigned int length(TsplibProblem &tsplibProblem);
 };

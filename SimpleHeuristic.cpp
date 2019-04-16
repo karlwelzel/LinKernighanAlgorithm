@@ -19,62 +19,83 @@
 // ============================================== TourParts class ======================================================
 // Enhanced UnionFind structure
 
-// TODO: Use TourVertex class to avoid unnecessary reverse operations
-TourParts::TourParts(unsigned int dimension) {
+// This class is a VertexList, so it also maintains a map that maps each vertex to its neighbors without specifying any
+// direction of these neighbors. At the beginning each vertex has no neighbors and then the individual connected
+// components (paths) are connected as needed. To make this as efficient as possible the parent of every connected
+// component starts the end vertices of the path that it (and all its children) are in.
+
+TourParts::TourParts(unsigned int dimension) : dimension(dimension) {
     for (unsigned int i = 0; i < dimension; ++i) {
         parent.push_back(i); // parent[i] = i
-        rank.push_back(0);   // rank[i] = 0
+        size.push_back(1);   // size[i] = 1
         // The tour initially only consists of the vertex i
-        tourPart.push_back(std::list<unsigned int>{i});
+        neighbors.emplace(i, std::make_pair(VertexList::NO_VERTEX, VertexList::NO_VERTEX));
+        pathEnds.emplace_back(i, i);
     }
 }
 
-const std::list<unsigned int> &TourParts::getTourPartOf(unsigned int i) {
-    return tourPart.at(find(i));
-}
-
 unsigned int TourParts::find(unsigned int x) {
-    if (parent.at(x) != x) {
+    if (parent.at(x) != x) { // path compression
         parent.at(x) = find(parent.at(x));
     }
     return parent.at(x);
 }
 
-int TourParts::join(unsigned int x, unsigned int y) {
+void TourParts::join(unsigned int x, unsigned int y) {
     // Join the parts of a tour that x and y are part of by adding the edge (x, y)
     unsigned int xr = find(x); // root of x
     unsigned int yr = find(y); // root of y
     if (xr == yr) {
-        return -1; // A tour part cannot be joined with itself, this would lead to non-Hamiltonian tours
+        return; // A path cannot be joined with itself, this would lead to non-Hamiltonian tours
     }
-    if (x == tourPart.at(xr).front() and y == tourPart.at(yr).front()) {
-        tourPart.at(xr).reverse();
-    } else if (x == tourPart.at(xr).front() and y == tourPart.at(yr).back()) {
-        tourPart.at(xr).reverse();
-        tourPart.at(yr).reverse();
-    } else if (x == tourPart.at(xr).back() and y == tourPart.at(yr).front()) {
-    } else if (x == tourPart.at(xr).back() and y == tourPart.at(yr).back()) {
-        tourPart.at(yr).reverse();
+    std::pair<unsigned int, unsigned int> newPathEnds;
+    if (x == pathEnds.at(xr).first and y == pathEnds.at(yr).first) {
+        newPathEnds = std::make_pair(pathEnds.at(xr).second, pathEnds.at(yr).second);
+    } else if (x == pathEnds.at(xr).first and y == pathEnds.at(yr).second) {
+        newPathEnds = std::make_pair(pathEnds.at(xr).second, pathEnds.at(yr).first);
+    } else if (x == pathEnds.at(xr).second and y == pathEnds.at(yr).first) {
+        newPathEnds = std::make_pair(pathEnds.at(xr).first, pathEnds.at(yr).second);
+    } else if (x == pathEnds.at(xr).second and y == pathEnds.at(yr).second) {
+        newPathEnds = std::make_pair(pathEnds.at(xr).first, pathEnds.at(yr).first);
     } else {
-        return -1; // x and y cannot be joined, because one of them is not an end of its tour part
+        return; // x and y cannot be joined, because one of them is not an end of its tour part
     }
-    // The tour parts can now be joined by adding tourPart.at(yr) at the end of tourPart.at(xr) or by adding
-    // tourPart.at(xr) at the beginning of tourPart.at(yr)
-    unsigned int newRoot;
-    if (rank.at(xr) > rank.at(yr)) {
-        newRoot = xr;
+
+    // Now make x and y neighbors of each other
+    if (!addNeighbor(x, y) or !addNeighbor(y, x)) {
+        throw std::runtime_error("You cannot join neighbors where one of them already has two neighbors.");
+    }
+
+    if (size.at(xr) > size.at(yr)) {
         parent.at(yr) = xr;
-        tourPart.at(xr).splice(tourPart.at(xr).end(), tourPart.at(yr));
+        size.at(xr) += size.at(yr);
+        pathEnds.at(xr) = newPathEnds;
     } else {
-        newRoot = yr;
         parent.at(xr) = yr;
-        tourPart.at(yr).splice(tourPart.at(yr).begin(), tourPart.at(xr));
+        size.at(yr) += size.at(xr);
+        pathEnds.at(yr) = newPathEnds;
     }
-    if (rank.at(xr) == rank.at(yr)) {
-        rank.at(yr)++;
-    }
-    return newRoot;
 }
+
+bool TourParts::isTourClosable() {
+    return size.at(find(0)) == dimension;
+}
+
+Tour TourParts::closeTour() {
+    // if there is only one root, then its also the root of 0
+    unsigned int root = find(0);
+    if (isTourClosable()) {
+        // join the last ends to form a tour
+        if (!addNeighbor(pathEnds.at(root).first, pathEnds.at(root).second) or
+            !addNeighbor(pathEnds.at(root).second, pathEnds.at(root).first)) {
+            throw std::runtime_error("You cannot join neighbors where one of them already has two neighbors.");
+        }
+        return Tour(neighbors);
+    } else {
+        throw std::runtime_error("The tour cannot be closed while there are multiple connected components");
+    }
+}
+
 
 // Compare edges by edge cost/distance given by a TsplibProblem
 class EdgeCostComparator {
@@ -115,9 +136,9 @@ Tour simpleHeuristic(TsplibProblem &tsplibProblem) {
 
     TourParts tourParts(tsplibProblem.getDimension());
     for (std::pair<unsigned int, unsigned int> edge : edges) {
-        int root = tourParts.join(edge.first, edge.second);
-        if (root >= 0 and tourParts.getTourPartOf(root).size() == tsplibProblem.getDimension()) {
-            return Tour(tourParts.getTourPartOf(root));
+        tourParts.join(edge.first, edge.second);
+        if (tourParts.isTourClosable()) {
+            return tourParts.closeTour();
         }
     }
 }
