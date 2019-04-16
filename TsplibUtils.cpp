@@ -1,3 +1,5 @@
+#include <utility>
+
 //
 // Created by Karl Welzel on 29/03/2019.
 //
@@ -234,31 +236,6 @@ int TsplibProblem::dist(unsigned int i, unsigned int j) const {
     }
 }
 
-// ================================================ TourVertex class ===================================================
-
-TourVertex::TourVertex() {
-    neighbors = std::make_pair(NO_VERTEX, NO_VERTEX);
-}
-
-TourVertex::TourVertex(const std::pair<unsigned int, unsigned int> &neighbors) : neighbors(neighbors) {}
-
-TourVertex::TourVertex(unsigned int neighbor1, unsigned int neighbor2) :
-        TourVertex(std::make_pair(neighbor1, neighbor2)) {}
-
-
-const std::pair<unsigned int, unsigned int> &TourVertex::getNeighbors() const {
-    return neighbors;
-}
-
-void TourVertex::setNeighbors(const std::pair<unsigned int, unsigned int> &neighbors) {
-    TourVertex::neighbors = neighbors;
-}
-
-void TourVertex::setNeighbors(const unsigned int neighbor1, const unsigned int neighbor2) {
-    setNeighbors(std::make_pair(neighbor1, neighbor2));
-}
-
-
 // =================================================== Tour class ======================================================
 
 Tour::Tour() = default;
@@ -271,14 +248,14 @@ void Tour::setVertices(const std::list<unsigned int> &tourList) {
     unsigned int current = *it;
     std::advance(it, 1);
     unsigned int next;
-    vertices.emplace(previous, TourVertex(tourList.back(), current));
+    vertices.emplace(previous, std::make_pair(tourList.back(), current));
     for (; it != tourList.end(); ++it) {
         next = *it;
-        vertices.emplace(current, TourVertex(previous, next));
+        vertices.emplace(current, std::make_pair(previous, next));
         previous = current;
         current = next;
     }
-    vertices.emplace(current, TourVertex(previous, tourList.front()));
+    vertices.emplace(current, std::make_pair(previous, tourList.front()));
 }
 
 
@@ -288,14 +265,10 @@ Tour::Tour(const std::list<unsigned int> &tourList) {
     setVertices(tourList);
 }
 
-const TourVertex Tour::tourVertexAt(const unsigned int &i) const {
-    return vertices.at(i);
-}
-
 // Which vertex comes after current, when previous comes before it?
 // previous is necessary to determine the direction
 const unsigned int Tour::next(unsigned int previous, unsigned int current) const {
-    std::pair<unsigned int, unsigned int> neighbors = vertices.at(current).getNeighbors();
+    std::pair<unsigned int, unsigned int> neighbors = vertices.at(current);
     if (previous != neighbors.first and previous != neighbors.second) {
         throw std::runtime_error(
                 "Tour::next: previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
@@ -307,42 +280,65 @@ const unsigned int Tour::next(unsigned int previous, unsigned int current) const
     }
 }
 
+// Returns some vertex, that is a neighbor of current
+const unsigned int Tour::next(unsigned int current) const {
+    return next(vertices.at(current).first, current);
+}
+
+
 // Set the vertex that comes after current, when previous comes before it?
 // previous is necessary to determine the direction
 void Tour::setNext(unsigned int previous, unsigned int current, unsigned int next) {
     if (previous == next) {
         throw std::runtime_error("Tour::setNext: You cannot set both neighbors to the same vertex.");
     }
-    std::pair<unsigned int, unsigned int> neighbors = vertices.at(current).getNeighbors();
+    std::pair<unsigned int, unsigned int> neighbors = vertices.at(current);
     if (previous != neighbors.first and previous != neighbors.second) {
         throw std::runtime_error(
                 "Tour::setNext: previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
                 std::to_string(current) + ")");
     }
-    vertices.at(current).setNeighbors(previous, next);
+    vertices.at(current) = std::make_pair(previous, next);
 }
 
 const unsigned int Tour::length(TsplibProblem &tsplibProblem) {
     unsigned int sum = 0;
-    int previous = 0, current = vertices.at(0).getNeighbors().second, next;
+    TourWalker tourWalker(*this, 0);
+    unsigned int currentVertex = tourWalker.getNextVertex();
+    unsigned int nextVertex = tourWalker.getNextVertex();
     do {
-        sum += tsplibProblem.dist(previous, current);
-        next = Tour::next(previous, current);
-        previous = current;
-        current = next;
-    } while (previous != 0);
+        sum += tsplibProblem.dist(currentVertex, nextVertex);
+        currentVertex = nextVertex;
+        nextVertex = tourWalker.getNextVertex();
+    } while (currentVertex != 0);
     return sum;
+}
+
+// =============================================== TourWalker class ====================================================
+
+// Create a TourWalker that starts the walk at vertex first
+TourWalker::TourWalker(const Tour &tour, unsigned int first) : TourWalker(tour, first, tour.next(first)) {}
+
+// Create a TourWalker that starts the walk at vertex first and then walks in the direction of vertex second
+TourWalker::TourWalker(const Tour &tour, unsigned int first, unsigned int second) : tour(tour), current(first),
+                                                                                    next(second) {}
+
+const unsigned int TourWalker::getNextVertex() {
+    unsigned int previous = current;
+    // Advance the walk
+    current = next;
+    next = tour.next(previous, current);
+    return previous;
 }
 
 std::ostream &operator<<(std::ostream &out, const Tour &tour) {
     std::string output;
-    int previous = 0, current = tour.tourVertexAt(0).getNeighbors().second, next;
+    TourWalker tourWalker(tour, 0);
+    unsigned int currentVertex = tourWalker.getNextVertex();
     do {
-        output += std::to_string(previous + 1) + ", ";
-        next = tour.next(previous, current);
-        previous = current;
-        current = next;
-    } while (previous != 0);
+        output += std::to_string(currentVertex + 1) + ", ";
+        currentVertex = tourWalker.getNextVertex();
+    } while (currentVertex != 0);
     out << output.substr(0, output.length() - 2) << std::endl;
     return out;
 }
@@ -431,4 +427,3 @@ std::string TsplibTour::readFile(std::ifstream &inputFile) {
 
     return "";
 }
-

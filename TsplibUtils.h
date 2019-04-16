@@ -42,31 +42,10 @@ public:
     int dist(unsigned int, unsigned int) const;
 };
 
-class TourVertex {
-private:
-    unsigned int NO_VERTEX = std::numeric_limits<unsigned int>::max();
-
-    std::pair<unsigned int, unsigned int> neighbors;
-
-public:
-    TourVertex();
-
-    TourVertex(unsigned int neighbor1, unsigned int neighbor2);
-
-    explicit TourVertex(const std::pair<unsigned int, unsigned int> &neighbors);
-
-    const std::pair<unsigned int, unsigned int> &getNeighbors() const;
-
-    void setNeighbors(const std::pair<unsigned int, unsigned int> &neighbors);
-
-    void setNeighbors(unsigned int neighbor1, unsigned int neighbor2);
-};
-
-// TODO: Refactor tour to be a map to individual TourVertex's that point to their neighbors
 class Tour {
 protected:
     // The vertices of this tour
-    std::map<unsigned int, TourVertex> vertices;
+    std::map<unsigned int, std::pair<unsigned int, unsigned int>> vertices;
 
     void setVertices(const std::list<unsigned int> &tourList);
 
@@ -75,9 +54,9 @@ public:
 
     explicit Tour(const std::list<unsigned int> &tourList);
 
-    const TourVertex tourVertexAt(const unsigned int &i) const;
-
     const unsigned int next(unsigned int previous, unsigned int current) const;
+
+    const unsigned int next(unsigned int current) const;
 
     void setNext(unsigned int previous, unsigned int current, unsigned int next);
 
@@ -87,12 +66,27 @@ public:
 std::ostream &operator<<(std::ostream &, const Tour &);
 
 
+class TourWalker {
+private:
+    Tour tour;
+    unsigned int current;
+    unsigned int next;
+
+public:
+    TourWalker(const Tour &tour, unsigned int first);
+
+    TourWalker(const Tour &tour, unsigned int first, unsigned int second);
+
+    const unsigned int getNextVertex();
+};
+
+
 class TsplibTour : public Tour {
 private:
     const char delimiter = ':';
 
-    std::string name;
-    std::string type;
+    std::string name = "";
+    std::string type = "";
     unsigned int dimension = 0;
 
     std::string interpretKeyword(const std::string &keyword, const std::string &value);
