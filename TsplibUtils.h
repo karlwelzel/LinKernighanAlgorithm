@@ -63,7 +63,7 @@ public:
 
     void setNext(unsigned int previous, unsigned int current, unsigned int next);
 
-    bool addNeighbor(unsigned int current, unsigned int next);
+    bool makeNeighbors(unsigned int vertex1, unsigned int vertex2);
 };
 
 class Tour : public VertexList {
@@ -71,6 +71,8 @@ public:
     using VertexList::VertexList;
 
     const unsigned int length(TsplibProblem &tsplibProblem);
+
+    bool isHamiltonianTour();
 };
 
 std::ostream &operator<<(std::ostream &, const Tour &);

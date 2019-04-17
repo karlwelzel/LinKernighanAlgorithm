@@ -218,6 +218,7 @@ unsigned int TsplibProblem::getDimension() const {
     return dimension;
 }
 
+// Compute the distance of i and j
 int TsplibProblem::dist(unsigned int i, unsigned int j) const {
     if (edgeWeightType == "EUC_2D") {
         double d = std::hypot(coordinates.at(i).at(0) - coordinates.at(j).at(0),
@@ -314,15 +315,26 @@ void VertexList::setNext(unsigned int previous, unsigned int current, unsigned i
     neighbors.at(current) = std::make_pair(previous, next);
 }
 
-// Tries to add the neighbor next to current and returns whether this was successful. It only fails if current already
-// has two neighbors.
-bool VertexList::addNeighbor(unsigned int current, unsigned int next) {
-    std::pair<unsigned int, unsigned int> currentNeighbors = neighbors.at(current);
-    if (currentNeighbors.first == NO_VERTEX) {
-        neighbors.at(current).first = next;
+// Tries to make vertex1 a neighbor of vertex2 and vertex2 a neighbor of vertex1 and returns wheter this was successful.
+// It only fails if one of them already has two neighbors.
+bool VertexList::makeNeighbors(unsigned int vertex1, unsigned int vertex2) {
+    std::pair<unsigned int, unsigned int> neighbors1 = neighbors.at(vertex1);
+    std::pair<unsigned int, unsigned int> neighbors2 = neighbors.at(vertex2);
+    if (neighbors1.first == NO_VERTEX and neighbors2.first == NO_VERTEX) {
+        neighbors.at(vertex1).first = vertex2;
+        neighbors.at(vertex2).first = vertex1;
         return true;
-    } else if (currentNeighbors.second == NO_VERTEX) {
-        neighbors.at(current).second = next;
+    } else if (neighbors1.first == NO_VERTEX and neighbors2.second == NO_VERTEX) {
+        neighbors.at(vertex1).first = vertex2;
+        neighbors.at(vertex2).second = vertex1;
+        return true;
+    } else if (neighbors1.second == NO_VERTEX and neighbors2.first == NO_VERTEX) {
+        neighbors.at(vertex1).second = vertex2;
+        neighbors.at(vertex2).first = vertex1;
+        return true;
+    } else if (neighbors1.second == NO_VERTEX and neighbors2.second == NO_VERTEX) {
+        neighbors.at(vertex1).second = vertex2;
+        neighbors.at(vertex2).second = vertex1;
         return true;
     } else {
         return false;
@@ -331,6 +343,7 @@ bool VertexList::addNeighbor(unsigned int current, unsigned int next) {
 
 // =================================================== Tour class ======================================================
 
+// Computes the length of the tour with the cost matrix given by a TSPLIB problem
 const unsigned int Tour::length(TsplibProblem &tsplibProblem) {
     unsigned int sum = 0;
     TourWalker tourWalker(*this, 0);
@@ -343,6 +356,26 @@ const unsigned int Tour::length(TsplibProblem &tsplibProblem) {
     } while (currentVertex != 0);
     return sum;
 }
+
+// Checks if this Tour really is a hamiltonian tour
+bool Tour::isHamiltonianTour() {
+    unsigned int dimension = neighbors.size();
+    std::vector<bool> visited(dimension, false);
+    TourWalker tourWalker(*this, 0);
+    unsigned int currentVertex = tourWalker.getNextVertex();
+    do {
+        if (currentVertex >= visited.size() or visited.at(currentVertex)) {
+            return false;
+        }
+        visited.at(currentVertex) = true;
+        currentVertex = tourWalker.getNextVertex();
+    } while (currentVertex != 0);
+    for (bool v : visited) {
+        if (!v) return false;
+    }
+    return true;
+}
+
 
 // =============================================== TourWalker class ====================================================
 

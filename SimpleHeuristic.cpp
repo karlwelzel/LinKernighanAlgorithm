@@ -62,7 +62,7 @@ void TourParts::join(unsigned int x, unsigned int y) {
     }
 
     // Now make x and y neighbors of each other
-    if (!addNeighbor(x, y) or !addNeighbor(y, x)) {
+    if (!makeNeighbors(x, y)) {
         throw std::runtime_error("You cannot join neighbors where one of them already has two neighbors.");
     }
 
@@ -86,8 +86,7 @@ Tour TourParts::closeTour() {
     unsigned int root = find(0);
     if (isTourClosable()) {
         // join the last ends to form a tour
-        if (!addNeighbor(pathEnds.at(root).first, pathEnds.at(root).second) or
-            !addNeighbor(pathEnds.at(root).second, pathEnds.at(root).first)) {
+        if (!makeNeighbors(pathEnds.at(root).first, pathEnds.at(root).second)) {
             throw std::runtime_error("You cannot join neighbors where one of them already has two neighbors.");
         }
         return Tour(neighbors);
