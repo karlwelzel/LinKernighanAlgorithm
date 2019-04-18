@@ -16,14 +16,27 @@
 #include "TsplibUtils.h"
 #include "SimpleHeuristic.h"
 
+/*
+ * The assignment is to implement a simple heuristic that sorts all of the edges by length and then tries one-by-one
+ * to add them to a subgraph that is always a subgraph of a Hamiltonian tour. This implementation uses an enhanced
+ * version of a UnionFind structure called "TourParts" to manage the connected components of this subgraph.
+ * The TourParts class is a subclass of VertexList and as such maintains a map that maps each vertex to its neighbors
+ * without specifying any direction of these neighbors. Each neighbor represents an outgoing edge of the vertex in the
+ * subgraph and every vertex has a maximum of two neighbors to ensure that it is a subgraph of a hamiltonian tour (this
+ * is not sufficient, but necessary). Using this map the TourParts class stores the current subgraph. Additionally it
+ * uses a UnionFind structures (UnionBySize) to store the connected components in this subgraph. In this case every
+ * connected component is path, so TourParts also stores both ends of every path in "pathEnds".
+ * At the beginning each vertex is a single connected component (or a path of length one) and then "join(x, y)" tries to
+ * connect the paths of x and y by adding the edge (x, y) (this works if and only if both x and y are ends of different
+ * paths). This is done for every edge sorted by length until there is only one connected component (= a hamiltonian
+ * path). At this point "closeTour" adds the unique edge that connects both ends of the path and returns the resulting
+ * tour.
+ */
+
+
 // ============================================== TourParts class ======================================================
-// Enhanced UnionFind structure
 
-// This class is a VertexList, so it also maintains a map that maps each vertex to its neighbors without specifying any
-// direction of these neighbors. At the beginning each vertex has no neighbors and then the individual connected
-// components (paths) are connected as needed. To make this as efficient as possible the parent of every connected
-// component starts the end vertices of the path that it (and all its children) are in.
-
+// Initialize this TourParts structure with dimension vertices
 TourParts::TourParts(unsigned int dimension) : dimension(dimension) {
     for (unsigned int i = 0; i < dimension; ++i) {
         parent.push_back(i); // parent[i] = i
@@ -34,6 +47,7 @@ TourParts::TourParts(unsigned int dimension) : dimension(dimension) {
     }
 }
 
+// Find the parent for vertex x
 unsigned int TourParts::find(unsigned int x) {
     if (parent.at(x) != x) { // path compression
         parent.at(x) = find(parent.at(x));
@@ -41,8 +55,9 @@ unsigned int TourParts::find(unsigned int x) {
     return parent.at(x);
 }
 
+// Try to join the connected components of x and y by adding the edge (x, y)
+// The function does not return whether this was successful
 void TourParts::join(unsigned int x, unsigned int y) {
-    // Join the parts of a tour that x and y are part of by adding the edge (x, y)
     unsigned int xr = find(x); // root of x
     unsigned int yr = find(y); // root of y
     if (xr == yr) {
@@ -77,10 +92,17 @@ void TourParts::join(unsigned int x, unsigned int y) {
     }
 }
 
+// Check whether there is only one connected component. In this case this component is a hamiltonian path and can only
+// be closed (to a tour) by a single edge that connects both ends of the path
 bool TourParts::isTourClosable() {
     return size.at(find(0)) == dimension;
 }
 
+// Try to close the tour by adding the unique edge that connects both ends of the only connected component. If there are
+// more than one component (i.e. isTourClosable() == false), this function throws an error, so you should always check
+// isTourClosable() before calling this function
+// After this function has been called the subgraph represented by neighbors is also a tour, so this object cannot be
+// used after this function was called
 Tour TourParts::closeTour() {
     // if there is only one root, then its also the root of 0
     unsigned int root = find(0);
@@ -111,16 +133,6 @@ public:
 };
 
 
-/*
- * The assignment was to implement a simple heuristic that sorts all of the edges by length and then tries one-by-one
- * to add them to a subgraph that is always a subgraph of a Hamiltonian tour. This implementation uses an enhanced
- * version of a UnionFind structure called "TourParts" to manage the connected components. In this case every connected
- * component is a path and a part of the final tour, so tourPart stores the current path as a std::list for every head
- * of a component. The "join" function tries to join two vertices and returns whether this was possible (both vertices
- * need to be at the end of a different path). In this way the algorithm tries to join every edge and stops when the
- * new path (after successful joining) contains every vertex. In this case only one edge can be used to close up the
- * tour and the result is returned.
- */
 Tour simpleHeuristic(TsplibProblem &tsplibProblem) {
     std::vector<std::pair<unsigned int, unsigned int>> edges;
     for (unsigned int i = 0; i < tsplibProblem.getDimension(); ++i) {

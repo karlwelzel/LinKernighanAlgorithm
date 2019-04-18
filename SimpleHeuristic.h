@@ -5,7 +5,7 @@
 #ifndef LINKERNINGHANALGORITHM_SIMPLEHEURISTIC_H
 #define LINKERNINGHANALGORITHM_SIMPLEHEURISTIC_H
 
-class TourParts : public VertexList { // Enhanced UnionFind structure
+class TourParts : public VertexList {
 private:
     unsigned int dimension;
     std::vector<unsigned int> parent;

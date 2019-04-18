@@ -7,6 +7,7 @@
 
 std::string trim(const std::string &, const std::string &);
 
+
 class TsplibProblem {
 private:
     const char delimiter = ':';
@@ -42,11 +43,10 @@ public:
     int dist(unsigned int, unsigned int) const;
 };
 
+
 class VertexList {
 protected:
     std::map<unsigned int, std::pair<unsigned int, unsigned int>> neighbors;
-
-    void setVertices(const std::list<unsigned int> &vertexList);
 
 public:
     unsigned int NO_VERTEX = std::numeric_limits<unsigned int>::max();
@@ -54,8 +54,6 @@ public:
     VertexList();
 
     explicit VertexList(std::map<unsigned int, std::pair<unsigned int, unsigned int>> neighbors);
-
-    explicit VertexList(const std::list<unsigned int> &vertexList);
 
     unsigned int next(unsigned int previous, unsigned int current) const;
 
@@ -67,8 +65,13 @@ public:
 };
 
 class Tour : public VertexList {
+protected:
+    void setVertices(const std::list<unsigned int> &vertexList);
+
 public:
     using VertexList::VertexList;
+
+    explicit Tour(const std::list<unsigned int> &vertexList);
 
     unsigned int length(TsplibProblem &tsplibProblem);
 
