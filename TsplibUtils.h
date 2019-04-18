@@ -57,9 +57,9 @@ public:
 
     explicit VertexList(const std::list<unsigned int> &vertexList);
 
-    const unsigned int next(unsigned int previous, unsigned int current) const;
+    unsigned int next(unsigned int previous, unsigned int current) const;
 
-    const unsigned int next(unsigned int current) const;
+    unsigned int next(unsigned int current) const;
 
     void setNext(unsigned int previous, unsigned int current, unsigned int next);
 
@@ -70,7 +70,7 @@ class Tour : public VertexList {
 public:
     using VertexList::VertexList;
 
-    const unsigned int length(TsplibProblem &tsplibProblem);
+    unsigned int length(TsplibProblem &tsplibProblem);
 
     bool isHamiltonianTour();
 };
@@ -89,7 +89,7 @@ public:
 
     TourWalker(const Tour &tour, unsigned int first, unsigned int second);
 
-    const unsigned int getNextVertex();
+    unsigned int getNextVertex();
 };
 
 

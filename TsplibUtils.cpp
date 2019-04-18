@@ -18,8 +18,8 @@
 
 // Trim whitespaces from the start and end of str
 std::string trim(const std::string &str, const std::string &whitespace = " \t") {
-    unsigned int start = str.find_first_not_of(whitespace);
-    unsigned int end = str.find_last_not_of(whitespace);
+    std::string::size_type start = str.find_first_not_of(whitespace);
+    std::string::size_type end = str.find_last_not_of(whitespace);
     if (start == std::string::npos) {
         return ""; // No non-whitespace character, trimming leaves only the empty string
     } else {
@@ -65,7 +65,7 @@ std::string TsplibProblem::interpretKeyword(const std::string &keyword, const st
 std::string TsplibProblem::readFile(std::ifstream &inputFile) {
     std::string line;
     std::string lastDataKeyword;
-    unsigned int delimiterIndex;
+    std::string::size_type delimiterIndex;
     std::vector<int> numbers; // All numbers in the TSPLIB file as they appear in EDGE_WEIGHT_SECTION
 
     while (inputFile) {
@@ -161,23 +161,23 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
         try {
             unsigned int numbersIndex = 0;
             if (edgeWeightFormat == "FULL_MATRIX") {
-                for (int i = 0; i < dimension; ++i) {
-                    for (int j = 0; j < dimension; ++j) {
+                for (unsigned int i = 0; i < dimension; ++i) {
+                    for (unsigned int j = 0; j < dimension; ++j) {
                         matrix[i][j] = numbers.at(numbersIndex);
                         numbersIndex++;
                     }
                 }
             } else if (edgeWeightFormat == "LOWER_DIAG_ROW") {
-                for (int i = 0; i < dimension; ++i) {
-                    for (int j = 0; j <= i; ++j) {
+                for (unsigned int i = 0; i < dimension; ++i) {
+                    for (unsigned int j = 0; j <= i; ++j) {
                         matrix[i][j] = numbers.at(numbersIndex);
                         matrix[j][i] = numbers.at(numbersIndex);
                         numbersIndex++;
                     }
                 }
             } else if (edgeWeightFormat == "UPPER_DIAG_ROW") {
-                for (int i = 0; i < dimension; ++i) {
-                    for (int j = i; j < dimension; ++j) {
+                for (unsigned int i = 0; i < dimension; ++i) {
+                    for (unsigned int j = i; j < dimension; ++j) {
                         matrix[i][j] = numbers.at(numbersIndex);
                         matrix[j][i] = numbers.at(numbersIndex);
                         numbersIndex++;
@@ -185,8 +185,8 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
                 }
             } else if (edgeWeightFormat == "UPPER_ROW") {
                 // The diagonal is never touched, so it is filled with zeros from the initialization
-                for (int i = 0; i < dimension; ++i) {
-                    for (int j = i + 1; j < dimension; ++j) {
+                for (unsigned int i = 0; i < dimension; ++i) {
+                    for (unsigned int j = i + 1; j < dimension; ++j) {
                         matrix[i][j] = numbers.at(numbersIndex);
                         matrix[j][i] = numbers.at(numbersIndex);
                         numbersIndex++;
@@ -275,7 +275,7 @@ VertexList::VertexList(const std::list<unsigned int> &vertexList) {
 
 // Which vertex comes after current, when previous comes before it?
 // previous is necessary to determine the direction
-const unsigned int VertexList::next(unsigned int previous, unsigned int current) const {
+unsigned int VertexList::next(unsigned int previous, unsigned int current) const {
     std::pair<unsigned int, unsigned int> currentNeighbors = neighbors.at(current);
     if (previous != currentNeighbors.first and previous != currentNeighbors.second) {
         throw std::runtime_error(
@@ -283,13 +283,13 @@ const unsigned int VertexList::next(unsigned int previous, unsigned int current)
                 std::to_string(current) + ")");
     } else if (previous == currentNeighbors.first) {
         return currentNeighbors.second;
-    } else if (previous == currentNeighbors.second) {
+    } else { // previous == currentNeighbors.second
         return currentNeighbors.first;
     }
 }
 
 // Returns some vertex, that is a neighbor of current, if one exists
-const unsigned int VertexList::next(unsigned int current) const {
+unsigned int VertexList::next(unsigned int current) const {
     std::pair<unsigned int, unsigned int> currentNeighbors = neighbors.at(current);
     if (currentNeighbors.first != NO_VERTEX) {
         return currentNeighbors.first;
@@ -344,7 +344,7 @@ bool VertexList::makeNeighbors(unsigned int vertex1, unsigned int vertex2) {
 // =================================================== Tour class ======================================================
 
 // Computes the length of the tour with the cost matrix given by a TSPLIB problem
-const unsigned int Tour::length(TsplibProblem &tsplibProblem) {
+unsigned int Tour::length(TsplibProblem &tsplibProblem) {
     unsigned int sum = 0;
     TourWalker tourWalker(*this, 0);
     unsigned int currentVertex = tourWalker.getNextVertex();
@@ -386,7 +386,7 @@ TourWalker::TourWalker(const Tour &tour, unsigned int first) : TourWalker(tour, 
 TourWalker::TourWalker(const Tour &tour, unsigned int first, unsigned int second) : tour(tour), current(first),
                                                                                     next(second) {}
 
-const unsigned int TourWalker::getNextVertex() {
+unsigned int TourWalker::getNextVertex() {
     unsigned int previous = current;
     // Advance the walk
     current = next;
@@ -436,7 +436,7 @@ std::string TsplibTour::interpretKeyword(const std::string &keyword, const std::
 std::string TsplibTour::readFile(std::ifstream &inputFile) {
     std::string line;
     std::string lastDataKeyword;
-    unsigned int delimiterIndex;
+    std::string::size_type delimiterIndex;
     std::list<unsigned int> tourList;
 
     while (inputFile) {

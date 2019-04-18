@@ -123,8 +123,8 @@ public:
  */
 Tour simpleHeuristic(TsplibProblem &tsplibProblem) {
     std::vector<std::pair<unsigned int, unsigned int>> edges;
-    for (int i = 0; i < tsplibProblem.getDimension(); ++i) {
-        for (int j = i + 1; j < tsplibProblem.getDimension(); ++j) {
+    for (unsigned int i = 0; i < tsplibProblem.getDimension(); ++i) {
+        for (unsigned int j = i + 1; j < tsplibProblem.getDimension(); ++j) {
             edges.emplace_back(i, j);
         }
     }
@@ -140,4 +140,6 @@ Tour simpleHeuristic(TsplibProblem &tsplibProblem) {
             return tourParts.closeTour();
         }
     }
+
+    throw std::runtime_error("SimpleHeuristic: Although every edge was checked, no tour has been found.");
 }
