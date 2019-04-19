@@ -18,6 +18,8 @@ class VertexList {
 protected:
     std::vector<std::pair<vertex_t, vertex_t>> neighbors;
 
+    void setNext(vertex_t previous, vertex_t current, vertex_t next);
+
 public:
     vertex_t NO_VERTEX = std::numeric_limits<unsigned int>::max();
 
@@ -32,8 +34,6 @@ public:
     vertex_t next(vertex_t previous, vertex_t current) const;
 
     vertex_t next(vertex_t current) const;
-
-    void setNext(vertex_t previous, vertex_t current, vertex_t next);
 
     bool makeNeighbors(vertex_t vertex1, vertex_t vertex2);
 };

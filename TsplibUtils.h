@@ -2,14 +2,16 @@
 // Created by Karl Welzel on 19/04/2019.
 //
 
-#ifndef LINKERNINGHANALGORITHM_TSPLIBPROBLEM_H
-#define LINKERNINGHANALGORITHM_TSPLIBPROBLEM_H
+#ifndef LINKERNINGHANALGORITHM_TSPLIBUTILS_H
+#define LINKERNINGHANALGORITHM_TSPLIBUTILS_H
 
 #include <string>
 #include <vector>
 #include "Tour.h"
 
+
 std::string trim(const std::string &str, const std::string &whitespace = " \t");
+
 
 class TsplibProblem {
 private:
@@ -49,4 +51,23 @@ public:
     distance_t length(Tour &tour);
 };
 
-#endif //LINKERNINGHANALGORITHM_TSPLIBPROBLEM_H
+
+class TsplibTour : public Tour {
+private:
+    const char delimiter = ':';
+
+    std::string name = "";
+    std::string type = "";
+    dimension_t dimension = 0;
+
+    std::string interpretKeyword(const std::string &keyword, const std::string &value);
+
+public:
+    const std::string &getName() const;
+
+    const std::string &getType() const;
+
+    std::string readFile(std::ifstream &inputFile);
+};
+
+#endif //LINKERNINGHANALGORITHM_TSPLIBUTILS_H

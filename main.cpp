@@ -1,12 +1,10 @@
 #include <iostream>
 #include <fstream>
 #include "Tour.h"
-#include "TsplibProblem.h"
-#include "TsplibTour.h"
+#include "TsplibUtils.h"
 #include "SimpleHeuristic.h"
 
-// TODO: Don't let Tour be a subclass of VertexList, but instead use it internally and make all Tours constant ???
-// TODO: Merge TsplibProblem and TsplibTour
+// NOTODO: Don't let Tour be a subclass of VertexList, but instead use it internally and make all Tours constant ???
 // TODO: Refactor all const in this code
 
 int main(int argc, char *argv[]) {

@@ -6,7 +6,7 @@
 #define LINKERNINGHANALGORITHM_SIMPLEHEURISTIC_H
 
 #include "Tour.h"
-#include "TsplibProblem.h"
+#include "TsplibUtils.h"
 
 class TourParts : public VertexList {
 private:

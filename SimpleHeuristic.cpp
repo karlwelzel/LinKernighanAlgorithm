@@ -52,7 +52,7 @@ void TourParts::join(vertex_t x, vertex_t y) {
     if (xr == yr) {
         return; // A path cannot be joined with itself, this would lead to non-Hamiltonian tours
     }
-    std::pair<unsigned int, unsigned int> newPathEnds;
+    std::pair<vertex_t, vertex_t> newPathEnds;
     if (x == pathEnds.at(xr).first and y == pathEnds.at(yr).first) {
         newPathEnds = std::make_pair(pathEnds.at(xr).second, pathEnds.at(yr).second);
     } else if (x == pathEnds.at(xr).first and y == pathEnds.at(yr).second) {
