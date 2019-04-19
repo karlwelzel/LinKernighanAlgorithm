@@ -14,12 +14,13 @@
 // these objects.
 // This class is the base class for Tour.
 
+const vertex_t VertexList::NO_VERTEX = std::numeric_limits<unsigned int>::max();
 
 VertexList::VertexList() = default;
 
 // Create dimension vertices, each with no neighbors
 VertexList::VertexList(dimension_t dimension) {
-    neighbors.assign(dimension, std::make_pair(VertexList::NO_VERTEX, VertexList::NO_VERTEX));
+    neighbors.assign(dimension, std::make_pair(NO_VERTEX, NO_VERTEX));
 }
 
 VertexList::VertexList(std::vector<std::pair<vertex_t, vertex_t>> neighbors) :
@@ -108,7 +109,7 @@ bool VertexList::makeNeighbors(vertex_t vertex1, vertex_t vertex2) {
 // adjacent entries in "vertexList" (start and end are also adjacent)
 // This expects a list containing the numbers from 0 to tour.size()-1 and clears neighbors
 void Tour::setVertices(const std::list<vertex_t> &vertexList) {
-    neighbors.assign(vertexList.size(), std::make_pair(VertexList::NO_VERTEX, VertexList::NO_VERTEX));
+    neighbors.assign(vertexList.size(), std::make_pair(NO_VERTEX, NO_VERTEX));
     auto it = vertexList.begin();
     vertex_t previous = *it;
     std::advance(it, 1);
@@ -147,9 +148,8 @@ bool Tour::isHamiltonianTour() {
 
 // =============================================== TourWalker class ====================================================
 
-// This class provides a way to walk through a Tour. It stores the tour, its current and next vertex (to store the
-// direction) and can be advanced by "getNextVertex". The tour object can still be altered while walking through it!
-// TODO: Check the claim above
+// This class provides a way to walk through a Tour. It stores a copy of the tour, its current and next vertex (to store
+// the direction) and can be advanced by "getNextVertex".
 
 
 // Create a TourWalker that starts the walk at vertex first

@@ -21,7 +21,7 @@ protected:
     void setNext(vertex_t previous, vertex_t current, vertex_t next);
 
 public:
-    vertex_t NO_VERTEX = std::numeric_limits<unsigned int>::max();
+    static const vertex_t NO_VERTEX;
 
     VertexList();
 
@@ -43,6 +43,7 @@ protected:
     void setVertices(const std::list<vertex_t> &vertexList);
 
 public:
+    // TODO: Replace these with checks that it really is a hamiltonian tour
     using VertexList::VertexList;
 
     bool isHamiltonianTour();
