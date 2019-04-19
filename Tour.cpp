@@ -1,0 +1,193 @@
+#include <utility>
+
+//
+// Created by Karl Welzel on 19/04/2019.
+//
+
+#include <regex>
+#include <fstream>
+#include <list>
+#include <cmath>
+#include <iostream>
+#include "Tour.h"
+
+
+// ================================================ VertexList class ===================================================
+
+// This class maintains a map that stores a maximum of two neighbors of each vertex. There is no inherent direction
+// encoded in these neighbors. This gives additional flexibility when compared to std::list while still having similar
+// run times. It is possible to create tours that do not contain every vertex or multiple separate paths or even have a
+// vertex x with neighbor y while y does not have x as its neighbor, so extra caution is necessary when manipulating
+// these objects.
+// This class is the base class for Tour.
+
+
+VertexList::VertexList() = default;
+
+VertexList::VertexList(std::map<unsigned int, std::pair<unsigned int, unsigned int>> neighbors) :
+        neighbors(std::move(neighbors)) {}
+
+// Which vertex comes after current, when previous comes before it?
+// previous is necessary to determine the direction
+unsigned int VertexList::next(unsigned int previous, unsigned int current) const {
+    std::pair<unsigned int, unsigned int> currentNeighbors = neighbors.at(current);
+    if (previous != currentNeighbors.first and previous != currentNeighbors.second) {
+        throw std::runtime_error(
+                "Tour::next: previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
+                std::to_string(current) + ")");
+    } else if (previous == currentNeighbors.first) {
+        return currentNeighbors.second;
+    } else { // previous == currentNeighbors.second
+        return currentNeighbors.first;
+    }
+}
+
+// Returns some vertex, that is a neighbor of current, if one exists
+unsigned int VertexList::next(unsigned int current) const {
+    std::pair<unsigned int, unsigned int> currentNeighbors = neighbors.at(current);
+    if (currentNeighbors.first != NO_VERTEX) {
+        return currentNeighbors.first;
+    } else if (currentNeighbors.second != NO_VERTEX) {
+        return currentNeighbors.second;
+    } else {
+        return NO_VERTEX;
+    }
+}
+
+// Set the vertex that comes after current, when previous comes before it. The neighbors of next are not changed!
+// previous is necessary to determine the direction
+void VertexList::setNext(unsigned int previous, unsigned int current, unsigned int next) {
+    if (previous == next) {
+        throw std::runtime_error("Tour::setNext: You cannot set both neighbors to the same vertex.");
+    }
+    std::pair<unsigned int, unsigned int> currentNeighbors = neighbors.at(current);
+    if (previous != currentNeighbors.first and previous != currentNeighbors.second) {
+        throw std::runtime_error(
+                "Tour::setNext: previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
+                std::to_string(current) + ")");
+    }
+    neighbors.at(current) = std::make_pair(previous, next);
+}
+
+// Tries to make vertex1 a neighbor of vertex2 and vertex2 a neighbor of vertex1 and returns whether this was
+// successful. It only fails if one of them already has two neighbors.
+bool VertexList::makeNeighbors(unsigned int vertex1, unsigned int vertex2) {
+    std::pair<unsigned int, unsigned int> neighbors1 = neighbors.at(vertex1);
+    std::pair<unsigned int, unsigned int> neighbors2 = neighbors.at(vertex2);
+    if (neighbors1.first == NO_VERTEX and neighbors2.first == NO_VERTEX) {
+        neighbors.at(vertex1).first = vertex2;
+        neighbors.at(vertex2).first = vertex1;
+        return true;
+    } else if (neighbors1.first == NO_VERTEX and neighbors2.second == NO_VERTEX) {
+        neighbors.at(vertex1).first = vertex2;
+        neighbors.at(vertex2).second = vertex1;
+        return true;
+    } else if (neighbors1.second == NO_VERTEX and neighbors2.first == NO_VERTEX) {
+        neighbors.at(vertex1).second = vertex2;
+        neighbors.at(vertex2).first = vertex1;
+        return true;
+    } else if (neighbors1.second == NO_VERTEX and neighbors2.second == NO_VERTEX) {
+        neighbors.at(vertex1).second = vertex2;
+        neighbors.at(vertex2).second = vertex1;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+
+// =================================================== Tour class ======================================================
+
+// This class represents a Tour, but as a subclass of VertexList, neighbors can be manipulated in a variety of ways so
+// that it is not actually a class. It is possible to check that with "isHamiltonianTour"
+
+
+// Initialize the neighbors map with a std::list that represents a tour. For each vertex x the neighbors are the
+// adjacent entries in "vertexList" (start and end are also adjacent)
+// This expects a list containing the numbers from 0 to tour.size()-1 and clears neighbors
+void Tour::setVertices(const std::list<unsigned int> &vertexList) {
+    neighbors.clear();
+    auto it = vertexList.begin();
+    unsigned int previous = *it;
+    std::advance(it, 1);
+    unsigned int current = *it;
+    std::advance(it, 1);
+    unsigned int next;
+    neighbors.emplace(previous, std::make_pair(vertexList.back(), current));
+    for (; it != vertexList.end(); ++it) {
+        next = *it;
+        neighbors.emplace(current, std::make_pair(previous, next));
+        previous = current;
+        current = next;
+    }
+    neighbors.emplace(current, std::make_pair(previous, vertexList.front()));
+}
+
+// Computes the length of the tour with the cost matrix given by a TSPLIB problem
+unsigned int Tour::length(TsplibProblem &tsplibProblem) {
+    unsigned int sum = 0;
+    TourWalker tourWalker(*this, 0);
+    unsigned int currentVertex = tourWalker.getNextVertex();
+    unsigned int nextVertex = tourWalker.getNextVertex();
+    do {
+        sum += tsplibProblem.dist(currentVertex, nextVertex);
+        currentVertex = nextVertex;
+        nextVertex = tourWalker.getNextVertex();
+    } while (currentVertex != 0);
+    return sum;
+}
+
+// Checks if this Tour really is a hamiltonian tour
+bool Tour::isHamiltonianTour() {
+    unsigned int dimension = neighbors.size();
+    std::vector<bool> visited(dimension, false);
+    TourWalker tourWalker(*this, 0);
+    unsigned int currentVertex = tourWalker.getNextVertex();
+    do {
+        if (currentVertex >= visited.size() or visited.at(currentVertex)) {
+            return false;
+        }
+        visited.at(currentVertex) = true;
+        currentVertex = tourWalker.getNextVertex();
+    } while (currentVertex != 0);
+    for (bool v : visited) {
+        if (!v) return false;
+    }
+    return true;
+}
+
+
+// =============================================== TourWalker class ====================================================
+
+// This class provides a way to walk through a Tour. It stores the tour, its current and next vertex (to store the
+// direction) and can be advanced by "getNextVertex". The tour object can still be altered while walking through it!
+// TODO: Check the claim above
+
+
+// Create a TourWalker that starts the walk at vertex first
+TourWalker::TourWalker(const Tour &tour, unsigned int first) : TourWalker(tour, first, tour.next(first)) {}
+
+// Create a TourWalker that starts the walk at vertex first and then walks in the direction of vertex second
+TourWalker::TourWalker(Tour tour, unsigned int first, unsigned int second) : tour(std::move(tour)),
+                                                                             current(first), next(second) {}
+
+// Advance the walk and get the next vertex
+unsigned int TourWalker::getNextVertex() {
+    unsigned int previous = current;
+    current = next;
+    next = tour.next(previous, current);
+    return previous;
+}
+
+// Output the tour to the stream out, typically used with std::cout
+std::ostream &operator<<(std::ostream &out, const Tour &tour) {
+    std::string output;
+    TourWalker tourWalker(tour, 0);
+    unsigned int currentVertex = tourWalker.getNextVertex();
+    do {
+        output += std::to_string(currentVertex + 1) + ", ";
+        currentVertex = tourWalker.getNextVertex();
+    } while (currentVertex != 0);
+    out << output.substr(0, output.length() - 2) << std::endl;
+    return out;
+}

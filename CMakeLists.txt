@@ -3,4 +3,5 @@ project(LinKerninghanAlgorithm)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(LinKerninghanAlgorithm main.cpp TsplibUtils.cpp TsplibUtils.h SimpleHeuristic.cpp SimpleHeuristic.h)
+add_executable(LinKerninghanAlgorithm main.cpp Tour.cpp Tour.h TsplibProblem.cpp TsplibProblem.h
+        TsplibTour.cpp TsplibTour.h SimpleHeuristic.cpp SimpleHeuristic.h)

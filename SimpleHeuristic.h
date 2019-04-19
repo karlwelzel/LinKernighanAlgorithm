@@ -5,6 +5,9 @@
 #ifndef LINKERNINGHANALGORITHM_SIMPLEHEURISTIC_H
 #define LINKERNINGHANALGORITHM_SIMPLEHEURISTIC_H
 
+#include "Tour.h"
+#include "TsplibProblem.h"
+
 class TourParts : public VertexList {
 private:
     unsigned int dimension;

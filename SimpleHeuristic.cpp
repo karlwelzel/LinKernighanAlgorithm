@@ -13,7 +13,6 @@
 #include <sstream>
 #include <algorithm>
 #include <regex>
-#include "TsplibUtils.h"
 #include "SimpleHeuristic.h"
 
 /*
@@ -101,8 +100,8 @@ bool TourParts::isTourClosable() {
 // Try to close the tour by adding the unique edge that connects both ends of the only connected component. If there are
 // more than one component (i.e. isTourClosable() == false), this function throws an error, so you should always check
 // isTourClosable() before calling this function
-// After this function has been called the subgraph represented by neighbors is also a tour, so this object cannot be
-// used after this function was called
+// After this function has been called the subgraph represented by neighbors is also a tour, so this object should not
+// be used after this function was called
 Tour TourParts::closeTour() {
     // if there is only one root, then its also the root of 0
     unsigned int root = find(0);

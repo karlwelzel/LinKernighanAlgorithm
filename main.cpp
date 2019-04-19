@@ -7,7 +7,8 @@
 #include <sstream>
 #include <algorithm>
 #include <regex>
-#include "TsplibUtils.h"
+#include "Tour.h"
+#include "TsplibTour.h"
 #include "SimpleHeuristic.h"
 
 // TODO: Create a alias for unsigned int or size_t that represents a vertex
@@ -20,7 +21,7 @@ int main(int argc, char *argv[]) {
     if (argc < 2) {
         std::cerr << "No file supplied." << std::endl;
         std::cout << "Usage:" << std::endl;
-        std::cout << "    LinKerninghanAlgorithm.exe tsplib_problem.tsp [optimal_tour.opt.tour]" << std::endl;
+        std::cout << "    LinKerninghanAlgorithm tsplib_problem.tsp [optimal_tour.opt.tour]" << std::endl;
         return 1;
     } else {
         problemFile.open(argv[1]);
