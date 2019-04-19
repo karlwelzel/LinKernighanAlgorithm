@@ -2,16 +2,10 @@
 // Created by karl on 19.04.19.
 //
 
-#include "TsplibProblem.h"
 #include <regex>
-#include <algorithm>
-#include <sstream>
 #include <fstream>
-#include <list>
-#include <vector>
 #include <cmath>
-#include <iostream>
-#include <utility>
+#include "TsplibProblem.h"
 #include "TsplibTour.h"
 
 // ============================================== TsplibTour class =====================================================
@@ -33,7 +27,7 @@ std::string TsplibTour::interpretKeyword(const std::string &keyword, const std::
 
     } else if (keyword == "COMMENT") {
     } else if (keyword == "DIMENSION") {
-        dimension = static_cast<unsigned int>(stoi(value));
+        dimension = static_cast<dimension_t>(stoi(value));
     } // every unknown keyword is ignored
     return "";
 }
@@ -44,7 +38,7 @@ std::string TsplibTour::readFile(std::ifstream &inputFile) {
     std::string line;
     std::string lastDataKeyword;
     std::string::size_type delimiterIndex;
-    std::list<unsigned int> tourList;
+    std::list<vertex_t> tourList;
 
     while (inputFile) {
         getline(inputFile, line);
@@ -71,11 +65,13 @@ std::string TsplibTour::readFile(std::ifstream &inputFile) {
                 if (lastDataKeyword == "TOUR_SECTION") {
                     // Every line is one single integer
                     std::stringstream stream(line);
-                    int n;
-                    while (stream >> n) {
-                        if (n >= 1) {
-                            tourList.push_back(n - 1);
-                        }
+                    vertex_t number;
+                    if (line == "-1") {
+                        lastDataKeyword.clear(); // The TOUR_SECTION is over
+                    } else if (stream >> number and number >= 1) {
+                        tourList.push_back(number - 1);
+                    } else {
+                        return "Expected a vertex or -1 in TOUR_SECTION, but got '" + line + "'";
                     }
                 } else if (!lastDataKeyword.empty()) {
                     // lastDataKeyword is unknown, so this block of data will be skipped

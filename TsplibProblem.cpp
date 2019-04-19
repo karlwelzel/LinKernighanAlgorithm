@@ -42,7 +42,7 @@ std::string TsplibProblem::interpretKeyword(const std::string &keyword, const st
 
     } else if (keyword == "COMMENT") {
     } else if (keyword == "DIMENSION") {
-        dimension = static_cast<unsigned int>(stoi(value));
+        dimension = static_cast<dimension_t>(stoi(value));
     } else if (keyword == "EDGE_WEIGHT_TYPE") {
         edgeWeightType = value;
         if (edgeWeightType != "EUC_2D" and edgeWeightType != "CEIL_2D" and edgeWeightType != "EXPLICIT") {
@@ -69,7 +69,7 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
     std::string line;
     std::string lastDataKeyword;
     std::string::size_type delimiterIndex;
-    std::vector<int> numbers; // All numbers in the TSPLIB file as they appear in EDGE_WEIGHT_SECTION
+    std::vector<distance_t> numbers; // All numbers in the TSPLIB file as they appear in EDGE_WEIGHT_SECTION
 
     while (inputFile) {
         getline(inputFile, line);
@@ -112,7 +112,7 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
                     // Already checked: nodeCoordType == "TWOD_COORDS"
                     // Every line has the format <integer> <real> <real>
                     std::stringstream stream(line);
-                    unsigned int n = 0;
+                    vertex_t n = 0;
                     double x = 0, y = 0;
                     stream >> n >> x >> y;
                     try {
@@ -123,7 +123,7 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
                 } else if (lastDataKeyword == "EDGE_WEIGHT_SECTION") {
                     // Every line is a sequence of integers separated by whitespaces
                     std::stringstream stream(line);
-                    int n;
+                    distance_t n;
                     while (stream >> n) {
                         numbers.push_back(n);
                     }
@@ -161,27 +161,27 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
     // Fill the matrix of distances properly
     if (edgeWeightType == "EXPLICIT") {
         // Initialize the matrix with zeros
-        matrix = std::vector<std::vector<int> >(dimension, std::vector<int>(dimension));
+        matrix.assign(dimension, std::vector<distance_t>(dimension, 0));
         try {
-            unsigned int numbersIndex = 0;
+            size_t numbersIndex = 0;
             if (edgeWeightFormat == "FULL_MATRIX") {
-                for (unsigned int i = 0; i < dimension; ++i) {
-                    for (unsigned int j = 0; j < dimension; ++j) {
+                for (vertex_t i = 0; i < dimension; ++i) {
+                    for (vertex_t j = 0; j < dimension; ++j) {
                         matrix[i][j] = numbers.at(numbersIndex);
                         numbersIndex++;
                     }
                 }
             } else if (edgeWeightFormat == "LOWER_DIAG_ROW") {
-                for (unsigned int i = 0; i < dimension; ++i) {
-                    for (unsigned int j = 0; j <= i; ++j) {
+                for (vertex_t i = 0; i < dimension; ++i) {
+                    for (vertex_t j = 0; j <= i; ++j) {
                         matrix[i][j] = numbers.at(numbersIndex);
                         matrix[j][i] = numbers.at(numbersIndex);
                         numbersIndex++;
                     }
                 }
             } else if (edgeWeightFormat == "UPPER_DIAG_ROW") {
-                for (unsigned int i = 0; i < dimension; ++i) {
-                    for (unsigned int j = i; j < dimension; ++j) {
+                for (vertex_t i = 0; i < dimension; ++i) {
+                    for (vertex_t j = i; j < dimension; ++j) {
                         matrix[i][j] = numbers.at(numbersIndex);
                         matrix[j][i] = numbers.at(numbersIndex);
                         numbersIndex++;
@@ -189,8 +189,8 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
                 }
             } else if (edgeWeightFormat == "UPPER_ROW") {
                 // The diagonal is never touched, so it is filled with zeros from the initialization
-                for (unsigned int i = 0; i < dimension; ++i) {
-                    for (unsigned int j = i + 1; j < dimension; ++j) {
+                for (vertex_t i = 0; i < dimension; ++i) {
+                    for (vertex_t j = i + 1; j < dimension; ++j) {
                         matrix[i][j] = numbers.at(numbersIndex);
                         matrix[j][i] = numbers.at(numbersIndex);
                         numbersIndex++;
@@ -219,23 +219,38 @@ const std::string &TsplibProblem::getType() const {
 }
 
 // Returns the number of vertices in the TSPLIB problem
-unsigned int TsplibProblem::getDimension() const {
+dimension_t TsplibProblem::getDimension() const {
     return dimension;
 }
 
 // Compute the distance of i and j
-int TsplibProblem::dist(unsigned int i, unsigned int j) const {
+distance_t TsplibProblem::dist(vertex_t i, vertex_t j) const {
     if (edgeWeightType == "EUC_2D") {
         double d = hypot(coordinates.at(i).at(0) - coordinates.at(j).at(0),
                          coordinates.at(i).at(1) - coordinates.at(j).at(1));
-        return lround(d);
+        return static_cast<distance_t>(lround(d)); // lround(d) >= 0, so casting does not produce any errors
     } else if (edgeWeightType == "CEIL_2D") {
         double d = hypot(coordinates.at(i).at(0) - coordinates.at(j).at(0),
                          coordinates.at(i).at(1) - coordinates.at(j).at(1));
-        return ceil(d);
+        // ceil(d) is a double and to prevent errors the result is rounded before casting to distance_t
+        return static_cast<distance_t>(lround(ceil(d)));
     } else if (edgeWeightType == "EXPLICIT") {
         return matrix.at(i).at(j);
     } else {
         throw std::runtime_error("The EDGE_WEIGHT_TYPE '" + edgeWeightType + "' is not supported.");
     }
 }
+
+distance_t TsplibProblem::length(Tour &tour) {
+    distance_t sum = 0;
+    TourWalker tourWalker(tour, 0);
+    vertex_t currentVertex = tourWalker.getNextVertex();
+    vertex_t nextVertex = tourWalker.getNextVertex();
+    do {
+        sum += dist(currentVertex, nextVertex);
+        currentVertex = nextVertex;
+        nextVertex = tourWalker.getNextVertex();
+    } while (currentVertex != 0);
+    return sum;
+}
+

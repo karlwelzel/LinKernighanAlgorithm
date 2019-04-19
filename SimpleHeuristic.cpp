@@ -4,15 +4,7 @@
 
 // This library contains the code for the introduction assignment
 
-#include <utility>
-#include <iostream>
-#include <cmath>
-#include <vector>
-#include <list>
-#include <fstream>
-#include <sstream>
 #include <algorithm>
-#include <regex>
 #include "SimpleHeuristic.h"
 
 /*
@@ -36,18 +28,17 @@
 // ============================================== TourParts class ======================================================
 
 // Initialize this TourParts structure with dimension vertices
-TourParts::TourParts(unsigned int dimension) : dimension(dimension) {
-    for (unsigned int i = 0; i < dimension; ++i) {
+TourParts::TourParts(dimension_t dimension) : dimension(dimension) {
+    for (dimension_t i = 0; i < dimension; ++i) {
         parent.push_back(i); // parent[i] = i
         size.push_back(1);   // size[i] = 1
-        // The tour initially only consists of the vertex i
         neighbors.emplace(i, std::make_pair(VertexList::NO_VERTEX, VertexList::NO_VERTEX));
         pathEnds.emplace_back(i, i);
     }
 }
 
 // Find the parent for vertex x
-unsigned int TourParts::find(unsigned int x) {
+vertex_t TourParts::find(vertex_t x) {
     if (parent.at(x) != x) { // path compression
         parent.at(x) = find(parent.at(x));
     }
@@ -56,21 +47,26 @@ unsigned int TourParts::find(unsigned int x) {
 
 // Try to join the connected components of x and y by adding the edge (x, y)
 // The function does not return whether this was successful
-void TourParts::join(unsigned int x, unsigned int y) {
-    unsigned int xr = find(x); // root of x
-    unsigned int yr = find(y); // root of y
+void TourParts::join(vertex_t x, vertex_t y) {
+    vertex_t xr = find(x); // root of x
+    vertex_t yr = find(y); // root of y
     if (xr == yr) {
         return; // A path cannot be joined with itself, this would lead to non-Hamiltonian tours
     }
-    std::pair<unsigned int, unsigned int> newPathEnds;
+    vertex_t firstPathEnd;
+    vertex_t secondPathEnd;
     if (x == pathEnds.at(xr).first and y == pathEnds.at(yr).first) {
-        newPathEnds = std::make_pair(pathEnds.at(xr).second, pathEnds.at(yr).second);
+        firstPathEnd = pathEnds.at(xr).second;
+        secondPathEnd = pathEnds.at(yr).second;
     } else if (x == pathEnds.at(xr).first and y == pathEnds.at(yr).second) {
-        newPathEnds = std::make_pair(pathEnds.at(xr).second, pathEnds.at(yr).first);
+        firstPathEnd = pathEnds.at(xr).second;
+        secondPathEnd = pathEnds.at(yr).first;
     } else if (x == pathEnds.at(xr).second and y == pathEnds.at(yr).first) {
-        newPathEnds = std::make_pair(pathEnds.at(xr).first, pathEnds.at(yr).second);
+        firstPathEnd = pathEnds.at(xr).first;
+        secondPathEnd = pathEnds.at(yr).second;
     } else if (x == pathEnds.at(xr).second and y == pathEnds.at(yr).second) {
-        newPathEnds = std::make_pair(pathEnds.at(xr).first, pathEnds.at(yr).first);
+        firstPathEnd = pathEnds.at(xr).first;
+        secondPathEnd = pathEnds.at(yr).first;
     } else {
         return; // x and y cannot be joined, because one of them is not an end of its tour part
     }
@@ -83,11 +79,13 @@ void TourParts::join(unsigned int x, unsigned int y) {
     if (size.at(xr) > size.at(yr)) {
         parent.at(yr) = xr;
         size.at(xr) += size.at(yr);
-        pathEnds.at(xr) = newPathEnds;
+        pathEnds.at(xr).first = firstPathEnd;
+        pathEnds.at(xr).second = secondPathEnd;
     } else {
         parent.at(xr) = yr;
         size.at(yr) += size.at(xr);
-        pathEnds.at(yr) = newPathEnds;
+        pathEnds.at(yr).first = firstPathEnd;
+        pathEnds.at(yr).second = secondPathEnd;
     }
 }
 
@@ -104,7 +102,7 @@ bool TourParts::isTourClosable() {
 // be used after this function was called
 Tour TourParts::closeTour() {
     // if there is only one root, then its also the root of 0
-    unsigned int root = find(0);
+    vertex_t root = find(0);
     if (isTourClosable()) {
         // join the last ends to form a tour
         if (!makeNeighbors(pathEnds.at(root).first, pathEnds.at(root).second)) {
@@ -125,17 +123,17 @@ private:
 public:
     explicit EdgeCostComparator(TsplibProblem &tsplibProblem) : tsplibProblem(tsplibProblem) {}
 
-    bool operator()(const std::pair<unsigned int, unsigned int> edge1,
-                    const std::pair<unsigned int, unsigned int> edge2) const {
+    bool operator()(const std::pair<vertex_t, vertex_t> edge1,
+                    const std::pair<vertex_t, vertex_t> edge2) const {
         return (tsplibProblem.dist(edge1.first, edge1.second) < tsplibProblem.dist(edge2.first, edge2.second));
     }
 };
 
 
 Tour simpleHeuristic(TsplibProblem &tsplibProblem) {
-    std::vector<std::pair<unsigned int, unsigned int>> edges;
-    for (unsigned int i = 0; i < tsplibProblem.getDimension(); ++i) {
-        for (unsigned int j = i + 1; j < tsplibProblem.getDimension(); ++j) {
+    std::vector<std::pair<vertex_t, vertex_t>> edges;
+    for (vertex_t i = 0; i < tsplibProblem.getDimension(); ++i) {
+        for (vertex_t j = i + 1; j < tsplibProblem.getDimension(); ++j) {
             edges.emplace_back(i, j);
         }
     }
@@ -145,7 +143,7 @@ Tour simpleHeuristic(TsplibProblem &tsplibProblem) {
     std::sort(edges.begin(), edges.end(), edgeComparator);
 
     TourParts tourParts(tsplibProblem.getDimension());
-    for (std::pair<unsigned int, unsigned int> edge : edges) {
+    for (std::pair<vertex_t, vertex_t> edge : edges) {
         tourParts.join(edge.first, edge.second);
         if (tourParts.isTourClosable()) {
             return tourParts.closeTour();

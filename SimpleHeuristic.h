@@ -10,17 +10,17 @@
 
 class TourParts : public VertexList {
 private:
-    unsigned int dimension;
-    std::vector<unsigned int> parent;
-    std::vector<unsigned int> size;
-    std::vector<std::pair<unsigned int, unsigned int>> pathEnds;
+    dimension_t dimension;
+    std::vector<vertex_t> parent;
+    std::vector<dimension_t> size;
+    std::vector<std::pair<vertex_t, vertex_t>> pathEnds;
 
 public:
-    explicit TourParts(unsigned int dimension);
+    explicit TourParts(size_t dimension);
 
-    unsigned int find(unsigned int x);
+    vertex_t find(vertex_t x);
 
-    void join(unsigned int x, unsigned int y);
+    void join(vertex_t x, vertex_t y);
 
     bool isTourClosable();
 

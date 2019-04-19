@@ -6,46 +6,40 @@
 #define LINKERNINGHANALGORITHM_TOUR_H
 
 #include <limits>
-#include <utility>
-#include <regex>
-#include <algorithm>
-#include <sstream>
-#include <fstream>
+#include <map>
 #include <list>
-#include <vector>
-#include <cmath>
 #include <iostream>
-#include <utility>
-#include "TsplibProblem.h"
+
+using vertex_t = size_t; // The type used for vertices
+using dimension_t = vertex_t; // The type used for counting vertices
+using distance_t = unsigned long; // The type used for distances and lengths
 
 class VertexList {
 protected:
-    std::map<unsigned int, std::pair<unsigned int, unsigned int>> neighbors;
+    std::map<vertex_t, std::pair<vertex_t, vertex_t>> neighbors;
 
 public:
-    unsigned int NO_VERTEX = std::numeric_limits<unsigned int>::max();
+    vertex_t NO_VERTEX = std::numeric_limits<unsigned int>::max();
 
     VertexList();
 
-    explicit VertexList(std::map<unsigned int, std::pair<unsigned int, unsigned int>> neighbors);
+    explicit VertexList(std::map<vertex_t, std::pair<vertex_t, vertex_t>> neighbors);
 
-    unsigned int next(unsigned int previous, unsigned int current) const;
+    vertex_t next(vertex_t previous, vertex_t current) const;
 
-    unsigned int next(unsigned int current) const;
+    vertex_t next(vertex_t current) const;
 
-    void setNext(unsigned int previous, unsigned int current, unsigned int next);
+    void setNext(vertex_t previous, vertex_t current, vertex_t next);
 
-    bool makeNeighbors(unsigned int vertex1, unsigned int vertex2);
+    bool makeNeighbors(vertex_t vertex1, vertex_t vertex2);
 };
 
 class Tour : public VertexList {
 protected:
-    void setVertices(const std::list<unsigned int> &vertexList);
+    void setVertices(const std::list<vertex_t> &vertexList);
 
 public:
     using VertexList::VertexList;
-
-    unsigned int length(TsplibProblem &tsplibProblem);
 
     bool isHamiltonianTour();
 };
@@ -53,15 +47,15 @@ public:
 class TourWalker {
 private:
     Tour tour;
-    unsigned int current;
-    unsigned int next;
+    vertex_t current;
+    vertex_t next;
 
 public:
-    TourWalker(const Tour &tour, unsigned int first);
+    TourWalker(const Tour &tour, vertex_t first);
 
-    TourWalker(Tour tour, unsigned int first, unsigned int second);
+    TourWalker(Tour tour, vertex_t first, vertex_t second);
 
-    unsigned int getNextVertex();
+    vertex_t getNextVertex();
 };
 
 std::ostream &operator<<(std::ostream &out, const Tour &tour);

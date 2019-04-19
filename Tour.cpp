@@ -1,14 +1,8 @@
-#include <utility>
-
 //
 // Created by Karl Welzel on 19/04/2019.
 //
 
-#include <regex>
-#include <fstream>
-#include <list>
-#include <cmath>
-#include <iostream>
+#include <vector>
 #include "Tour.h"
 
 
@@ -24,13 +18,13 @@
 
 VertexList::VertexList() = default;
 
-VertexList::VertexList(std::map<unsigned int, std::pair<unsigned int, unsigned int>> neighbors) :
+VertexList::VertexList(std::map<vertex_t, std::pair<vertex_t, vertex_t>> neighbors) :
         neighbors(std::move(neighbors)) {}
 
 // Which vertex comes after current, when previous comes before it?
 // previous is necessary to determine the direction
-unsigned int VertexList::next(unsigned int previous, unsigned int current) const {
-    std::pair<unsigned int, unsigned int> currentNeighbors = neighbors.at(current);
+vertex_t VertexList::next(vertex_t previous, vertex_t current) const {
+    std::pair<vertex_t, vertex_t> currentNeighbors = neighbors.at(current);
     if (previous != currentNeighbors.first and previous != currentNeighbors.second) {
         throw std::runtime_error(
                 "Tour::next: previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
@@ -43,8 +37,8 @@ unsigned int VertexList::next(unsigned int previous, unsigned int current) const
 }
 
 // Returns some vertex, that is a neighbor of current, if one exists
-unsigned int VertexList::next(unsigned int current) const {
-    std::pair<unsigned int, unsigned int> currentNeighbors = neighbors.at(current);
+vertex_t VertexList::next(vertex_t current) const {
+    std::pair<vertex_t, vertex_t> currentNeighbors = neighbors.at(current);
     if (currentNeighbors.first != NO_VERTEX) {
         return currentNeighbors.first;
     } else if (currentNeighbors.second != NO_VERTEX) {
@@ -56,24 +50,25 @@ unsigned int VertexList::next(unsigned int current) const {
 
 // Set the vertex that comes after current, when previous comes before it. The neighbors of next are not changed!
 // previous is necessary to determine the direction
-void VertexList::setNext(unsigned int previous, unsigned int current, unsigned int next) {
+void VertexList::setNext(vertex_t previous, vertex_t current, vertex_t next) {
     if (previous == next) {
         throw std::runtime_error("Tour::setNext: You cannot set both neighbors to the same vertex.");
     }
-    std::pair<unsigned int, unsigned int> currentNeighbors = neighbors.at(current);
+    std::pair<vertex_t, vertex_t> currentNeighbors = neighbors.at(current);
     if (previous != currentNeighbors.first and previous != currentNeighbors.second) {
         throw std::runtime_error(
                 "Tour::setNext: previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
                 std::to_string(current) + ")");
     }
-    neighbors.at(current) = std::make_pair(previous, next);
+    neighbors.at(current).first = previous;
+    neighbors.at(current).second = next;
 }
 
 // Tries to make vertex1 a neighbor of vertex2 and vertex2 a neighbor of vertex1 and returns whether this was
 // successful. It only fails if one of them already has two neighbors.
-bool VertexList::makeNeighbors(unsigned int vertex1, unsigned int vertex2) {
-    std::pair<unsigned int, unsigned int> neighbors1 = neighbors.at(vertex1);
-    std::pair<unsigned int, unsigned int> neighbors2 = neighbors.at(vertex2);
+bool VertexList::makeNeighbors(vertex_t vertex1, vertex_t vertex2) {
+    std::pair<vertex_t, vertex_t> neighbors1 = neighbors.at(vertex1);
+    std::pair<vertex_t, vertex_t> neighbors2 = neighbors.at(vertex2);
     if (neighbors1.first == NO_VERTEX and neighbors2.first == NO_VERTEX) {
         neighbors.at(vertex1).first = vertex2;
         neighbors.at(vertex2).first = vertex1;
@@ -105,14 +100,14 @@ bool VertexList::makeNeighbors(unsigned int vertex1, unsigned int vertex2) {
 // Initialize the neighbors map with a std::list that represents a tour. For each vertex x the neighbors are the
 // adjacent entries in "vertexList" (start and end are also adjacent)
 // This expects a list containing the numbers from 0 to tour.size()-1 and clears neighbors
-void Tour::setVertices(const std::list<unsigned int> &vertexList) {
+void Tour::setVertices(const std::list<vertex_t> &vertexList) {
     neighbors.clear();
     auto it = vertexList.begin();
-    unsigned int previous = *it;
+    vertex_t previous = *it;
     std::advance(it, 1);
-    unsigned int current = *it;
+    vertex_t current = *it;
     std::advance(it, 1);
-    unsigned int next;
+    vertex_t next;
     neighbors.emplace(previous, std::make_pair(vertexList.back(), current));
     for (; it != vertexList.end(); ++it) {
         next = *it;
@@ -123,26 +118,12 @@ void Tour::setVertices(const std::list<unsigned int> &vertexList) {
     neighbors.emplace(current, std::make_pair(previous, vertexList.front()));
 }
 
-// Computes the length of the tour with the cost matrix given by a TSPLIB problem
-unsigned int Tour::length(TsplibProblem &tsplibProblem) {
-    unsigned int sum = 0;
-    TourWalker tourWalker(*this, 0);
-    unsigned int currentVertex = tourWalker.getNextVertex();
-    unsigned int nextVertex = tourWalker.getNextVertex();
-    do {
-        sum += tsplibProblem.dist(currentVertex, nextVertex);
-        currentVertex = nextVertex;
-        nextVertex = tourWalker.getNextVertex();
-    } while (currentVertex != 0);
-    return sum;
-}
-
 // Checks if this Tour really is a hamiltonian tour
 bool Tour::isHamiltonianTour() {
-    unsigned int dimension = neighbors.size();
+    dimension_t dimension = neighbors.size();
     std::vector<bool> visited(dimension, false);
     TourWalker tourWalker(*this, 0);
-    unsigned int currentVertex = tourWalker.getNextVertex();
+    vertex_t currentVertex = tourWalker.getNextVertex();
     do {
         if (currentVertex >= visited.size() or visited.at(currentVertex)) {
             return false;
@@ -165,15 +146,15 @@ bool Tour::isHamiltonianTour() {
 
 
 // Create a TourWalker that starts the walk at vertex first
-TourWalker::TourWalker(const Tour &tour, unsigned int first) : TourWalker(tour, first, tour.next(first)) {}
+TourWalker::TourWalker(const Tour &tour, vertex_t first) : TourWalker(tour, first, tour.next(first)) {}
 
 // Create a TourWalker that starts the walk at vertex first and then walks in the direction of vertex second
-TourWalker::TourWalker(Tour tour, unsigned int first, unsigned int second) : tour(std::move(tour)),
-                                                                             current(first), next(second) {}
+TourWalker::TourWalker(Tour tour, vertex_t first, vertex_t second) : tour(std::move(tour)),
+                                                                     current(first), next(second) {}
 
 // Advance the walk and get the next vertex
-unsigned int TourWalker::getNextVertex() {
-    unsigned int previous = current;
+vertex_t TourWalker::getNextVertex() {
+    vertex_t previous = current;
     current = next;
     next = tour.next(previous, current);
     return previous;
@@ -183,7 +164,7 @@ unsigned int TourWalker::getNextVertex() {
 std::ostream &operator<<(std::ostream &out, const Tour &tour) {
     std::string output;
     TourWalker tourWalker(tour, 0);
-    unsigned int currentVertex = tourWalker.getNextVertex();
+    vertex_t currentVertex = tourWalker.getNextVertex();
     do {
         output += std::to_string(currentVertex + 1) + ", ";
         currentVertex = tourWalker.getNextVertex();

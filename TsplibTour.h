@@ -13,7 +13,7 @@ private:
 
     std::string name = "";
     std::string type = "";
-    unsigned int dimension = 0;
+    dimension_t dimension = 0;
 
     std::string interpretKeyword(const std::string &keyword, const std::string &value);
 

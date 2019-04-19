@@ -1,19 +1,13 @@
-#include <utility>
 #include <iostream>
-#include <cmath>
-#include <vector>
-#include <list>
 #include <fstream>
-#include <sstream>
-#include <algorithm>
-#include <regex>
 #include "Tour.h"
+#include "TsplibProblem.h"
 #include "TsplibTour.h"
 #include "SimpleHeuristic.h"
 
-// TODO: Create a alias for unsigned int or size_t that represents a vertex
-// TODO: Move VertexList, Tour and TourWalker into its own library
 // TODO: Don't let Tour be a subclass of VertexList, but instead use it internally and make all Tours constant ???
+// TODO: Merge TsplibProblem and TsplibTour
+// TODO: Replace std::map neighbors by std::vector neighbors to avoid errors with missing vertices
 // TODO: Refactor all const in this code
 
 int main(int argc, char *argv[]) {
@@ -21,7 +15,7 @@ int main(int argc, char *argv[]) {
     if (argc < 2) {
         std::cerr << "No file supplied." << std::endl;
         std::cout << "Usage:" << std::endl;
-        std::cout << "    LinKerninghanAlgorithm tsplib_problem.tsp [optimal_tour.opt.tour]" << std::endl;
+        std::cout << "    LinKerninghanAlgorithm tsplib_problem.tsp [tsplib_problem.opt.tour]" << std::endl;
         return 1;
     } else {
         problemFile.open(argv[1]);
@@ -54,7 +48,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Output the best tour found by the algorithm and compare it to the optimal tour if given
-    unsigned int length = tour.length(problem);
+    distance_t length = problem.length(tour);
     std::cout << "This is the shortest tour found:" << std::endl;
     std::cout << tour;
     std::cout << "It is " << length << " units long." << std::endl << std::endl;
@@ -79,8 +73,14 @@ int main(int argc, char *argv[]) {
             return 1;
         }
 
+        // Check whether the TsplibProblem problem and the TsplibTour optimalTour belong to the same problem
+        if (optimalTour.getName() != problem.getName() + ".opt.tour") {
+            std::cerr << "The TSPLIB tour file does not belong to the TSPLIB problem file";
+            return 1;
+        }
+
         // Print the optimal tour and its length and compare it to the tour returned by the heuristic
-        unsigned int optimalLength = optimalTour.length(problem);
+        distance_t optimalLength = problem.length(optimalTour);
         std::cout << "This is the optimal tour:" << std::endl;
         std::cout << optimalTour;
         std::cout << "It is " << optimalLength << " units long." << std::endl << std::endl;

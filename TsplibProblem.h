@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include "Tour.h"
 
 std::string trim(const std::string &str, const std::string &whitespace = " \t");
 
@@ -16,13 +17,14 @@ private:
 
     std::string name;
     std::string type;
-    unsigned int dimension = 0;
+    dimension_t dimension = 0;
     std::string edgeWeightType;
     std::string edgeWeightFormat;
     std::string nodeCoordType = "TWOD_COORDS";
 
     // if EDGE_WEIGHT_TYPE is EXPLICIT
-    std::vector<std::vector<int>, std::allocator<std::vector<int>>> matrix; // The matrix described in the TSPLIB file
+    // The matrix described in the TSPLIB file
+    std::vector<std::vector<distance_t>> matrix;
 
     // if EDGE_WEIGHT_TYPE is *_2D
     std::vector<std::vector<double>> coordinates; // Every entry is a 2d coordinate
@@ -39,10 +41,12 @@ public:
 
     const std::string &getType() const;
 
-    unsigned int getDimension() const;
+    dimension_t getDimension() const;
 
 
-    int dist(unsigned int i, unsigned int j) const;
+    distance_t dist(vertex_t i, vertex_t j) const;
+
+    distance_t length(Tour &tour);
 };
 
 #endif //LINKERNINGHANALGORITHM_TSPLIBPROBLEM_H
