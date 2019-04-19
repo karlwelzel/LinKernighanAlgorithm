@@ -7,7 +7,6 @@
 
 // TODO: Don't let Tour be a subclass of VertexList, but instead use it internally and make all Tours constant ???
 // TODO: Merge TsplibProblem and TsplibTour
-// TODO: Replace std::map neighbors by std::vector neighbors to avoid errors with missing vertices
 // TODO: Refactor all const in this code
 
 int main(int argc, char *argv[]) {

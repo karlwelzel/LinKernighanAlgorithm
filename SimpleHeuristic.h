@@ -10,7 +10,6 @@
 
 class TourParts : public VertexList {
 private:
-    dimension_t dimension;
     std::vector<vertex_t> parent;
     std::vector<dimension_t> size;
     std::vector<std::pair<vertex_t, vertex_t>> pathEnds;

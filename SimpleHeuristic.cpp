@@ -28,11 +28,10 @@
 // ============================================== TourParts class ======================================================
 
 // Initialize this TourParts structure with dimension vertices
-TourParts::TourParts(dimension_t dimension) : dimension(dimension) {
+TourParts::TourParts(dimension_t dimension) : VertexList(dimension) {
     for (dimension_t i = 0; i < dimension; ++i) {
         parent.push_back(i); // parent[i] = i
         size.push_back(1);   // size[i] = 1
-        neighbors.emplace(i, std::make_pair(VertexList::NO_VERTEX, VertexList::NO_VERTEX));
         pathEnds.emplace_back(i, i);
     }
 }
@@ -53,46 +52,39 @@ void TourParts::join(vertex_t x, vertex_t y) {
     if (xr == yr) {
         return; // A path cannot be joined with itself, this would lead to non-Hamiltonian tours
     }
-    vertex_t firstPathEnd;
-    vertex_t secondPathEnd;
+    std::pair<unsigned int, unsigned int> newPathEnds;
     if (x == pathEnds.at(xr).first and y == pathEnds.at(yr).first) {
-        firstPathEnd = pathEnds.at(xr).second;
-        secondPathEnd = pathEnds.at(yr).second;
+        newPathEnds = std::make_pair(pathEnds.at(xr).second, pathEnds.at(yr).second);
     } else if (x == pathEnds.at(xr).first and y == pathEnds.at(yr).second) {
-        firstPathEnd = pathEnds.at(xr).second;
-        secondPathEnd = pathEnds.at(yr).first;
+        newPathEnds = std::make_pair(pathEnds.at(xr).second, pathEnds.at(yr).first);
     } else if (x == pathEnds.at(xr).second and y == pathEnds.at(yr).first) {
-        firstPathEnd = pathEnds.at(xr).first;
-        secondPathEnd = pathEnds.at(yr).second;
+        newPathEnds = std::make_pair(pathEnds.at(xr).first, pathEnds.at(yr).second);
     } else if (x == pathEnds.at(xr).second and y == pathEnds.at(yr).second) {
-        firstPathEnd = pathEnds.at(xr).first;
-        secondPathEnd = pathEnds.at(yr).first;
+        newPathEnds = std::make_pair(pathEnds.at(xr).first, pathEnds.at(yr).first);
     } else {
-        return; // x and y cannot be joined, because one of them is not an end of its tour part
+        return; // x and y cannot be joined, because one of them is not an end of its path
     }
 
     // Now make x and y neighbors of each other
     if (!makeNeighbors(x, y)) {
-        throw std::runtime_error("You cannot join neighbors where one of them already has two neighbors.");
+        throw std::runtime_error("You cannot join neighbors when one of them already has two neighbors.");
     }
 
     if (size.at(xr) > size.at(yr)) {
         parent.at(yr) = xr;
         size.at(xr) += size.at(yr);
-        pathEnds.at(xr).first = firstPathEnd;
-        pathEnds.at(xr).second = secondPathEnd;
+        pathEnds.at(xr) = newPathEnds;
     } else {
         parent.at(xr) = yr;
         size.at(yr) += size.at(xr);
-        pathEnds.at(yr).first = firstPathEnd;
-        pathEnds.at(yr).second = secondPathEnd;
+        pathEnds.at(yr) = newPathEnds;
     }
 }
 
 // Check whether there is only one connected component. In this case this component is a hamiltonian path and can only
 // be closed (to a tour) by a single edge that connects both ends of the path
 bool TourParts::isTourClosable() {
-    return size.at(find(0)) == dimension;
+    return size.at(find(0)) == getDimension();
 }
 
 // Try to close the tour by adding the unique edge that connects both ends of the only connected component. If there are
@@ -106,7 +98,7 @@ Tour TourParts::closeTour() {
     if (isTourClosable()) {
         // join the last ends to form a tour
         if (!makeNeighbors(pathEnds.at(root).first, pathEnds.at(root).second)) {
-            throw std::runtime_error("You cannot join neighbors where one of them already has two neighbors.");
+            throw std::runtime_error("You cannot join neighbors when one of them already has two neighbors.");
         }
         return Tour(neighbors);
     } else {
@@ -150,5 +142,6 @@ Tour simpleHeuristic(TsplibProblem &tsplibProblem) {
         }
     }
 
+    // This line will never be reached, because the graph is a complete graph
     throw std::runtime_error("SimpleHeuristic: Although every edge was checked, no tour has been found.");
 }

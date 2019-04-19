@@ -2,7 +2,6 @@
 // Created by Karl Welzel on 19/04/2019.
 //
 
-#include <vector>
 #include "Tour.h"
 
 
@@ -18,8 +17,17 @@
 
 VertexList::VertexList() = default;
 
-VertexList::VertexList(std::map<vertex_t, std::pair<vertex_t, vertex_t>> neighbors) :
+// Create dimension vertices, each with no neighbors
+VertexList::VertexList(dimension_t dimension) {
+    neighbors.assign(dimension, std::make_pair(VertexList::NO_VERTEX, VertexList::NO_VERTEX));
+}
+
+VertexList::VertexList(std::vector<std::pair<vertex_t, vertex_t>> neighbors) :
         neighbors(std::move(neighbors)) {}
+
+dimension_t VertexList::getDimension() {
+    return neighbors.size();
+}
 
 // Which vertex comes after current, when previous comes before it?
 // previous is necessary to determine the direction
@@ -60,8 +68,7 @@ void VertexList::setNext(vertex_t previous, vertex_t current, vertex_t next) {
                 "Tour::setNext: previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
                 std::to_string(current) + ")");
     }
-    neighbors.at(current).first = previous;
-    neighbors.at(current).second = next;
+    neighbors.at(current) = std::make_pair(previous, next);
 }
 
 // Tries to make vertex1 a neighbor of vertex2 and vertex2 a neighbor of vertex1 and returns whether this was
@@ -101,21 +108,21 @@ bool VertexList::makeNeighbors(vertex_t vertex1, vertex_t vertex2) {
 // adjacent entries in "vertexList" (start and end are also adjacent)
 // This expects a list containing the numbers from 0 to tour.size()-1 and clears neighbors
 void Tour::setVertices(const std::list<vertex_t> &vertexList) {
-    neighbors.clear();
+    neighbors.assign(vertexList.size(), std::make_pair(VertexList::NO_VERTEX, VertexList::NO_VERTEX));
     auto it = vertexList.begin();
     vertex_t previous = *it;
     std::advance(it, 1);
     vertex_t current = *it;
     std::advance(it, 1);
     vertex_t next;
-    neighbors.emplace(previous, std::make_pair(vertexList.back(), current));
+    neighbors.at(previous) = std::make_pair(vertexList.back(), current);
     for (; it != vertexList.end(); ++it) {
         next = *it;
-        neighbors.emplace(current, std::make_pair(previous, next));
+        neighbors.at(current) = std::make_pair(previous, next);
         previous = current;
         current = next;
     }
-    neighbors.emplace(current, std::make_pair(previous, vertexList.front()));
+    neighbors.at(current) = std::make_pair(previous, vertexList.front());
 }
 
 // Checks if this Tour really is a hamiltonian tour

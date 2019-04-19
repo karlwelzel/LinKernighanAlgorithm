@@ -6,8 +6,8 @@
 #define LINKERNINGHANALGORITHM_TOUR_H
 
 #include <limits>
-#include <map>
 #include <list>
+#include <vector>
 #include <iostream>
 
 using vertex_t = size_t; // The type used for vertices
@@ -16,14 +16,18 @@ using distance_t = unsigned long; // The type used for distances and lengths
 
 class VertexList {
 protected:
-    std::map<vertex_t, std::pair<vertex_t, vertex_t>> neighbors;
+    std::vector<std::pair<vertex_t, vertex_t>> neighbors;
 
 public:
     vertex_t NO_VERTEX = std::numeric_limits<unsigned int>::max();
 
     VertexList();
 
-    explicit VertexList(std::map<vertex_t, std::pair<vertex_t, vertex_t>> neighbors);
+    explicit VertexList(dimension_t dimension);
+
+    explicit VertexList(std::vector<std::pair<vertex_t, vertex_t>> neighbors);
+
+    dimension_t getDimension();
 
     vertex_t next(vertex_t previous, vertex_t current) const;
 
