@@ -2,6 +2,7 @@
 // Created by Karl Welzel on 19/04/2019.
 //
 
+#include <utility>
 #include "Tour.h"
 
 
@@ -26,7 +27,7 @@ VertexList::VertexList(dimension_t dimension) {
 VertexList::VertexList(std::vector<std::pair<vertex_t, vertex_t>> neighbors) :
         neighbors(std::move(neighbors)) {}
 
-dimension_t VertexList::getDimension() {
+dimension_t VertexList::getDimension() const {
     return neighbors.size();
 }
 
@@ -105,6 +106,15 @@ bool VertexList::makeNeighbors(vertex_t vertex1, vertex_t vertex2) {
 // that it is not actually a class. It is possible to check that with "isHamiltonianTour"
 
 
+Tour::Tour() = default;
+
+Tour::Tour(std::vector<std::pair<vertex_t, vertex_t>> neighbors) : VertexList(std::move(neighbors)) {
+    if (!isHamiltonianTour()) {
+        throw std::runtime_error(
+                "A Tour object cannot be initialized with neighbors that do not describe a hamiltonian tour");
+    }
+}
+
 // Initialize the neighbors map with a std::list that represents a tour. For each vertex x the neighbors are the
 // adjacent entries in "vertexList" (start and end are also adjacent)
 // This expects a list containing the numbers from 0 to tour.size()-1 and clears neighbors
@@ -127,7 +137,7 @@ void Tour::setVertices(const std::list<vertex_t> &vertexList) {
 }
 
 // Checks if this Tour really is a hamiltonian tour
-bool Tour::isHamiltonianTour() {
+bool Tour::isHamiltonianTour() const {
     dimension_t dimension = neighbors.size();
     std::vector<bool> visited(dimension, false);
     TourWalker tourWalker(*this, 0);

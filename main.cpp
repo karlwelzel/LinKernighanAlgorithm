@@ -5,7 +5,6 @@
 #include "SimpleHeuristic.h"
 
 // NOTODO: Don't let Tour be a subclass of VertexList, but instead use it internally and make all Tours constant ???
-// TODO: Refactor all const in this code
 
 int main(int argc, char *argv[]) {
     std::ifstream problemFile;

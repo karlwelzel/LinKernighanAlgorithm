@@ -48,7 +48,7 @@ public:
 
     distance_t dist(vertex_t i, vertex_t j) const;
 
-    distance_t length(Tour &tour);
+    distance_t length(Tour &tour) const;
 };
 
 
@@ -63,11 +63,11 @@ private:
     std::string interpretKeyword(const std::string &keyword, const std::string &value);
 
 public:
+    std::string readFile(std::ifstream &inputFile);
+
     const std::string &getName() const;
 
     const std::string &getType() const;
-
-    std::string readFile(std::ifstream &inputFile);
 };
 
 #endif //LINKERNINGHANALGORITHM_TSPLIBUTILS_H

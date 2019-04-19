@@ -241,7 +241,7 @@ distance_t TsplibProblem::dist(vertex_t i, vertex_t j) const {
     }
 }
 
-distance_t TsplibProblem::length(Tour &tour) {
+distance_t TsplibProblem::length(Tour &tour) const {
     distance_t sum = 0;
     TourWalker tourWalker(tour, 0);
     vertex_t currentVertex = tourWalker.getNextVertex();

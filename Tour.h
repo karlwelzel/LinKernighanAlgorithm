@@ -29,7 +29,7 @@ public:
 
     explicit VertexList(std::vector<std::pair<vertex_t, vertex_t>> neighbors);
 
-    dimension_t getDimension();
+    dimension_t getDimension() const;
 
     vertex_t next(vertex_t previous, vertex_t current) const;
 
@@ -43,15 +43,16 @@ protected:
     void setVertices(const std::list<vertex_t> &vertexList);
 
 public:
-    // TODO: Replace these with checks that it really is a hamiltonian tour
-    using VertexList::VertexList;
+    Tour();
 
-    bool isHamiltonianTour();
+    explicit Tour(std::vector<std::pair<vertex_t, vertex_t>> neighbors);
+
+    bool isHamiltonianTour() const;
 };
 
 class TourWalker {
 private:
-    Tour tour;
+    const Tour tour;
     vertex_t current;
     vertex_t next;
 
