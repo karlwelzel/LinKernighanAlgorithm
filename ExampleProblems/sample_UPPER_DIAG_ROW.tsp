@@ -1,0 +1,13 @@
+NAME: sample_FULL_MATRIX
+TYPE: TSP
+DIMENSION: 6
+EDGE_WEIGHT_TYPE: EXPLICIT
+EDGE_WEIGHT_FORMAT: UPPER_DIAG_ROW
+EDGE_WEIGHT_SECTION
+ 0  5  5  7  7 10
+    0  6  2  6  7
+       0  6  2  7
+          0  6  5
+             0  5
+                0
+EOF

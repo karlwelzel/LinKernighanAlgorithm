@@ -49,6 +49,18 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
+/*
+    // DEBUG: Print out all distances in matrix form
+    for (vertex_t i = 0; i < problem.getDimension(); ++i) {
+        for (vertex_t j = 0; j < problem.getDimension(); ++j) {
+            std::cout.width(3);
+            std::cout << problem.dist(i, j);
+        }
+        std::cout << std::endl;
+    }
+*/
+
+
     // Use the heuristic from the introduction assignment to get a tour
     const Tour tour = simpleHeuristic(problem);
 
