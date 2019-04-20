@@ -36,7 +36,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Use the heuristic from the introduction assignment to get a tour
-    Tour tour = simpleHeuristic(problem);
+    const Tour tour = simpleHeuristic(problem);
 
     // DEBUG: Check whether tour really is a hamiltonian tour
     if (!tour.isHamiltonianTour()) {

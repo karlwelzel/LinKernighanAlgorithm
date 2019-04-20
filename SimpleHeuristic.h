@@ -15,7 +15,7 @@ private:
     std::vector<std::pair<vertex_t, vertex_t>> pathEnds;
 
 public:
-    explicit TourParts(size_t dimension);
+    explicit TourParts(dimension_t dimension);
 
     vertex_t find(vertex_t x);
 

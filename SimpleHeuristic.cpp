@@ -28,7 +28,7 @@
 // ============================================== TourParts class ======================================================
 
 // Initialize this TourParts structure with dimension vertices
-TourParts::TourParts(dimension_t dimension) : VertexList(dimension) {
+TourParts::TourParts(const dimension_t dimension) : VertexList(dimension) {
     for (dimension_t i = 0; i < dimension; ++i) {
         parent.push_back(i); // parent[i] = i
         size.push_back(1);   // size[i] = 1
@@ -37,7 +37,7 @@ TourParts::TourParts(dimension_t dimension) : VertexList(dimension) {
 }
 
 // Find the parent for vertex x
-vertex_t TourParts::find(vertex_t x) {
+vertex_t TourParts::find(const vertex_t x) {
     if (parent.at(x) != x) { // path compression
         parent.at(x) = find(parent.at(x));
     }
@@ -46,9 +46,9 @@ vertex_t TourParts::find(vertex_t x) {
 
 // Try to join the connected components of x and y by adding the edge (x, y)
 // The function does not return whether this was successful
-void TourParts::join(vertex_t x, vertex_t y) {
-    vertex_t xr = find(x); // root of x
-    vertex_t yr = find(y); // root of y
+void TourParts::join(const vertex_t x, const vertex_t y) {
+    const vertex_t xr = find(x); // root of x
+    const vertex_t yr = find(y); // root of y
     if (xr == yr) {
         return; // A path cannot be joined with itself, this would lead to non-Hamiltonian tours
     }
@@ -94,7 +94,7 @@ bool TourParts::isTourClosable() {
 // be used after this function was called
 Tour TourParts::closeTour() {
     // if there is only one root, then its also the root of 0
-    vertex_t root = find(0);
+    const vertex_t root = find(0);
     if (isTourClosable()) {
         // join the last ends to form a tour
         if (!makeNeighbors(pathEnds.at(root).first, pathEnds.at(root).second)) {
@@ -130,12 +130,12 @@ Tour simpleHeuristic(TsplibProblem &tsplibProblem) {
         }
     }
 
-    EdgeCostComparator edgeComparator(tsplibProblem);
+    const EdgeCostComparator edgeComparator(tsplibProblem);
     // Sort edges by edge cost/distance in ascending order
     std::sort(edges.begin(), edges.end(), edgeComparator);
 
     TourParts tourParts(tsplibProblem.getDimension());
-    for (std::pair<vertex_t, vertex_t> edge : edges) {
+    for (const std::pair<vertex_t, vertex_t> edge : edges) {
         tourParts.join(edge.first, edge.second);
         if (tourParts.isTourClosable()) {
             return tourParts.closeTour();

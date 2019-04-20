@@ -20,7 +20,7 @@ const vertex_t VertexList::NO_VERTEX = std::numeric_limits<unsigned int>::max();
 VertexList::VertexList() = default;
 
 // Create dimension vertices, each with no neighbors
-VertexList::VertexList(dimension_t dimension) {
+VertexList::VertexList(const dimension_t dimension) {
     neighbors.assign(dimension, std::make_pair(NO_VERTEX, NO_VERTEX));
 }
 
@@ -33,8 +33,8 @@ dimension_t VertexList::getDimension() const {
 
 // Which vertex comes after current, when previous comes before it?
 // previous is necessary to determine the direction
-vertex_t VertexList::next(vertex_t previous, vertex_t current) const {
-    std::pair<vertex_t, vertex_t> currentNeighbors = neighbors.at(current);
+vertex_t VertexList::next(const vertex_t previous, const vertex_t current) const {
+    const std::pair<vertex_t, vertex_t> currentNeighbors = neighbors.at(current);
     if (previous != currentNeighbors.first and previous != currentNeighbors.second) {
         throw std::runtime_error(
                 "Tour::next: previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
@@ -46,8 +46,8 @@ vertex_t VertexList::next(vertex_t previous, vertex_t current) const {
     }
 }
 
-// Returns some vertex, that is a neighbor of current, if one exists
-vertex_t VertexList::next(vertex_t current) const {
+// Returns some vertex, that is a neighbor of current, if one exists, otherwise NO_VERTEX
+vertex_t VertexList::next(const vertex_t current) const {
     std::pair<vertex_t, vertex_t> currentNeighbors = neighbors.at(current);
     if (currentNeighbors.first != NO_VERTEX) {
         return currentNeighbors.first;
@@ -60,11 +60,11 @@ vertex_t VertexList::next(vertex_t current) const {
 
 // Set the vertex that comes after current, when previous comes before it. The neighbors of next are not changed!
 // previous is necessary to determine the direction
-void VertexList::setNext(vertex_t previous, vertex_t current, vertex_t next) {
+void VertexList::setNext(const vertex_t previous, const vertex_t current, const vertex_t next) {
     if (previous == next) {
         throw std::runtime_error("Tour::setNext: You cannot set both neighbors to the same vertex.");
     }
-    std::pair<vertex_t, vertex_t> currentNeighbors = neighbors.at(current);
+    const std::pair<vertex_t, vertex_t> currentNeighbors = neighbors.at(current);
     if (previous != currentNeighbors.first and previous != currentNeighbors.second) {
         throw std::runtime_error(
                 "Tour::setNext: previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
@@ -75,9 +75,9 @@ void VertexList::setNext(vertex_t previous, vertex_t current, vertex_t next) {
 
 // Tries to make vertex1 a neighbor of vertex2 and vertex2 a neighbor of vertex1 and returns whether this was
 // successful. It only fails if one of them already has two neighbors.
-bool VertexList::makeNeighbors(vertex_t vertex1, vertex_t vertex2) {
-    std::pair<vertex_t, vertex_t> neighbors1 = neighbors.at(vertex1);
-    std::pair<vertex_t, vertex_t> neighbors2 = neighbors.at(vertex2);
+bool VertexList::makeNeighbors(const vertex_t vertex1, const vertex_t vertex2) {
+    const std::pair<vertex_t, vertex_t> neighbors1 = neighbors.at(vertex1);
+    const std::pair<vertex_t, vertex_t> neighbors2 = neighbors.at(vertex2);
     if (neighbors1.first == NO_VERTEX and neighbors2.first == NO_VERTEX) {
         neighbors.at(vertex1).first = vertex2;
         neighbors.at(vertex2).first = vertex1;
@@ -102,8 +102,8 @@ bool VertexList::makeNeighbors(vertex_t vertex1, vertex_t vertex2) {
 
 // =================================================== Tour class ======================================================
 
-// This class represents a Tour, but as a subclass of VertexList, neighbors can be manipulated in a variety of ways so
-// that it is not actually a class. It is possible to check that with "isHamiltonianTour"
+// This class represents a Tour. It is a subclass of VertexList, but avoids the problems of VertexList by only allowing
+// changes that don't destroy the tour property
 
 
 Tour::Tour() = default;
@@ -119,6 +119,7 @@ Tour::Tour(std::vector<std::pair<vertex_t, vertex_t>> neighbors) : VertexList(st
 // adjacent entries in "vertexList" (start and end are also adjacent)
 // This expects a list containing the numbers from 0 to tour.size()-1 and clears neighbors
 void Tour::setVertices(const std::list<vertex_t> &vertexList) {
+    // TODO: Rewrite this code with makeNeighbors
     neighbors.assign(vertexList.size(), std::make_pair(NO_VERTEX, NO_VERTEX));
     auto it = vertexList.begin();
     vertex_t previous = *it;
@@ -171,7 +172,7 @@ TourWalker::TourWalker(Tour tour, vertex_t first, vertex_t second) : tour(std::m
 
 // Advance the walk and get the next vertex
 vertex_t TourWalker::getNextVertex() {
-    vertex_t previous = current;
+    const vertex_t previous = current;
     current = next;
     next = tour.next(previous, current);
     return previous;

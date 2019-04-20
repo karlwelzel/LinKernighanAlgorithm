@@ -12,8 +12,8 @@
 
 // Trim whitespaces from the start and end of str
 std::string trim(const std::string &str, const std::string &whitespace) {
-    std::string::size_type start = str.find_first_not_of(whitespace);
-    std::string::size_type end = str.find_last_not_of(whitespace);
+    const std::string::size_type start = str.find_first_not_of(whitespace);
+    const std::string::size_type end = str.find_last_not_of(whitespace);
     if (start == std::string::npos) {
         return ""; // No non-whitespace character, trimming leaves only the empty string
     } else {
@@ -39,8 +39,8 @@ std::string TsplibProblem::interpretKeyword(const std::string &keyword, const st
         if (value != "TSP") {
             return "TYPE must be TSP";
         }
-
     } else if (keyword == "COMMENT") {
+        // ignore any comments
     } else if (keyword == "DIMENSION") {
         dimension = static_cast<dimension_t>(stoi(value));
     } else if (keyword == "EDGE_WEIGHT_TYPE") {
@@ -78,9 +78,9 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
             // ignore empty lines
         } else if ((delimiterIndex = line.find(delimiter)) != std::string::npos) {
             // The specification part with entries of the form <keyword> : <value>
-            std::string keyword = trim(line.substr(0, delimiterIndex));
-            std::string value = trim(line.substr(delimiterIndex + 1, std::string::npos));
-            std::string errorMessage = interpretKeyword(keyword, value);
+            const std::string keyword = trim(line.substr(0, delimiterIndex));
+            const std::string value = trim(line.substr(delimiterIndex + 1, std::string::npos));
+            const std::string errorMessage = interpretKeyword(keyword, value);
             if (!errorMessage.empty()) {
                 return errorMessage;
             }
@@ -163,6 +163,7 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
         // Initialize the matrix with zeros
         matrix.assign(dimension, std::vector<distance_t>(dimension, 0));
         try {
+            // TODO: Test all these possible edge weight formats
             size_t numbersIndex = 0;
             if (edgeWeightFormat == "FULL_MATRIX") {
                 for (vertex_t i = 0; i < dimension; ++i) {
@@ -224,15 +225,15 @@ dimension_t TsplibProblem::getDimension() const {
 }
 
 // Compute the distance of i and j
-distance_t TsplibProblem::dist(vertex_t i, vertex_t j) const {
+distance_t TsplibProblem::dist(const vertex_t i, const vertex_t j) const {
     if (edgeWeightType == "EUC_2D") {
         double d = hypot(coordinates.at(i).at(0) - coordinates.at(j).at(0),
                          coordinates.at(i).at(1) - coordinates.at(j).at(1));
-        return static_cast<distance_t>(lround(d)); // lround(d) >= 0, so casting does not produce any errors
+        return static_cast<distance_t>(lround(d)); // lround(d) >= 0, so casting does not produce any
     } else if (edgeWeightType == "CEIL_2D") {
         double d = hypot(coordinates.at(i).at(0) - coordinates.at(j).at(0),
                          coordinates.at(i).at(1) - coordinates.at(j).at(1));
-        // ceil(d) is a double and to prevent errors the result is rounded before casting to distance_t
+        // ceil(d) returns a double and to prevent errors the result is rounded before casting to distance_t
         return static_cast<distance_t>(lround(ceil(d)));
     } else if (edgeWeightType == "EXPLICIT") {
         return matrix.at(i).at(j);
@@ -241,7 +242,7 @@ distance_t TsplibProblem::dist(vertex_t i, vertex_t j) const {
     }
 }
 
-distance_t TsplibProblem::length(Tour &tour) const {
+distance_t TsplibProblem::length(const Tour &tour) const {
     distance_t sum = 0;
     TourWalker tourWalker(tour, 0);
     vertex_t currentVertex = tourWalker.getNextVertex();
@@ -276,6 +277,7 @@ std::string TsplibTour::interpretKeyword(const std::string &keyword, const std::
         }
 
     } else if (keyword == "COMMENT") {
+        // ignore any comments
     } else if (keyword == "DIMENSION") {
         dimension = static_cast<dimension_t>(stoi(value));
     } // every unknown keyword is ignored
@@ -297,9 +299,9 @@ std::string TsplibTour::readFile(std::ifstream &inputFile) {
             // ignore this line
         } else if ((delimiterIndex = line.find(delimiter)) != std::string::npos) {
             // The specification part with entries of the form <keyword> : <value>
-            std::string keyword = trim(line.substr(0, delimiterIndex));
-            std::string value = trim(line.substr(delimiterIndex + 1, std::string::npos));
-            std::string errorMessage = interpretKeyword(keyword, value);
+            const std::string keyword = trim(line.substr(0, delimiterIndex));
+            const std::string value = trim(line.substr(delimiterIndex + 1, std::string::npos));
+            const std::string errorMessage = interpretKeyword(keyword, value);
             if (!errorMessage.empty()) {
                 return errorMessage;
             }

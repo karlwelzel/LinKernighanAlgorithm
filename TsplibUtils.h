@@ -48,7 +48,7 @@ public:
 
     distance_t dist(vertex_t i, vertex_t j) const;
 
-    distance_t length(Tour &tour) const;
+    distance_t length(const Tour &tour) const;
 };
 
 
