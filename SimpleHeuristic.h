@@ -5,6 +5,8 @@
 #ifndef LINKERNINGHANALGORITHM_SIMPLEHEURISTIC_H
 #define LINKERNINGHANALGORITHM_SIMPLEHEURISTIC_H
 
+#include <utility>
+#include <vector>
 #include "Tour.h"
 #include "TsplibUtils.h"
 
@@ -26,6 +28,6 @@ public:
     Tour closeTour();
 };
 
-Tour simpleHeuristic(TsplibProblem &tsplibProblem);
+Tour simpleHeuristic(const TsplibProblem &tsplibProblem);
 
 #endif //LINKERNINGHANALGORITHM_SIMPLEHEURISTIC_H

@@ -3,6 +3,10 @@
 //
 
 #include <utility>
+#include <limits>
+#include <list>
+#include <vector>
+#include <iostream>
 #include "Tour.h"
 
 

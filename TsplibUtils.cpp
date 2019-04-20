@@ -2,11 +2,12 @@
 // Created by Karl Welzel on 19/04/2019.
 //
 
-#include <iostream>
 #include <list>
 #include <cmath>
-#include <fstream>
 #include <regex>
+#include <string>
+#include <vector>
+#include <fstream>
 #include "TsplibUtils.h"
 
 

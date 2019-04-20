@@ -5,6 +5,7 @@
 #ifndef LINKERNINGHANALGORITHM_TOUR_H
 #define LINKERNINGHANALGORITHM_TOUR_H
 
+#include <utility>
 #include <limits>
 #include <list>
 #include <vector>

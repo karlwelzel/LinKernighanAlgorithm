@@ -4,6 +4,8 @@
 
 // This library contains the code for the introduction assignment
 
+#include <utility>
+#include <vector>
 #include <algorithm>
 #include "SimpleHeuristic.h"
 
@@ -113,7 +115,7 @@ private:
     TsplibProblem tsplibProblem;
 
 public:
-    explicit EdgeCostComparator(TsplibProblem &tsplibProblem) : tsplibProblem(tsplibProblem) {}
+    explicit EdgeCostComparator(const TsplibProblem &tsplibProblem) : tsplibProblem(tsplibProblem) {}
 
     bool operator()(const std::pair<vertex_t, vertex_t> edge1,
                     const std::pair<vertex_t, vertex_t> edge2) const {
@@ -122,7 +124,7 @@ public:
 };
 
 
-Tour simpleHeuristic(TsplibProblem &tsplibProblem) {
+Tour simpleHeuristic(const TsplibProblem &tsplibProblem) {
     std::vector<std::pair<vertex_t, vertex_t>> edges;
     for (vertex_t i = 0; i < tsplibProblem.getDimension(); ++i) {
         for (vertex_t j = i + 1; j < tsplibProblem.getDimension(); ++j) {
