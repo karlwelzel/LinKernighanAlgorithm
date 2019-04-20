@@ -5,6 +5,10 @@
 #include "SimpleHeuristic.h"
 
 // NOTODO: Don't let Tour be a subclass of VertexList, but instead use it internally and make all Tours constant ???
+// TODO: Check all parameters: pass by value or pass by reference
+// TODO: Add all includes from .h to .cpp files
+// TODO: Use valgrind
+// TODO: profile with callgrind and kcachegrind
 
 int main(int argc, char *argv[]) {
     std::ifstream problemFile;

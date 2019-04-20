@@ -119,22 +119,17 @@ Tour::Tour(std::vector<std::pair<vertex_t, vertex_t>> neighbors) : VertexList(st
 // adjacent entries in "vertexList" (start and end are also adjacent)
 // This expects a list containing the numbers from 0 to tour.size()-1 and clears neighbors
 void Tour::setVertices(const std::list<vertex_t> &vertexList) {
-    // TODO: Rewrite this code with makeNeighbors
     neighbors.assign(vertexList.size(), std::make_pair(NO_VERTEX, NO_VERTEX));
+    vertex_t previous, current;
     auto it = vertexList.begin();
-    vertex_t previous = *it;
+    current = *it;
     std::advance(it, 1);
-    vertex_t current = *it;
-    std::advance(it, 1);
-    vertex_t next;
-    neighbors.at(previous) = std::make_pair(vertexList.back(), current);
     for (; it != vertexList.end(); ++it) {
-        next = *it;
-        neighbors.at(current) = std::make_pair(previous, next);
         previous = current;
-        current = next;
+        current = *it;
+        makeNeighbors(previous, current);
     }
-    neighbors.at(current) = std::make_pair(previous, vertexList.front());
+    makeNeighbors(vertexList.back(), vertexList.front());
 }
 
 // Checks if this Tour really is a hamiltonian tour
