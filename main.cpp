@@ -5,9 +5,6 @@
 #include "TsplibUtils.h"
 #include "SimpleHeuristic.h"
 
-// TODO: Use valgrind
-// TODO: profile with callgrind and kcachegrind
-
 // TSPLIB test instances:
 // berlin52            EUC_2D
 // ch130               EUC_2D (with decimal places)
