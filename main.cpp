@@ -5,9 +5,20 @@
 #include "TsplibUtils.h"
 #include "SimpleHeuristic.h"
 
-// NOTODO: Don't let Tour be a subclass of VertexList, but instead use it internally and make all Tours constant ???
 // TODO: Use valgrind
 // TODO: profile with callgrind and kcachegrind
+
+// TSPLIB test instances:
+// berlin52            EUC_2D
+// ch130               EUC_2D (with decimal places)
+// d198                EUC_2D (coordinates in scientific notation)
+// usa13509            EUC_2D (too big)
+// pla7397             CEIL_2D
+// brg180              UPPER_ROW
+// si175               UPPER_DIAG_ROW
+// si1032              UPPER_DIAG_ROW
+// fri26               LOWER_DIAG_ROW
+// swiss42             FULL_MATRIX
 
 int main(int argc, char *argv[]) {
     std::ifstream problemFile;
@@ -73,7 +84,8 @@ int main(int argc, char *argv[]) {
         }
 
         // Check whether the TsplibProblem problem and the TsplibTour optimalTour belong to the same problem
-        if (optimalTour.getName() != problem.getName() + ".opt.tour") {
+        if (optimalTour.getName().substr(0, problem.getName().size()) != problem.getName()) {
+            // optimalTour.getName() does not start with problem.getName()
             std::cerr << "The TSPLIB tour file does not belong to the TSPLIB problem file";
             return 1;
         }

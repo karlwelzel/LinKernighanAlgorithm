@@ -52,8 +52,8 @@ std::string TsplibProblem::interpretKeyword(const std::string &keyword, const st
     } else if (keyword == "EDGE_WEIGHT_FORMAT") {
         edgeWeightFormat = value;
         if (edgeWeightFormat != "FULL_MATRIX" and edgeWeightFormat != "LOWER_DIAG_ROW" and
-            edgeWeightFormat != "UPPER_DIAG_ROW" and edgeWeightFormat != "UPPER_DIAG") {
-            return "EDGE_WEIGHT_FORMAT must be one of: FULL_MATRIX, LOWER_DIAG_ROW, UPPER_DIAG_ROW, UPPER_DIAG";
+            edgeWeightFormat != "UPPER_DIAG_ROW" and edgeWeightFormat != "UPPER_ROW") {
+            return "EDGE_WEIGHT_FORMAT must be one of: FULL_MATRIX, LOWER_DIAG_ROW, UPPER_DIAG_ROW, UPPER_ROW";
         }
     } else if (keyword == "NODE_COORD_TYPE") {
         nodeCoordType = value;

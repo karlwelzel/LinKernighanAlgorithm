@@ -115,7 +115,7 @@ private:
     TsplibProblem tsplibProblem;
 
 public:
-    explicit EdgeCostComparator(const TsplibProblem &tsplibProblem) : tsplibProblem(tsplibProblem) {}
+    explicit EdgeCostComparator(TsplibProblem tsplibProblem) : tsplibProblem(std::move(tsplibProblem)) {}
 
     bool operator()(const std::pair<vertex_t, vertex_t> edge1,
                     const std::pair<vertex_t, vertex_t> edge2) const {
