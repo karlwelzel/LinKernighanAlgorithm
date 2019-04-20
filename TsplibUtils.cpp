@@ -164,7 +164,6 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
         // Initialize the matrix with zeros
         matrix.assign(dimension, std::vector<distance_t>(dimension, 0));
         try {
-            // TODO: Test all these possible edge weight formats
             size_t numbersIndex = 0;
             if (edgeWeightFormat == "FULL_MATRIX") {
                 for (vertex_t i = 0; i < dimension; ++i) {
