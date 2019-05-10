@@ -5,13 +5,16 @@
 #include <utility>
 #include <list>
 #include <cmath>
-#include <regex>
 #include <string>
 #include <vector>
 #include <fstream>
+#include <sstream>
 #include "TsplibUtils.h"
 
-// TODO: Refactor from readFile to fromFile as an alternative "constructor"
+// Checks if str has the UPPERCASE_WITH_UNDERSCORES format, that all keywords have
+bool isKeyword(const std::string &str) {
+    return str.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZ_") == std::string::npos;
+}
 
 // Trim whitespaces from the start and end of str
 std::string trim(const std::string &str, const std::string &whitespace) {
@@ -90,7 +93,7 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
             }
         } else {
             // The data part or an invalid part of the file
-            if (std::regex_match(line, std::regex("[A-Z_]+"))) {
+            if (isKeyword(line)) {
                 // line is some kind of keyword, because all keywords have the UPPERCASE_WITH_UNDERSCORES format.
                 lastDataKeyword = line;
                 if (line == "EOF") {
@@ -313,7 +316,7 @@ std::string TsplibTour::readFile(std::ifstream &inputFile) {
             }
         } else {
             // The data part or an invalid part of the file
-            if (std::regex_match(line, std::regex("[A-Z_]+"))) {
+            if (isKeyword(line)) {
                 // line is some kind of keyword, because all keywords have the UPPERCASE_WITH_UNDERSCORES format.
                 lastDataKeyword = line;
                 if (line == "EOF") {
