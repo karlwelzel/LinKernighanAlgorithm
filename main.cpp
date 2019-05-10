@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <numeric>
 #include "Tour.h"
 #include "TsplibUtils.h"
 #include "SimpleHeuristic.h"
@@ -57,6 +58,12 @@ int main(int argc, char *argv[]) {
     }
 */
 
+
+    // Print the length of the tour 1, ..., n
+    std::vector<vertex_t> ascendingVertices(problem.getDimension());
+    std::iota(ascendingVertices.begin(), ascendingVertices.end(), 0);
+    distance_t ascendingLength = problem.length(Tour(ascendingVertices));
+    std::cout << "The tour 1, 2, ..., n has length " << ascendingLength << "." << std::endl << std::endl;
 
     // Use the heuristic from the introduction assignment to get a tour
     const Tour tour = simpleHeuristic(problem);

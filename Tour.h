@@ -41,12 +41,14 @@ public:
 
 class Tour : public VertexList {
 protected:
-    void setVertices(const std::list<vertex_t> &vertexList);
+    void setVertices(const std::vector<vertex_t> &vertexList);
 
 public:
     Tour();
 
     explicit Tour(std::vector<std::pair<vertex_t, vertex_t>> neighbors);
+
+    explicit Tour(const std::vector<vertex_t> &vertexList);
 
     bool isHamiltonianTour() const;
 };

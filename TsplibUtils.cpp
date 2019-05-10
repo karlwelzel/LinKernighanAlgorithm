@@ -11,6 +11,7 @@
 #include <fstream>
 #include "TsplibUtils.h"
 
+// TODO: Refactor from readFile to fromFile as an alternative "constructor"
 
 // Trim whitespaces from the start and end of str
 std::string trim(const std::string &str, const std::string &whitespace) {
@@ -295,7 +296,7 @@ std::string TsplibTour::readFile(std::ifstream &inputFile) {
     std::string line;
     std::string lastDataKeyword;
     std::string::size_type delimiterIndex;
-    std::list<vertex_t> tourList;
+    std::vector<vertex_t> tourList;
 
     while (inputFile) {
         getline(inputFile, line);

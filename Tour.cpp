@@ -119,15 +119,19 @@ Tour::Tour(std::vector<std::pair<vertex_t, vertex_t>> neighbors) : VertexList(st
     }
 }
 
+Tour::Tour(const std::vector<vertex_t> &vertexList) {
+    setVertices(vertexList);
+}
+
 // Initialize the neighbors map with a std::list that represents a tour. For each vertex x the neighbors are the
 // adjacent entries in "vertexList" (start and end are also adjacent)
 // This expects a list containing the numbers from 0 to tour.size()-1 and clears neighbors
-void Tour::setVertices(const std::list<vertex_t> &vertexList) {
+void Tour::setVertices(const std::vector<vertex_t> &vertexList) {
     neighbors.assign(vertexList.size(), std::make_pair(NO_VERTEX, NO_VERTEX));
     vertex_t previous, current;
     auto it = vertexList.begin();
     current = *it;
-    std::advance(it, 1);
+    ++it;
     for (; it != vertexList.end(); ++it) {
         previous = current;
         current = *it;
