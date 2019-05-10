@@ -2,6 +2,7 @@
 // Created by Karl Welzel on 19/04/2019.
 //
 
+#include <utility>
 #include <list>
 #include <cmath>
 #include <regex>
@@ -28,6 +29,7 @@ std::string trim(const std::string &str, const std::string &whitespace) {
 // This class reads and stores problems from the TSPLIB library, while also checking for syntax errors, logical errors
 // or unsupported keywords
 
+TsplibProblem::TsplibProblem() = default;
 
 // Interpret a single keyword value pair from the specification part of a TSPLIB file
 // Expects keyword and value to not have any superfluous whitespaces or line breaks
@@ -261,8 +263,11 @@ distance_t TsplibProblem::length(const Tour &tour) const {
 // This class reads and stores tours from the TSPLIB library, while also checking for syntax errors, logical errors
 // or unsupported keywords
 
+TsplibTour::TsplibTour() = default;
 
-TsplibProblem::TsplibProblem() = default;
+// Construct a TsplibTour from a tour with some additional information
+TsplibTour::TsplibTour(std::string name, const Tour &tour) : name(std::move(name)), type("TOUR"),
+                                                             dimension(tour.getDimension()), Tour(tour) {}
 
 // Interpret a single keyword value pair from the specification part of a TSPLIB tour file
 // Expects keyword and value to not have any superfluous whitespaces or line breaks
@@ -346,6 +351,22 @@ std::string TsplibTour::readFile(std::ifstream &inputFile) {
     return "";
 }
 
+std::string TsplibTour::toTsplibTourFile() {
+    std::string output;
+    output += "NAME : " + name + "\n";
+    output += "TYPE : " + type + "\n";
+    output += "DIMENSION : " + std::to_string(dimension) + "\n";
+    output += "TOUR_SECTION\n";
+    TourWalker tourWalker(*this, 0);
+    vertex_t currentVertex = tourWalker.getNextVertex();
+    do {
+        output += std::to_string(currentVertex + 1) + "\n";
+        currentVertex = tourWalker.getNextVertex();
+    } while (currentVertex != 0);
+    output += "-1\n";
+    return output;
+}
+
 // Returns the name of the TSPLIB tour
 const std::string &TsplibTour::getName() const {
     return name;
@@ -355,4 +376,5 @@ const std::string &TsplibTour::getName() const {
 const std::string &TsplibTour::getType() const {
     return type;
 }
+
 

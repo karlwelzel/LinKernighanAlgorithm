@@ -64,7 +64,13 @@ private:
     std::string interpretKeyword(const std::string &keyword, const std::string &value);
 
 public:
+    TsplibTour();
+
+    TsplibTour(std::string name, const Tour &tour);
+
     std::string readFile(std::ifstream &inputFile);
+
+    std::string toTsplibTourFile();
 
     const std::string &getName() const;
 

@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
     std::string errorMessage = problem.readFile(problemFile);
     problemFile.close();
 
-    std::cout << "Opened the " << problem.getName() << " TSPLIB file" << std::endl;
+    std::cout << "Opened the " << problem.getName() << " TSPLIB file" << std::endl << std::endl;
     if (!errorMessage.empty()) {
         std::cerr << "The TSPLIB file has an invalid format: " << errorMessage
                   << std::endl;
@@ -68,9 +68,8 @@ int main(int argc, char *argv[]) {
 
     // Output the best tour found by the algorithm and compare it to the optimal tour if given
     distance_t length = problem.length(tour);
-    std::cout << "This is the shortest tour found:" << std::endl;
-    std::cout << tour;
-    std::cout << "It is " << length << " units long." << std::endl << std::endl;
+    std::cout << "The following tour was the shortest tour found. It is " << length << " units long." << std::endl;
+    std::cout << TsplibTour(problem.getName() + ".tour", tour).toTsplibTourFile() << std::endl;
 
     // Check whether a second command line argument is given
     std::ifstream optimalTourFile;
@@ -99,13 +98,10 @@ int main(int argc, char *argv[]) {
             return 1;
         }
 
-        // Print the optimal tour and its length and compare it to the tour returned by the heuristic
+        // Compare the length of the optimal tour to the tour returned by the heuristic
         distance_t optimalLength = problem.length(optimalTour);
-        std::cout << "This is the optimal tour:" << std::endl;
-        std::cout << optimalTour;
-        std::cout << "It is " << optimalLength << " units long." << std::endl << std::endl;
-        std::cout << "The best tour found by the heuristic is " << (length / (double) optimalLength - 1) * 100
-                  << "% above the optimum." << std::endl;
+        std::cout << "The best tour found by the heuristic is " << ((length / (double) optimalLength) - 1) * 100
+                  << "% above the optimum of " << optimalLength << "." << std::endl;
     }
 
     return 0;
