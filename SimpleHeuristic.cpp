@@ -29,8 +29,8 @@ vertex_t TourParts::find(const vertex_t x) {
 }
 
 void TourParts::join(const vertex_t x, const vertex_t y) {
-    const vertex_t xr = find(x); // root of x
-    const vertex_t yr = find(y); // root of y
+    vertex_t xr = find(x); // root of x
+    vertex_t yr = find(y); // root of y
     if (xr == yr) {
         return; // A path cannot be joined with itself, this would lead to non-Hamiltonian tours
     }
@@ -47,20 +47,16 @@ void TourParts::join(const vertex_t x, const vertex_t y) {
         return; // x and y cannot be joined, because one of them is not an end of its path
     }
 
-    // Now make x and y neighbors of each other
     if (!makeNeighbors(x, y)) {
         throw std::runtime_error("You cannot join neighbors when one of them already has two neighbors.");
     }
 
     if (size.at(xr) > size.at(yr)) {
-        parent.at(yr) = xr;
-        size.at(xr) += size.at(yr);
-        pathEnds.at(xr) = newPathEnds;
-    } else {
-        parent.at(xr) = yr;
-        size.at(yr) += size.at(xr);
-        pathEnds.at(yr) = newPathEnds;
+        std::swap(xr, yr);
     }
+    parent.at(xr) = yr;
+    size.at(yr) += size.at(xr);
+    pathEnds.at(yr) = newPathEnds;
 }
 
 bool TourParts::isTourClosable() {

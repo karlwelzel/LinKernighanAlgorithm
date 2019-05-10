@@ -12,7 +12,7 @@
 
 // ================================================ VertexList class ===================================================
 
-const vertex_t VertexList::NO_VERTEX = std::numeric_limits<unsigned int>::max();
+const vertex_t VertexList::NO_VERTEX = std::numeric_limits<vertex_t>::max();
 
 VertexList::VertexList() = default;
 
@@ -28,7 +28,7 @@ dimension_t VertexList::getDimension() const {
 }
 
 vertex_t VertexList::next(const vertex_t previous, const vertex_t current) const {
-    const std::pair<vertex_t, vertex_t> currentNeighbors = neighbors.at(current);
+    const std::pair<vertex_t, vertex_t> &currentNeighbors = neighbors.at(current);
     if (previous != currentNeighbors.first and previous != currentNeighbors.second) {
         throw std::runtime_error(
                 "Tour::next: previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
@@ -53,38 +53,39 @@ vertex_t VertexList::next(const vertex_t current) const {
 
 void VertexList::setNext(const vertex_t previous, const vertex_t current, const vertex_t next) {
     if (previous == next) {
-        throw std::runtime_error("Tour::setNext: You cannot set both neighbors to the same vertex.");
+        throw std::runtime_error("setNext: You cannot set both neighbors to the same vertex.");
     }
-    const std::pair<vertex_t, vertex_t> currentNeighbors = neighbors.at(current);
+    const std::pair<vertex_t, vertex_t> &currentNeighbors = neighbors.at(current);
     if (previous != currentNeighbors.first and previous != currentNeighbors.second) {
         throw std::runtime_error(
-                "Tour::setNext: previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
+                "setNext: previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
                 std::to_string(current) + ")");
     }
     neighbors.at(current) = std::make_pair(previous, next);
 }
 
+void VertexList::setNeighbor(vertex_t vertex, vertex_t newNeighbor) {
+    std::pair<vertex_t, vertex_t> &neighborsOfVertex = neighbors.at(vertex);
+    if (neighborsOfVertex.first == NO_VERTEX) {
+        neighborsOfVertex.first = newNeighbor;
+    } else if (neighborsOfVertex.second == NO_VERTEX) {
+        neighborsOfVertex.second = newNeighbor;
+    } else {
+        throw std::runtime_error("setNeighbor: Both neighbors are already set.");
+    }
+
+}
+
 bool VertexList::makeNeighbors(const vertex_t vertex1, const vertex_t vertex2) {
     const std::pair<vertex_t, vertex_t> neighbors1 = neighbors.at(vertex1);
     const std::pair<vertex_t, vertex_t> neighbors2 = neighbors.at(vertex2);
-    if (neighbors1.first == NO_VERTEX and neighbors2.first == NO_VERTEX) {
-        neighbors.at(vertex1).first = vertex2;
-        neighbors.at(vertex2).first = vertex1;
-        return true;
-    } else if (neighbors1.first == NO_VERTEX and neighbors2.second == NO_VERTEX) {
-        neighbors.at(vertex1).first = vertex2;
-        neighbors.at(vertex2).second = vertex1;
-        return true;
-    } else if (neighbors1.second == NO_VERTEX and neighbors2.first == NO_VERTEX) {
-        neighbors.at(vertex1).second = vertex2;
-        neighbors.at(vertex2).first = vertex1;
-        return true;
-    } else if (neighbors1.second == NO_VERTEX and neighbors2.second == NO_VERTEX) {
-        neighbors.at(vertex1).second = vertex2;
-        neighbors.at(vertex2).second = vertex1;
-        return true;
-    } else {
+    if ((neighbors1.first != NO_VERTEX and neighbors1.second != NO_VERTEX) or
+        (neighbors2.first != NO_VERTEX and neighbors2.second != NO_VERTEX)) {
         return false;
+    } else {
+        setNeighbor(vertex1, vertex2);
+        setNeighbor(vertex2, vertex1);
+        return true;
     }
 }
 

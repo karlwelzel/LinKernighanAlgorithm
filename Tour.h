@@ -34,6 +34,10 @@ protected:
     // previous is necessary to determine the direction
     void setNext(vertex_t previous, vertex_t current, vertex_t next);
 
+    // Set newNeighbor as one of the neighbors of vertex.
+    // Throws a runtime_error if both of the neighbors of vertex are already set
+    void setNeighbor(vertex_t vertex, vertex_t newNeighbor);
+
 public:
     // A placeholder to indicate that a vertex is missing
     static const vertex_t NO_VERTEX;
