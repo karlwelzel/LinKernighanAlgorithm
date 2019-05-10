@@ -30,14 +30,8 @@ std::string trim(const std::string &str, const std::string &whitespace) {
 
 // ============================================ TsplibProblem class ====================================================
 
-// This class reads and stores problems from the TSPLIB library, while also checking for syntax errors, logical errors
-// or unsupported keywords
-
 TsplibProblem::TsplibProblem() = default;
 
-// Interpret a single keyword value pair from the specification part of a TSPLIB file
-// Expects keyword and value to not have any superfluous whitespaces or line breaks
-// Returns an error message if an error occurred and an empty string otherwise
 std::string TsplibProblem::interpretKeyword(const std::string &keyword, const std::string &value) {
     if (keyword == "NAME") {
         name = value;
@@ -70,8 +64,6 @@ std::string TsplibProblem::interpretKeyword(const std::string &keyword, const st
     return "";
 }
 
-// Interpret the file "inputFile" as a TSPLIB file and store the information given there
-// Returns an error message if an error occurred and an empty string otherwise
 std::string TsplibProblem::readFile(std::ifstream &inputFile) {
     std::string line;
     std::string lastDataKeyword;
@@ -215,22 +207,18 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
     return "";
 }
 
-// Returns the name of the TSPLIB problem
 const std::string &TsplibProblem::getName() const {
     return name;
 }
 
-// Returns the type of the TSPLIB problem (always TSP)
 const std::string &TsplibProblem::getType() const {
     return type;
 }
 
-// Returns the number of vertices in the TSPLIB problem
 dimension_t TsplibProblem::getDimension() const {
     return dimension;
 }
 
-// Compute the distance of i and j
 distance_t TsplibProblem::dist(const vertex_t i, const vertex_t j) const {
     if (edgeWeightType == "EUC_2D") {
         double d = hypot(coordinates.at(i).at(0) - coordinates.at(j).at(0),
@@ -264,18 +252,11 @@ distance_t TsplibProblem::length(const Tour &tour) const {
 
 // ============================================== TsplibTour class =====================================================
 
-// This class reads and stores tours from the TSPLIB library, while also checking for syntax errors, logical errors
-// or unsupported keywords
-
 TsplibTour::TsplibTour() = default;
 
-// Construct a TsplibTour from a tour with some additional information
 TsplibTour::TsplibTour(std::string name, const Tour &tour) : name(std::move(name)), type("TOUR"),
                                                              dimension(tour.getDimension()), Tour(tour) {}
 
-// Interpret a single keyword value pair from the specification part of a TSPLIB tour file
-// Expects keyword and value to not have any superfluous whitespaces or line breaks
-// Returns an error message if an error occurred and an empty string otherwise
 std::string TsplibTour::interpretKeyword(const std::string &keyword, const std::string &value) {
     if (keyword == "NAME") {
         name = value;
@@ -293,8 +274,6 @@ std::string TsplibTour::interpretKeyword(const std::string &keyword, const std::
     return "";
 }
 
-// Interpret the file "inputFile" as a TSPLIB tour file and store the information given there
-// Returns an error message if an error occurred and an empty string otherwise
 std::string TsplibTour::readFile(std::ifstream &inputFile) {
     std::string line;
     std::string lastDataKeyword;
@@ -371,12 +350,10 @@ std::string TsplibTour::toTsplibTourFile() {
     return output;
 }
 
-// Returns the name of the TSPLIB tour
 const std::string &TsplibTour::getName() const {
     return name;
 }
 
-// Returns the type of the TSPLIB problem (always TOUR)
 const std::string &TsplibTour::getType() const {
     return type;
 }
