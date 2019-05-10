@@ -5,6 +5,7 @@
 // This library contains the code for the introduction assignment
 
 #include <utility>
+#include <tuple>
 #include <vector>
 #include <algorithm>
 #include "SimpleHeuristic.h"
@@ -109,36 +110,22 @@ Tour TourParts::closeTour() {
 }
 
 
-// Compare edges by edge cost/distance given by a TsplibProblem
-class EdgeCostComparator {
-private:
-    TsplibProblem tsplibProblem;
-
-public:
-    explicit EdgeCostComparator(TsplibProblem tsplibProblem) : tsplibProblem(std::move(tsplibProblem)) {}
-
-    bool operator()(const std::pair<vertex_t, vertex_t> edge1,
-                    const std::pair<vertex_t, vertex_t> edge2) const {
-        return (tsplibProblem.dist(edge1.first, edge1.second) < tsplibProblem.dist(edge2.first, edge2.second));
-    }
-};
-
-
 Tour simpleHeuristic(const TsplibProblem &tsplibProblem) {
-    std::vector<std::pair<vertex_t, vertex_t>> edges;
+    std::vector<std::tuple<distance_t, vertex_t, vertex_t>> edges;
     for (vertex_t i = 0; i < tsplibProblem.getDimension(); ++i) {
         for (vertex_t j = i + 1; j < tsplibProblem.getDimension(); ++j) {
-            edges.emplace_back(i, j);
+            edges.emplace_back(tsplibProblem.dist(i, j), i, j);
         }
     }
 
-    const EdgeCostComparator edgeComparator(tsplibProblem);
     // Sort edges by edge cost/distance in ascending order
-    std::sort(edges.begin(), edges.end(), edgeComparator);
+    std::sort(edges.begin(), edges.end());
 
     TourParts tourParts(tsplibProblem.getDimension());
-    for (const std::pair<vertex_t, vertex_t> edge : edges) {
-        tourParts.join(edge.first, edge.second);
+    for (const auto edge : edges) {
+        vertex_t vertex1, vertex2;
+        std::tie(std::ignore, vertex1, vertex2) = edge;
+        tourParts.join(vertex1, vertex2);
         if (tourParts.isTourClosable()) {
             return tourParts.closeTour();
         }
