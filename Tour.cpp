@@ -64,16 +64,29 @@ void VertexList::setNext(const vertex_t previous, const vertex_t current, const 
     neighbors.at(current) = std::make_pair(previous, next);
 }
 
-void VertexList::setNeighbor(vertex_t vertex, vertex_t newNeighbor) {
+void VertexList::addNeighbor(vertex_t vertex, vertex_t newNeighbor) {
     std::pair<vertex_t, vertex_t> &neighborsOfVertex = neighbors.at(vertex);
     if (neighborsOfVertex.first == NO_VERTEX) {
         neighborsOfVertex.first = newNeighbor;
     } else if (neighborsOfVertex.second == NO_VERTEX) {
         neighborsOfVertex.second = newNeighbor;
     } else {
-        throw std::runtime_error("setNeighbor: Both neighbors are already set.");
+        throw std::runtime_error(
+                "addNeighbor: Both neighbors of vertex (" + std::to_string(vertex) + ") are already set.");
     }
+}
 
+void VertexList::removeNeighbor(vertex_t vertex, vertex_t neighbor) {
+    std::pair<vertex_t, vertex_t> &neighborsOfVertex = neighbors.at(vertex);
+    if (neighborsOfVertex.first == neighbor) {
+        neighborsOfVertex.first = NO_VERTEX;
+    } else if (neighborsOfVertex.second == neighbor) {
+        neighborsOfVertex.second = NO_VERTEX;
+    } else {
+        throw std::runtime_error(
+                "removeNeighbor: neighbor (" + std::to_string(neighbor) + ") is not a neighbor of vertex (" +
+                std::to_string(vertex) + ").");
+    }
 }
 
 bool VertexList::makeNeighbors(const vertex_t vertex1, const vertex_t vertex2) {
@@ -83,8 +96,8 @@ bool VertexList::makeNeighbors(const vertex_t vertex1, const vertex_t vertex2) {
         (neighbors2.first != NO_VERTEX and neighbors2.second != NO_VERTEX)) {
         return false;
     } else {
-        setNeighbor(vertex1, vertex2);
-        setNeighbor(vertex2, vertex1);
+        addNeighbor(vertex1, vertex2);
+        addNeighbor(vertex2, vertex1);
         return true;
     }
 }
@@ -135,6 +148,26 @@ bool Tour::isHamiltonianTour() const {
         if (!v) return false;
     }
     return true;
+}
+
+Tour Tour::exchange(std::vector<vertex_t> alternatingWalk) {
+    Tour tour(*this);
+    for (vertex_t i = 0; i < alternatingWalk.size(); ++i) {
+        // The current edge in the alternating walk is from vertex1 to vertex2
+        vertex_t vertex1 = alternatingWalk.at(i);
+        vertex_t vertex2 = alternatingWalk.at((i + 1) % alternatingWalk.size());
+        if (i % 2 == 0) { // {x_i, x_i+1} is part of the tour
+            tour.removeNeighbor(vertex1, vertex2);
+            tour.removeNeighbor(vertex2, vertex1);
+        } else { // {x_i, x_i+1} is not part of the tour
+            tour.addNeighbor(vertex1, vertex2);
+            tour.addNeighbor(vertex2, vertex1);
+        }
+    }
+
+    if (!tour.isHamiltonianTour()) {
+        throw std::runtime_error("The exchange with the given alternating walk does not result in a hamiltonian tour");
+    }
 }
 
 

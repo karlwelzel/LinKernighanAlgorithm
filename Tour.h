@@ -36,7 +36,11 @@ protected:
 
     // Set newNeighbor as one of the neighbors of vertex.
     // Throws a runtime_error if both of the neighbors of vertex are already set
-    void setNeighbor(vertex_t vertex, vertex_t newNeighbor);
+    void addNeighbor(vertex_t vertex, vertex_t newNeighbor);
+
+    // Deletes neighbor as a neighbor of vertex
+    // Throws a runtime_error if neighbor is not a neighbor of vertex
+    void removeNeighbor(vertex_t vertex, vertex_t neighbor);
 
 public:
     // A placeholder to indicate that a vertex is missing
@@ -63,6 +67,7 @@ public:
     // Tries to make vertex1 a neighbor of vertex2 and vertex2 a neighbor of vertex1 and returns whether this was
     // successful. It only fails if one of them already has two neighbors.
     bool makeNeighbors(vertex_t vertex1, vertex_t vertex2);
+
 };
 
 
@@ -90,6 +95,8 @@ public:
 
     // Checks if this Tour really is a hamiltonian tour
     bool isHamiltonianTour() const;
+
+    Tour exchange(std::vector<vertex_t> alternatingWalk);
 };
 
 
