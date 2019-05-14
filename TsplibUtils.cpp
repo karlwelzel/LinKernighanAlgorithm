@@ -249,6 +249,18 @@ distance_t TsplibProblem::length(const Tour &tour) const {
     return sum;
 }
 
+distance_t TsplibProblem::exchangeGain(std::vector<vertex_t> &alternatingWalk) const {
+    distance_t value = 0;
+    for (size_t i = 0; i < alternatingWalk.size() - 1; ++i) {
+        if (i % 2 == 0) {
+            value += dist(alternatingWalk.at(i), alternatingWalk.at(i + 1));
+        } else {
+            value -= dist(alternatingWalk.at(i), alternatingWalk.at(i + 1));
+        }
+    }
+    return value;
+}
+
 
 // ============================================== TsplibTour class =====================================================
 

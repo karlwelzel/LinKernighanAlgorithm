@@ -64,6 +64,10 @@ void VertexList::setNext(const vertex_t previous, const vertex_t current, const 
     neighbors.at(current) = std::make_pair(previous, next);
 }
 
+bool VertexList::isNeighbor(vertex_t vertex, vertex_t neighbor) const {
+    return neighbors.at(vertex).first == neighbor or neighbors.at(vertex).second == neighbor;
+}
+
 void VertexList::addNeighbor(vertex_t vertex, vertex_t newNeighbor) {
     std::pair<vertex_t, vertex_t> &neighborsOfVertex = neighbors.at(vertex);
     if (neighborsOfVertex.first == NO_VERTEX) {
@@ -90,10 +94,7 @@ void VertexList::removeNeighbor(vertex_t vertex, vertex_t neighbor) {
 }
 
 bool VertexList::makeNeighbors(const vertex_t vertex1, const vertex_t vertex2) {
-    const std::pair<vertex_t, vertex_t> neighbors1 = neighbors.at(vertex1);
-    const std::pair<vertex_t, vertex_t> neighbors2 = neighbors.at(vertex2);
-    if ((neighbors1.first != NO_VERTEX and neighbors1.second != NO_VERTEX) or
-        (neighbors2.first != NO_VERTEX and neighbors2.second != NO_VERTEX)) {
+    if (!isNeighbor(vertex1, NO_VERTEX) or !isNeighbor(vertex2, NO_VERTEX)) {
         return false;
     } else {
         addNeighbor(vertex1, vertex2);
@@ -150,7 +151,7 @@ bool Tour::isHamiltonianTour() const {
     return true;
 }
 
-Tour Tour::exchange(std::vector<vertex_t> alternatingWalk) {
+Tour Tour::exchange(std::vector<vertex_t> &alternatingWalk) const {
     Tour tour(*this);
     for (vertex_t i = 0; i < alternatingWalk.size(); ++i) {
         // The current edge in the alternating walk is from vertex1 to vertex2
@@ -164,10 +165,11 @@ Tour Tour::exchange(std::vector<vertex_t> alternatingWalk) {
             tour.addNeighbor(vertex2, vertex1);
         }
     }
+    return tour;
+}
 
-    if (!tour.isHamiltonianTour()) {
-        throw std::runtime_error("The exchange with the given alternating walk does not result in a hamiltonian tour");
-    }
+bool Tour::isTourAfterExchange(std::vector<vertex_t> &alternatingWalk) const {
+    return exchange(alternatingWalk).isHamiltonianTour();
 }
 
 

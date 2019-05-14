@@ -64,6 +64,9 @@ public:
     // Returns some vertex, that is a neighbor of current, if one exists, otherwise NO_VERTEX
     vertex_t next(vertex_t current) const;
 
+    // Checks whether next is a neighbor of current
+    bool isNeighbor(vertex_t vertex, vertex_t neighbor) const;
+
     // Tries to make vertex1 a neighbor of vertex2 and vertex2 a neighbor of vertex1 and returns whether this was
     // successful. It only fails if one of them already has two neighbors.
     bool makeNeighbors(vertex_t vertex1, vertex_t vertex2);
@@ -96,7 +99,16 @@ public:
     // Checks if this Tour really is a hamiltonian tour
     bool isHamiltonianTour() const;
 
-    Tour exchange(std::vector<vertex_t> alternatingWalk);
+    // Checks if the tour after exchanging all edges of alternatingWalk on the tour by edges not on the tour is still
+    // a hamiltonian tour
+    // Expects a closed alternating walk that starts with an edge on the tour
+    bool isTourAfterExchange(std::vector<vertex_t> &alternatingWalk) const;
+
+    // Computes the tour after exchanging all edges of alternatingWalk on the tour by edges not on the tour, but does
+    // not modify the tour object itself
+    // Expects a closed alternating walk that starts with an edge on the tour
+    // Expects that the exchange will lead to a hamiltonian tour, check with isTourAfterExchange beforehand
+    Tour exchange(std::vector<vertex_t> &alternatingWalk) const;
 };
 
 
