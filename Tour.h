@@ -26,6 +26,9 @@ using distance_t = unsigned long; // The type used for distances and lengths
 // This class is the base class for Tour.
 
 
+// TODO: Refactor neighbors to be of type std::vector<std::vector<vertex_t>>
+// This avoids NO_VECTOR, allows iteration, avoids duplicate code
+
 class VertexList {
 protected:
     std::vector<std::pair<vertex_t, vertex_t>> neighbors;
@@ -57,6 +60,9 @@ public:
     // Returns the number of vertices
     dimension_t getDimension() const;
 
+    // Returns the neighbors of vertex in the tour
+    std::pair<vertex_t, vertex_t> getNeighbors(vertex_t vertex);
+
     // Which vertex comes after current, when previous comes before it?
     // previous is necessary to determine the direction
     vertex_t next(vertex_t previous, vertex_t current) const;
@@ -66,6 +72,10 @@ public:
 
     // Checks whether next is a neighbor of current
     bool isNeighbor(vertex_t vertex, vertex_t neighbor) const;
+
+    // Checks whether the tour contains the edge {vertex1, vertex2}
+    // This function is an alias for isNeighbor
+    bool containsEdge(vertex_t vertex1, vertex_t vertex2) const;
 
     // Tries to make vertex1 a neighbor of vertex2 and vertex2 a neighbor of vertex1 and returns whether this was
     // successful. It only fails if one of them already has two neighbors.
@@ -98,6 +108,8 @@ public:
 
     // Checks if this Tour really is a hamiltonian tour
     bool isHamiltonianTour() const;
+
+    // TODO: Refactor that isTourAfterExchange and exchange accept additional vertices as tuple
 
     // Checks if the tour after exchanging all edges of alternatingWalk on the tour by edges not on the tour is still
     // a hamiltonian tour

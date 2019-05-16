@@ -27,6 +27,10 @@ dimension_t VertexList::getDimension() const {
     return neighbors.size();
 }
 
+std::pair<vertex_t, vertex_t> VertexList::getNeighbors(vertex_t vertex) {
+    return neighbors.at(vertex);
+}
+
 vertex_t VertexList::next(const vertex_t previous, const vertex_t current) const {
     const std::pair<vertex_t, vertex_t> &currentNeighbors = neighbors.at(current);
     if (previous != currentNeighbors.first and previous != currentNeighbors.second) {
@@ -66,6 +70,10 @@ void VertexList::setNext(const vertex_t previous, const vertex_t current, const 
 
 bool VertexList::isNeighbor(vertex_t vertex, vertex_t neighbor) const {
     return neighbors.at(vertex).first == neighbor or neighbors.at(vertex).second == neighbor;
+}
+
+bool VertexList::containsEdge(vertex_t vertex1, vertex_t vertex2) const {
+    return isNeighbor(vertex1, vertex2);
 }
 
 void VertexList::addNeighbor(vertex_t vertex, vertex_t newNeighbor) {

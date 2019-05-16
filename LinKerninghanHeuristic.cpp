@@ -10,10 +10,24 @@
 #include <numeric>
 #include "LinKerninghanHeuristic.h"
 
+
+bool containsEdge(const std::vector<vertex_t> &walk, vertex_t vertex1, vertex_t vertex2) {
+    for (dimension_t i = 0; i < walk.size() - 1; ++i) {
+        if ((walk.at(i) == vertex1 and walk.at(i + 1) == vertex2) or
+            (walk.at(i) == vertex2 and walk.at(i + 1) == vertex1)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// This is implemented as described in Combinatorial Optimization with p_1 = 5, p_2 = 2 and G = K_n
+
 Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &startTour) {
     const size_t backtrackingDepth = 5;
     const size_t infeasibilityDepth = 2;
 
+    const dimension_t dimension = tsplibProblem.getDimension();
     Tour currentTour = startTour;
     std::vector<std::vector<vertex_t>> vertexChoices;
     std::vector<vertex_t> chosenVertices;
@@ -23,12 +37,13 @@ Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &star
     while (true) {
         // Create set X_0 with all vertices
         vertexChoices.clear();
-        vertexChoices.emplace_back(tsplibProblem.getDimension());
+        vertexChoices.emplace_back(dimension);
         std::iota(vertexChoices.at(0).begin(), vertexChoices.at(0).end(), 0);
 
         bestAlternatingWalk.clear();
         highestGain = 0;
-        for (size_t i = 0;; ++i) {
+        size_t i = 0;
+        while (true) {
             if (vertexChoices.at(i).empty() and highestGain > 0) {
                 currentTour.exchange(bestAlternatingWalk);
                 break;
@@ -37,21 +52,25 @@ Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &star
                     return currentTour;
                 } else {
                     i = std::min(i - 1, backtrackingDepth);
-                    // TODO: Remove unnecessary vertexChoices and chosenVertices
+                    vertexChoices.erase(vertexChoices.begin() + i, vertexChoices.end());
+                    chosenVertices.erase(chosenVertices.begin() + i - 1, chosenVertices.end());
+                    continue;
                 }
             }
 
-            // TODO: Maybe always remove the last element of chosenVertices to make this if-statement unnecessary
-            if (chosenVertices.size() < i) {
-                chosenVertices.push_back(vertexChoices.at(i).back());
-            } else {
-                chosenVertices.at(i) = vertexChoices.at(i).back();
-            }
+            chosenVertices.push_back(vertexChoices.at(i).back());
             vertexChoices.at(i).pop_back();
 
             // DEBUG:
-            if (chosenVertices.size() < i) {
-                throw std::runtime_error("chosenVertices.size() is too low");
+            if (vertexChoices.size() == i) {
+                throw std::runtime_error(
+                        "vertexChoices.size() (=" + std::to_string(vertexChoices.size()) + ") is not i-1 (=" +
+                        std::to_string(i - 1) + ")");
+            }
+            if (chosenVertices.size() == i) {
+                throw std::runtime_error(
+                        "chosenVertices.size() (=" + std::to_string(chosenVertices.size()) + ") is not i-1 (=" +
+                        std::to_string(i - 1) + ")");
             }
 
             if (i % 2 == 1 and i >= 3) {
@@ -65,16 +84,51 @@ Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &star
                 chosenVertices.pop_back();
             }
 
-            // DEBUG:
-            if (vertexChoices.size() != i - 1) {
-                throw std::runtime_error("vertexChoices.size() is not correct");
-            }
+            vertexChoices.emplace_back(); // Add set X_{i+1}
+            vertex_t xi = chosenVertices.at(i);
             if (i % 2 == 1) { // i is odd
-                vertexChoices.emplace_back(); // Add set X_{i+1}
-                // You can use currentTour.isNeighbor()
-            } else { // i is even
+                for (vertex_t x = 0; x < dimension; ++x) {
+                    if (x != chosenVertices.at(0) and x != chosenVertices.at(i) and
+                        !currentTour.containsEdge(xi, x) and
+                        !containsEdge(chosenVertices, xi, x) and
+                        tsplibProblem.exchangeGain(chosenVertices) - tsplibProblem.dist(xi, x) > highestGain) {
+                        vertexChoices.at(i + 1).push_back(x);
+                    }
 
+                }
+            } else { // i is even
+                if (i <= infeasibilityDepth) {
+                    vertex_t neighbor1, neighbor2;
+                    std::tie(neighbor1, neighbor2) = currentTour.getNeighbors(xi);
+                    if (!containsEdge(chosenVertices, xi, neighbor1)) {
+                        vertexChoices.at(i + 1).push_back(neighbor1);
+                    }
+                    if (!containsEdge(chosenVertices, xi, neighbor2)) {
+                        vertexChoices.at(i + 1).push_back(neighbor2);
+                    }
+                } else {
+                    vertex_t neighbor1, neighbor2;
+                    std::tie(neighbor1, neighbor2) = currentTour.getNeighbors(xi);
+                    if (!containsEdge(chosenVertices, xi, neighbor1)) {
+                        chosenVertices.push_back(neighbor1);
+                        chosenVertices.push_back(chosenVertices.at(0));
+                        if (currentTour.isTourAfterExchange(chosenVertices)) {
+                            vertexChoices.at(i + 1).push_back(neighbor1);
+                        }
+                        chosenVertices.erase(chosenVertices.end() - 2, chosenVertices.end());
+                    }
+                    if (!containsEdge(chosenVertices, xi, neighbor2)) {
+                        chosenVertices.push_back(neighbor2);
+                        chosenVertices.push_back(chosenVertices.at(0));
+                        if (currentTour.isTourAfterExchange(chosenVertices)) {
+                            vertexChoices.at(i + 1).push_back(neighbor2);
+                        }
+                        chosenVertices.erase(chosenVertices.end() - 2, chosenVertices.end());
+                    }
+                }
             }
+
+            ++i;
         }
 
     }
