@@ -6,70 +6,55 @@
 #include <limits>
 #include <list>
 #include <vector>
+#include <algorithm>
 #include <iostream>
 #include "Tour.h"
 
 
 // ================================================ VertexList class ===================================================
 
-const vertex_t VertexList::NO_VERTEX = std::numeric_limits<vertex_t>::max();
-
 VertexList::VertexList() = default;
 
-VertexList::VertexList(const dimension_t dimension) {
-    neighbors.assign(dimension, std::make_pair(NO_VERTEX, NO_VERTEX));
-}
+VertexList::VertexList(const dimension_t dimension) : neighbors(dimension) {}
 
-VertexList::VertexList(std::vector<std::pair<vertex_t, vertex_t>> neighbors) :
+VertexList::VertexList(std::vector<std::vector<vertex_t>> neighbors) :
         neighbors(std::move(neighbors)) {}
 
 dimension_t VertexList::getDimension() const {
     return neighbors.size();
 }
 
-std::pair<vertex_t, vertex_t> VertexList::getNeighbors(vertex_t vertex) {
+std::vector<vertex_t> VertexList::getNeighbors(vertex_t vertex) {
     return neighbors.at(vertex);
 }
 
 vertex_t VertexList::next(const vertex_t previous, const vertex_t current) const {
-    const std::pair<vertex_t, vertex_t> &currentNeighbors = neighbors.at(current);
-    if (previous != currentNeighbors.first and previous != currentNeighbors.second) {
+    const std::vector<vertex_t> &currentNeighbors = neighbors.at(current);
+    const auto iterator = std::find(currentNeighbors.begin(), currentNeighbors.end(), previous);
+    const long index = std::distance(currentNeighbors.begin(), iterator);
+
+    if (currentNeighbors.size() != 2) {
+        throw std::runtime_error("current (" + std::to_string(current) + ") does not have two neighbors");
+    } else if (iterator == currentNeighbors.end()) {
         throw std::runtime_error(
-                "Tour::next: previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
+                "previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
                 std::to_string(current) + ")");
-    } else if (previous == currentNeighbors.first) {
-        return currentNeighbors.second;
-    } else { // previous == currentNeighbors.second
-        return currentNeighbors.first;
+    } else {
+        return currentNeighbors.at((index + 1) % 2);
     }
 }
 
 vertex_t VertexList::next(const vertex_t current) const {
-    std::pair<vertex_t, vertex_t> currentNeighbors = neighbors.at(current);
-    if (currentNeighbors.first != NO_VERTEX) {
-        return currentNeighbors.first;
-    } else if (currentNeighbors.second != NO_VERTEX) {
-        return currentNeighbors.second;
-    } else {
-        return NO_VERTEX;
+    const std::vector<vertex_t> &currentNeighbors = neighbors.at(current);
+    if (currentNeighbors.empty()) {
+        throw std::runtime_error("current (" + std::to_string(current) + ") does not have a neighbor");
     }
-}
-
-void VertexList::setNext(const vertex_t previous, const vertex_t current, const vertex_t next) {
-    if (previous == next) {
-        throw std::runtime_error("setNext: You cannot set both neighbors to the same vertex.");
-    }
-    const std::pair<vertex_t, vertex_t> &currentNeighbors = neighbors.at(current);
-    if (previous != currentNeighbors.first and previous != currentNeighbors.second) {
-        throw std::runtime_error(
-                "setNext: previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
-                std::to_string(current) + ")");
-    }
-    neighbors.at(current) = std::make_pair(previous, next);
+    return currentNeighbors.at(0);
 }
 
 bool VertexList::isNeighbor(vertex_t vertex, vertex_t neighbor) const {
-    return neighbors.at(vertex).first == neighbor or neighbors.at(vertex).second == neighbor;
+    const std::vector<vertex_t> &vertexNeighbors = neighbors.at(vertex);
+    return std::find(vertexNeighbors.begin(), vertexNeighbors.end(), neighbor) != vertexNeighbors.end();
 }
 
 bool VertexList::containsEdge(vertex_t vertex1, vertex_t vertex2) const {
@@ -77,32 +62,29 @@ bool VertexList::containsEdge(vertex_t vertex1, vertex_t vertex2) const {
 }
 
 void VertexList::addNeighbor(vertex_t vertex, vertex_t newNeighbor) {
-    std::pair<vertex_t, vertex_t> &neighborsOfVertex = neighbors.at(vertex);
-    if (neighborsOfVertex.first == NO_VERTEX) {
-        neighborsOfVertex.first = newNeighbor;
-    } else if (neighborsOfVertex.second == NO_VERTEX) {
-        neighborsOfVertex.second = newNeighbor;
-    } else {
+    std::vector<vertex_t> &vertexNeighbors = neighbors.at(vertex);
+    if (vertexNeighbors.size() >= 2) {
         throw std::runtime_error(
-                "addNeighbor: Both neighbors of vertex (" + std::to_string(vertex) + ") are already set.");
+                "Both neighbors of vertex (" + std::to_string(vertex) + ") are already set.");
+    } else {
+        vertexNeighbors.push_back(newNeighbor);
     }
 }
 
 void VertexList::removeNeighbor(vertex_t vertex, vertex_t neighbor) {
-    std::pair<vertex_t, vertex_t> &neighborsOfVertex = neighbors.at(vertex);
-    if (neighborsOfVertex.first == neighbor) {
-        neighborsOfVertex.first = NO_VERTEX;
-    } else if (neighborsOfVertex.second == neighbor) {
-        neighborsOfVertex.second = NO_VERTEX;
-    } else {
+    std::vector<vertex_t> &vertexNeighbors = neighbors.at(vertex);
+    const auto iterator = std::find(vertexNeighbors.begin(), vertexNeighbors.end(), neighbor);
+    if (iterator == vertexNeighbors.end()) {
         throw std::runtime_error(
                 "removeNeighbor: neighbor (" + std::to_string(neighbor) + ") is not a neighbor of vertex (" +
                 std::to_string(vertex) + ").");
+    } else {
+        vertexNeighbors.erase(iterator);
     }
 }
 
 bool VertexList::makeNeighbors(const vertex_t vertex1, const vertex_t vertex2) {
-    if (!isNeighbor(vertex1, NO_VERTEX) or !isNeighbor(vertex2, NO_VERTEX)) {
+    if (neighbors.at(vertex1).size() >= 2 or neighbors.at(vertex2).size() >= 2) {
         return false;
     } else {
         addNeighbor(vertex1, vertex2);
@@ -116,7 +98,7 @@ bool VertexList::makeNeighbors(const vertex_t vertex1, const vertex_t vertex2) {
 
 Tour::Tour() = default;
 
-Tour::Tour(std::vector<std::pair<vertex_t, vertex_t>> neighbors) : VertexList(std::move(neighbors)) {
+Tour::Tour(std::vector<std::vector<vertex_t>> neighbors) : VertexList(std::move(neighbors)) {
     if (!isHamiltonianTour()) {
         throw std::runtime_error(
                 "A Tour object cannot be initialized with neighbors that do not describe a hamiltonian tour");
@@ -128,15 +110,9 @@ Tour::Tour(const std::vector<vertex_t> &vertexList) {
 }
 
 void Tour::setVertices(const std::vector<vertex_t> &vertexList) {
-    neighbors.assign(vertexList.size(), std::make_pair(NO_VERTEX, NO_VERTEX));
-    vertex_t previous, current;
-    auto it = vertexList.begin();
-    current = *it;
-    ++it;
-    for (; it != vertexList.end(); ++it) {
-        previous = current;
-        current = *it;
-        makeNeighbors(previous, current);
+    neighbors.assign(vertexList.size(), std::vector<vertex_t>());
+    for (auto it = vertexList.begin(); it != vertexList.end() - 1; ++it) {
+        makeNeighbors(*it, *std::next(it));
     }
     makeNeighbors(vertexList.back(), vertexList.front());
 }
@@ -147,28 +123,26 @@ bool Tour::isHamiltonianTour() const {
     TourWalker tourWalker(*this, 0);
     vertex_t currentVertex = tourWalker.getNextVertex();
     do {
-        if (currentVertex >= visited.size() or visited.at(currentVertex)) {
+        if (visited.at(currentVertex)) {
             return false;
         }
         visited.at(currentVertex) = true;
         currentVertex = tourWalker.getNextVertex();
     } while (currentVertex != 0);
-    for (bool v : visited) {
-        if (!v) return false;
-    }
-    return true;
+    // Check if all elements in visited are true
+    return std::all_of(visited.begin(), visited.end(), [](bool v) { return v; });
 }
 
 Tour Tour::exchange(std::vector<vertex_t> &alternatingWalk) const {
     Tour tour(*this);
-    for (vertex_t i = 0; i < alternatingWalk.size(); ++i) {
+    for (vertex_t i = 0; i < alternatingWalk.size() - 1; ++i) {
         // The current edge in the alternating walk is from vertex1 to vertex2
         vertex_t vertex1 = alternatingWalk.at(i);
-        vertex_t vertex2 = alternatingWalk.at((i + 1) % alternatingWalk.size());
-        if (i % 2 == 0) { // {x_i, x_i+1} is part of the tour
+        vertex_t vertex2 = alternatingWalk.at(i + 1);
+        if (i % 2 == 0) { // {vertex1, vertex2} is part of the tour
             tour.removeNeighbor(vertex1, vertex2);
             tour.removeNeighbor(vertex2, vertex1);
-        } else { // {x_i, x_i+1} is not part of the tour
+        } else { // {vertex1, vertex2}  is not part of the tour
             tour.addNeighbor(vertex1, vertex2);
             tour.addNeighbor(vertex2, vertex1);
         }

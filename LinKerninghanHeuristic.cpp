@@ -88,8 +88,7 @@ Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &star
             vertex_t xi = chosenVertices.at(i);
             if (i % 2 == 1) { // i is odd
                 for (vertex_t x = 0; x < dimension; ++x) {
-                    if (x != chosenVertices.at(0) and x != chosenVertices.at(i) and
-                        !currentTour.containsEdge(xi, x) and
+                    if (x != xi and x != chosenVertices.at(0) and !currentTour.containsEdge(xi, x) and
                         !containsEdge(chosenVertices, xi, x) and
                         tsplibProblem.exchangeGain(chosenVertices) - tsplibProblem.dist(xi, x) > highestGain) {
                         vertexChoices.at(i + 1).push_back(x);
@@ -98,32 +97,21 @@ Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &star
                 }
             } else { // i is even
                 if (i <= infeasibilityDepth) {
-                    vertex_t neighbor1, neighbor2;
-                    std::tie(neighbor1, neighbor2) = currentTour.getNeighbors(xi);
-                    if (!containsEdge(chosenVertices, xi, neighbor1)) {
-                        vertexChoices.at(i + 1).push_back(neighbor1);
-                    }
-                    if (!containsEdge(chosenVertices, xi, neighbor2)) {
-                        vertexChoices.at(i + 1).push_back(neighbor2);
+                    for (vertex_t neighbor : currentTour.getNeighbors(xi)) {
+                        if (!containsEdge(chosenVertices, xi, neighbor)) {
+                            vertexChoices.at(i + 1).push_back(neighbor);
+                        }
                     }
                 } else {
-                    vertex_t neighbor1, neighbor2;
-                    std::tie(neighbor1, neighbor2) = currentTour.getNeighbors(xi);
-                    if (!containsEdge(chosenVertices, xi, neighbor1)) {
-                        chosenVertices.push_back(neighbor1);
-                        chosenVertices.push_back(chosenVertices.at(0));
-                        if (currentTour.isTourAfterExchange(chosenVertices)) {
-                            vertexChoices.at(i + 1).push_back(neighbor1);
+                    for (vertex_t neighbor : currentTour.getNeighbors(xi)) {
+                        if (!containsEdge(chosenVertices, xi, neighbor)) {
+                            chosenVertices.push_back(neighbor);
+                            chosenVertices.push_back(chosenVertices.at(0));
+                            if (currentTour.isTourAfterExchange(chosenVertices)) {
+                                vertexChoices.at(i + 1).push_back(neighbor);
+                            }
+                            chosenVertices.erase(chosenVertices.end() - 2, chosenVertices.end());
                         }
-                        chosenVertices.erase(chosenVertices.end() - 2, chosenVertices.end());
-                    }
-                    if (!containsEdge(chosenVertices, xi, neighbor2)) {
-                        chosenVertices.push_back(neighbor2);
-                        chosenVertices.push_back(chosenVertices.at(0));
-                        if (currentTour.isTourAfterExchange(chosenVertices)) {
-                            vertexChoices.at(i + 1).push_back(neighbor2);
-                        }
-                        chosenVertices.erase(chosenVertices.end() - 2, chosenVertices.end());
                     }
                 }
             }

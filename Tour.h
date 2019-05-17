@@ -26,16 +26,9 @@ using distance_t = unsigned long; // The type used for distances and lengths
 // This class is the base class for Tour.
 
 
-// TODO: Refactor neighbors to be of type std::vector<std::vector<vertex_t>>
-// This avoids NO_VECTOR, allows iteration, avoids duplicate code
-
 class VertexList {
 protected:
-    std::vector<std::pair<vertex_t, vertex_t>> neighbors;
-
-    // Set the vertex that comes after current, when previous comes before it. The neighbors of next are not changed!
-    // previous is necessary to determine the direction
-    void setNext(vertex_t previous, vertex_t current, vertex_t next);
+    std::vector<std::vector<vertex_t>> neighbors;
 
     // Set newNeighbor as one of the neighbors of vertex.
     // Throws a runtime_error if both of the neighbors of vertex are already set
@@ -46,28 +39,27 @@ protected:
     void removeNeighbor(vertex_t vertex, vertex_t neighbor);
 
 public:
-    // A placeholder to indicate that a vertex is missing
-    static const vertex_t NO_VERTEX;
-
     VertexList();
 
     // Create dimension vertices, each with no neighbors
     explicit VertexList(dimension_t dimension);
 
     // Create VertexList from a given neighbors map
-    explicit VertexList(std::vector<std::pair<vertex_t, vertex_t>> neighbors);
+    explicit VertexList(std::vector<std::vector<vertex_t>> neighbors);
 
     // Returns the number of vertices
     dimension_t getDimension() const;
 
     // Returns the neighbors of vertex in the tour
-    std::pair<vertex_t, vertex_t> getNeighbors(vertex_t vertex);
+    std::vector<vertex_t> getNeighbors(vertex_t vertex);
 
     // Which vertex comes after current, when previous comes before it?
     // previous is necessary to determine the direction
+    // Throws a runtime_error if the vertex cannot be determined
     vertex_t next(vertex_t previous, vertex_t current) const;
 
-    // Returns some vertex, that is a neighbor of current, if one exists, otherwise NO_VERTEX
+    // Returns some vertex, that is a neighbor of current
+    // Throws a runtime_error if current has no neighbor
     vertex_t next(vertex_t current) const;
 
     // Checks whether next is a neighbor of current
@@ -101,7 +93,7 @@ public:
     Tour();
 
     // Create VertexList from a given neighbors map, checks if the map represents a tour
-    explicit Tour(std::vector<std::pair<vertex_t, vertex_t>> neighbors);
+    explicit Tour(std::vector<std::vector<vertex_t>> neighbors);
 
     // see setVertices
     explicit Tour(const std::vector<vertex_t> &vertexList);
