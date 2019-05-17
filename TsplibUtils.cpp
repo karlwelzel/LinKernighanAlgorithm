@@ -249,6 +249,7 @@ distance_t TsplibProblem::length(const Tour &tour) const {
     return sum;
 }
 
+// TODO: Change return type to avoid problems with negative distances
 distance_t TsplibProblem::exchangeGain(std::vector<vertex_t> &alternatingWalk) const {
     distance_t value = 0;
     for (size_t i = 0; i < alternatingWalk.size() - 1; ++i) {
