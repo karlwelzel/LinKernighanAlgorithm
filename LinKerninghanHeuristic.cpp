@@ -2,7 +2,6 @@
 // Created by karl on 14.05.19.
 //
 
-#include "SimpleHeuristic.h"
 #include <algorithm>
 #include <vector>
 #include <tuple>
@@ -36,6 +35,12 @@ bool AlternatingWalk::containsEdge(vertex_t vertex1, vertex_t vertex2) const {
     return false;
 }
 
+std::ostream &operator<<(std::ostream &out, const AlternatingWalk &walk) {
+    for (vertex_t vertex : walk) {
+        out << vertex << ", ";
+    }
+    return out;
+}
 
 // This is implemented as described in Combinatorial Optimization with p_1 = 5, p_2 = 2 and G = K_n
 
@@ -56,21 +61,26 @@ Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &star
         vertexChoices.emplace_back(dimension);
         std::iota(vertexChoices.at(0).begin(), vertexChoices.at(0).end(), 0);
 
+        currentWalk.clear();
         bestAlternatingWalk.clear();
         highestGain = 0;
         size_t i = 0;
         while (true) {
-            if (vertexChoices.at(i).empty() and highestGain > 0) {
-                currentTour.exchange(bestAlternatingWalk);
-                break;
-            } else if (vertexChoices.at(i).empty() and highestGain == 0) {
-                if (i == 0) {
-                    return currentTour;
-                } else {
-                    i = std::min(i - 1, backtrackingDepth);
-                    vertexChoices.erase(vertexChoices.begin() + i, vertexChoices.end());
-                    currentWalk.erase(currentWalk.begin() + i - 1, currentWalk.end());
-                    continue;
+            if (vertexChoices.at(i).empty()) {
+                if (highestGain > 0) {
+                    // TODO: Why does this output the same exchanges over and over?
+                    std::cout << "Exchange done: " << bestAlternatingWalk << std::endl;
+                    currentTour = currentTour.exchange(bestAlternatingWalk);
+                    break;
+                } else { // highestGain == 0
+                    if (i == 0) {
+                        return currentTour;
+                    } else {
+                        i = std::min(i - 1, backtrackingDepth);
+                        vertexChoices.erase(vertexChoices.begin() + i + 1, vertexChoices.end());
+                        currentWalk.erase(currentWalk.begin() + i, currentWalk.end());
+                        continue;
+                    }
                 }
             }
 

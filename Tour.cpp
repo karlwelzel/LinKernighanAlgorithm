@@ -135,17 +135,21 @@ bool Tour::isHamiltonianTour() const {
 
 Tour Tour::exchange(const std::vector<vertex_t> &alternatingWalk) const {
     Tour tour(*this);
-    for (vertex_t i = 0; i < alternatingWalk.size() - 1; ++i) {
+    // Remove all edges in the alternatingWalk that are part of the tour (every edge with even i)
+    for (vertex_t i = 0; i < alternatingWalk.size() - 1; i += 2) {
         // The current edge in the alternating walk is from vertex1 to vertex2
         vertex_t vertex1 = alternatingWalk.at(i);
         vertex_t vertex2 = alternatingWalk.at(i + 1);
-        if (i % 2 == 0) { // {vertex1, vertex2} is part of the tour
-            tour.removeNeighbor(vertex1, vertex2);
-            tour.removeNeighbor(vertex2, vertex1);
-        } else { // {vertex1, vertex2}  is not part of the tour
-            tour.addNeighbor(vertex1, vertex2);
-            tour.addNeighbor(vertex2, vertex1);
-        }
+        tour.removeNeighbor(vertex1, vertex2);
+        tour.removeNeighbor(vertex2, vertex1);
+    }
+    // Add all edges in the alternatingWalk that are not part of the tour (every edge with odd i)
+    for (vertex_t i = 1; i < alternatingWalk.size() - 1; i += 2) {
+        // The current edge in the alternating walk is from vertex1 to vertex2
+        vertex_t vertex1 = alternatingWalk.at(i);
+        vertex_t vertex2 = alternatingWalk.at(i + 1);
+        tour.addNeighbor(vertex1, vertex2);
+        tour.addNeighbor(vertex2, vertex1);
     }
     return tour;
 }

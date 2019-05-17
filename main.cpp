@@ -5,6 +5,7 @@
 #include "Tour.h"
 #include "TsplibUtils.h"
 #include "SimpleHeuristic.h"
+#include "LinKerninghanHeuristic.h"
 
 // TSPLIB test instances:
 // berlin52            EUC_2D
@@ -66,7 +67,7 @@ int main(int argc, char *argv[]) {
     std::cout << "The tour 1, 2, ..., n has length " << ascendingLength << "." << std::endl << std::endl;
 
     // Use the heuristic from the introduction assignment to get a tour
-    const Tour tour = simpleHeuristic(problem);
+    const Tour tour = linKerninghanHeuristic(problem, simpleHeuristic(problem));
 
     // DEBUG: Check whether tour really is a hamiltonian tour
     if (!tour.isHamiltonianTour()) {

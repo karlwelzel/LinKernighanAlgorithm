@@ -5,6 +5,7 @@
 #ifndef LINKERNINGHANALGORITHM_LINKERNINGHANHEURISTIC_H
 #define LINKERNINGHANALGORITHM_LINKERNINGHANHEURISTIC_H
 
+#include <vector>
 #include "Tour.h"
 #include "TsplibUtils.h"
 
@@ -25,6 +26,10 @@ public:
 
     bool containsEdge(vertex_t vertex1, vertex_t vertex2) const;
 };
+
+// Output the walk to the stream out, typically used with std::cout
+std::ostream &operator<<(std::ostream &out, const AlternatingWalk &walk);
+
 
 Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &startTour);
 
