@@ -133,7 +133,7 @@ bool Tour::isHamiltonianTour() const {
     return std::all_of(visited.begin(), visited.end(), [](bool v) { return v; });
 }
 
-Tour Tour::exchange(std::vector<vertex_t> &alternatingWalk) const {
+Tour Tour::exchange(const std::vector<vertex_t> &alternatingWalk) const {
     Tour tour(*this);
     for (vertex_t i = 0; i < alternatingWalk.size() - 1; ++i) {
         // The current edge in the alternating walk is from vertex1 to vertex2
@@ -150,7 +150,7 @@ Tour Tour::exchange(std::vector<vertex_t> &alternatingWalk) const {
     return tour;
 }
 
-bool Tour::isTourAfterExchange(std::vector<vertex_t> &alternatingWalk) const {
+bool Tour::isTourAfterExchange(const std::vector<vertex_t> &alternatingWalk) const {
     return exchange(alternatingWalk).isHamiltonianTour();
 }
 

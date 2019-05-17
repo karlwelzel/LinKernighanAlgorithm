@@ -8,7 +8,23 @@
 #include "Tour.h"
 #include "TsplibUtils.h"
 
-bool containsEdge(const std::vector<vertex_t> &walk, vertex_t vertex1, vertex_t vertex2);
+// ============================================= AlternatingWalk class =================================================
+
+// This class represents an alternating walk and adds some utility functions to the vector class
+
+
+class AlternatingWalk : public std::vector<vertex_t> {
+public:
+    // Adds the first vertex to the end, to get a closed alternating walk, and returns the result.
+    // Does not change the walk it is called upon
+    AlternatingWalk close() const;
+
+    // Appends vertex at the end, closes the walk (see close) and returns the result
+    // Does not change the walk it is called upon
+    AlternatingWalk appendAndClose(vertex_t vertex) const;
+
+    bool containsEdge(vertex_t vertex1, vertex_t vertex2) const;
+};
 
 Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &startTour);
 

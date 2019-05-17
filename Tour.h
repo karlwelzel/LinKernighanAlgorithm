@@ -101,18 +101,16 @@ public:
     // Checks if this Tour really is a hamiltonian tour
     bool isHamiltonianTour() const;
 
-    // TODO: Refactor that isTourAfterExchange and exchange accept additional vertices as tuple
-
     // Checks if the tour after exchanging all edges of alternatingWalk on the tour by edges not on the tour is still
     // a hamiltonian tour
     // Expects a closed alternating walk that starts with an edge on the tour
-    bool isTourAfterExchange(std::vector<vertex_t> &alternatingWalk) const;
+    bool isTourAfterExchange(const std::vector<vertex_t> &alternatingWalk) const;
 
     // Computes the tour after exchanging all edges of alternatingWalk on the tour by edges not on the tour, but does
     // not modify the tour object itself
     // Expects a closed alternating walk that starts with an edge on the tour
     // Expects that the exchange will lead to a hamiltonian tour, check with isTourAfterExchange beforehand
-    Tour exchange(std::vector<vertex_t> &alternatingWalk) const;
+    Tour exchange(const std::vector<vertex_t> &alternatingWalk) const;
 };
 
 

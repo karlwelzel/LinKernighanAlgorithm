@@ -11,15 +11,31 @@
 #include "LinKerninghanHeuristic.h"
 
 
-bool containsEdge(const std::vector<vertex_t> &walk, vertex_t vertex1, vertex_t vertex2) {
-    for (dimension_t i = 0; i < walk.size() - 1; ++i) {
-        if ((walk.at(i) == vertex1 and walk.at(i + 1) == vertex2) or
-            (walk.at(i) == vertex2 and walk.at(i + 1) == vertex1)) {
+// ============================================= AlternatingWalk class =================================================
+
+AlternatingWalk AlternatingWalk::close() const {
+    AlternatingWalk result(*this);
+    result.push_back(at(0));
+    return result;
+}
+
+AlternatingWalk AlternatingWalk::appendAndClose(vertex_t vertex) const {
+    AlternatingWalk result(*this);
+    result.push_back(vertex);
+    result.push_back(at(0));
+    return result;
+}
+
+bool AlternatingWalk::containsEdge(vertex_t vertex1, vertex_t vertex2) const {
+    for (dimension_t i = 0; i < size() - 1; ++i) {
+        if ((at(i) == vertex1 and at(i + 1) == vertex2) or
+            (at(i) == vertex2 and at(i + 1) == vertex1)) {
             return true;
         }
     }
     return false;
 }
+
 
 // This is implemented as described in Combinatorial Optimization with p_1 = 5, p_2 = 2 and G = K_n
 
@@ -30,8 +46,8 @@ Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &star
     const dimension_t dimension = tsplibProblem.getDimension();
     Tour currentTour = startTour;
     std::vector<std::vector<vertex_t>> vertexChoices;
-    std::vector<vertex_t> chosenVertices;
-    std::vector<vertex_t> bestAlternatingWalk;
+    AlternatingWalk currentWalk;
+    AlternatingWalk bestAlternatingWalk;
     distance_t highestGain = 0;
 
     while (true) {
@@ -53,12 +69,12 @@ Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &star
                 } else {
                     i = std::min(i - 1, backtrackingDepth);
                     vertexChoices.erase(vertexChoices.begin() + i, vertexChoices.end());
-                    chosenVertices.erase(chosenVertices.begin() + i - 1, chosenVertices.end());
+                    currentWalk.erase(currentWalk.begin() + i - 1, currentWalk.end());
                     continue;
                 }
             }
 
-            chosenVertices.push_back(vertexChoices.at(i).back());
+            currentWalk.push_back(vertexChoices.at(i).back());
             vertexChoices.at(i).pop_back();
 
             // DEBUG:
@@ -67,30 +83,31 @@ Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &star
                         "vertexChoices.size() (=" + std::to_string(vertexChoices.size()) + ") is not i-1 (=" +
                         std::to_string(i - 1) + ")");
             }
-            if (chosenVertices.size() == i) {
+            if (currentWalk.size() == i) {
                 throw std::runtime_error(
-                        "chosenVertices.size() (=" + std::to_string(chosenVertices.size()) + ") is not i-1 (=" +
+                        "currentWalk.size() (=" + std::to_string(currentWalk.size()) + ") is not i-1 (=" +
                         std::to_string(i - 1) + ")");
             }
 
             if (i % 2 == 1 and i >= 3) {
-                chosenVertices.push_back(chosenVertices.at(0)); // chosenVertices = (x_0, x_1, ..., x_i, x_0)
+                AlternatingWalk closedWalk = currentWalk.close(); // closedWalk = (x_0, x_1, ..., x_i, x_0)
                 distance_t gain;
-                if ((gain = tsplibProblem.exchangeGain(chosenVertices)) > highestGain and
-                    currentTour.isTourAfterExchange(chosenVertices)) {
-                    bestAlternatingWalk = chosenVertices; // TODO: This should be a copy operation, is it?
+                if ((gain = tsplibProblem.exchangeGain(closedWalk)) > highestGain
+                    and currentTour.isTourAfterExchange(closedWalk)) {
+                    bestAlternatingWalk = closedWalk; // TODO: This should be a copy operation, is it?
                     highestGain = gain;
                 }
-                chosenVertices.pop_back();
             }
 
             vertexChoices.emplace_back(); // Add set X_{i+1}
-            vertex_t xi = chosenVertices.at(i);
+            vertex_t xi = currentWalk.at(i);
             if (i % 2 == 1) { // i is odd
                 for (vertex_t x = 0; x < dimension; ++x) {
-                    if (x != xi and x != chosenVertices.at(0) and !currentTour.containsEdge(xi, x) and
-                        !containsEdge(chosenVertices, xi, x) and
-                        tsplibProblem.exchangeGain(chosenVertices) - tsplibProblem.dist(xi, x) > highestGain) {
+                    if (x != xi and x != currentWalk.at(0)
+                        and !currentTour.containsEdge(xi, x)
+                        and !currentWalk.containsEdge(xi, x)
+                        and tsplibProblem.exchangeGain(currentWalk) - tsplibProblem.dist(xi, x) > highestGain) {
+
                         vertexChoices.at(i + 1).push_back(x);
                     }
 
@@ -98,19 +115,16 @@ Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &star
             } else { // i is even
                 if (i <= infeasibilityDepth) {
                     for (vertex_t neighbor : currentTour.getNeighbors(xi)) {
-                        if (!containsEdge(chosenVertices, xi, neighbor)) {
+                        if (!currentWalk.containsEdge(xi, neighbor)) {
                             vertexChoices.at(i + 1).push_back(neighbor);
                         }
                     }
                 } else {
                     for (vertex_t neighbor : currentTour.getNeighbors(xi)) {
-                        if (!containsEdge(chosenVertices, xi, neighbor)) {
-                            chosenVertices.push_back(neighbor);
-                            chosenVertices.push_back(chosenVertices.at(0));
-                            if (currentTour.isTourAfterExchange(chosenVertices)) {
-                                vertexChoices.at(i + 1).push_back(neighbor);
-                            }
-                            chosenVertices.erase(chosenVertices.end() - 2, chosenVertices.end());
+                        if (!currentWalk.containsEdge(xi, neighbor)
+                            and currentTour.isTourAfterExchange(currentWalk.appendAndClose(neighbor))) {
+
+                            vertexChoices.at(i + 1).push_back(neighbor);
                         }
                     }
                 }
