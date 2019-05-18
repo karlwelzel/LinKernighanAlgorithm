@@ -103,11 +103,10 @@ Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &star
             }
 
             if (i % 2 == 1 and i >= 3) {
-                // TODO: There is a problem that {x_i, x_0} can be in closedWalk twice
                 AlternatingWalk closedWalk = currentWalk.close(); // closedWalk = (x_0, x_1, ..., x_i, x_0)
                 signed_distance_t gain = tsplibProblem.exchangeGain(closedWalk);
                 if (gain > highestGain and currentTour.isTourAfterExchange(closedWalk)) {
-                    bestAlternatingWalk = closedWalk; // TODO: This should be a copy operation, is it?
+                    bestAlternatingWalk = closedWalk;
                     highestGain = gain;
                 }
             }
@@ -126,6 +125,7 @@ Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &star
 
                 }
             } else { // i is even
+                // TODO: There is a problem that {x_i, x_0} can be in closedWalk twice
                 if (i <= infeasibilityDepth) {
                     for (vertex_t neighbor : currentTour.getNeighbors(xi)) {
                         if (!currentWalk.containsEdge(xi, neighbor)) {
@@ -134,9 +134,10 @@ Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &star
                     }
                 } else {
                     for (vertex_t neighbor : currentTour.getNeighbors(xi)) {
+                        // For the above to_do check !currentWalk.containsEdge(neighbor, currentWalk.at(0))
                         if (!currentWalk.containsEdge(xi, neighbor)
+                            // and neighbor != currentWalk.at(1)
                             and currentTour.isTourAfterExchange(currentWalk.appendAndClose(neighbor))) {
-
                             vertexChoices.at(i + 1).push_back(neighbor);
                         }
                     }
