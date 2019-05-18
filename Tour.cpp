@@ -30,17 +30,16 @@ std::vector<vertex_t> VertexList::getNeighbors(vertex_t vertex) {
 
 vertex_t VertexList::next(const vertex_t previous, const vertex_t current) const {
     const std::vector<vertex_t> &currentNeighbors = neighbors.at(current);
-    const auto iterator = std::find(currentNeighbors.begin(), currentNeighbors.end(), previous);
-    const long index = std::distance(currentNeighbors.begin(), iterator);
-
     if (currentNeighbors.size() != 2) {
         throw std::runtime_error("current (" + std::to_string(current) + ") does not have two neighbors");
-    } else if (iterator == currentNeighbors.end()) {
+    } else if (currentNeighbors[0] == previous) {
+        return currentNeighbors[1];
+    } else if (currentNeighbors[1] == previous) {
+        return currentNeighbors[0];
+    } else {
         throw std::runtime_error(
                 "previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
                 std::to_string(current) + ")");
-    } else {
-        return currentNeighbors.at((index + 1) % 2);
     }
 }
 
@@ -49,7 +48,7 @@ vertex_t VertexList::next(const vertex_t current) const {
     if (currentNeighbors.empty()) {
         throw std::runtime_error("current (" + std::to_string(current) + ") does not have a neighbor");
     }
-    return currentNeighbors.at(0);
+    return currentNeighbors[0];
 }
 
 bool VertexList::isNeighbor(vertex_t vertex, vertex_t neighbor) const {
