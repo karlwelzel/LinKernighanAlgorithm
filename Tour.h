@@ -14,6 +14,7 @@
 using vertex_t = size_t; // The type used for vertices
 using dimension_t = vertex_t; // The type used for counting vertices
 using distance_t = unsigned long; // The type used for distances and lengths
+using signed_distance_t = long long; // The type used for distances and lengths that can be negative
 
 
 // ================================================ VertexList class ===================================================

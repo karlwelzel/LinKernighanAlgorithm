@@ -53,7 +53,7 @@ Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &star
     std::vector<std::vector<vertex_t>> vertexChoices;
     AlternatingWalk currentWalk;
     AlternatingWalk bestAlternatingWalk;
-    distance_t highestGain = 0;
+    signed_distance_t highestGain = 0;
 
     while (true) {
         // Create set X_0 with all vertices
@@ -68,11 +68,10 @@ Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &star
         while (true) {
             if (vertexChoices.at(i).empty()) {
                 if (highestGain > 0) {
-                    // TODO: Why does this output the same exchanges over and over?
                     currentTour = currentTour.exchange(bestAlternatingWalk);
                     std::cout << "Exchange done: " << bestAlternatingWalk << std::endl;
-                    std::cout << " with gain: " << highestGain << tsplibProblem.exchangeGain(bestAlternatingWalk)
-                              << std::endl;
+                    std::cout << " with gain: " << tsplibProblem.exchangeGain(bestAlternatingWalk) << " (highestGain = "
+                              << highestGain << ")" << std::endl;
                     std::cout << " new tour: " << currentTour;
                     std::cout << " with length: " << tsplibProblem.length(currentTour) << std::endl;
                     break;
@@ -106,9 +105,8 @@ Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &star
             if (i % 2 == 1 and i >= 3) {
                 // TODO: There is a problem that {x_i, x_0} can be in closedWalk twice
                 AlternatingWalk closedWalk = currentWalk.close(); // closedWalk = (x_0, x_1, ..., x_i, x_0)
-                distance_t gain;
-                if ((gain = tsplibProblem.exchangeGain(closedWalk)) > highestGain
-                    and currentTour.isTourAfterExchange(closedWalk)) {
+                signed_distance_t gain = tsplibProblem.exchangeGain(closedWalk);
+                if (gain > highestGain and currentTour.isTourAfterExchange(closedWalk)) {
                     bestAlternatingWalk = closedWalk; // TODO: This should be a copy operation, is it?
                     highestGain = gain;
                 }
