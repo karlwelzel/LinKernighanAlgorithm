@@ -70,7 +70,7 @@ Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &star
         while (true) {
             if (vertexChoices.at(i).empty()) {
                 if (highestGain > 0) {
-                    currentTour = currentTour.exchange(bestAlternatingWalk);
+                    currentTour.exchange(bestAlternatingWalk);
                     std::cout << "Exchange done: " << bestAlternatingWalk << std::endl;
                     std::cout << " with gain: " << tsplibProblem.exchangeGain(bestAlternatingWalk) << " (highestGain = "
                               << highestGain << ")" << std::endl;

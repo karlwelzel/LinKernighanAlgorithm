@@ -103,15 +103,18 @@ public:
     bool isHamiltonianTour() const;
 
     // Checks if the tour after exchanging all edges of alternatingWalk on the tour by edges not on the tour is still
-    // a hamiltonian tour
+    // a hamiltonian tour, does not change the tour itself
     // Expects a closed alternating walk that starts with an edge on the tour
-    bool isTourAfterExchange(const std::vector<vertex_t> &alternatingWalk) const;
+    bool isTourAfterExchange(const std::vector<vertex_t> &alternatingWalk);
 
-    // Computes the tour after exchanging all edges of alternatingWalk on the tour by edges not on the tour, but does
-    // not modify the tour object itself
+    // Exchanges all edges of alternatingWalk on the tour by edges not on the tour
     // Expects a closed alternating walk that starts with an edge on the tour
     // Expects that the exchange will lead to a hamiltonian tour, check with isTourAfterExchange beforehand
-    Tour exchange(const std::vector<vertex_t> &alternatingWalk) const;
+    void exchange(const std::vector<vertex_t> &alternatingWalk);
+
+    // Undo an exchange, done by Tour::exchange
+    // Expects that the last exchange was called with the same alternating walk
+    void undoExchange(const std::vector<vertex_t> &alternatingWalk);
 };
 
 

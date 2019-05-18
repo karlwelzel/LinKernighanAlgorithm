@@ -132,29 +132,49 @@ bool Tour::isHamiltonianTour() const {
     return std::all_of(visited.begin(), visited.end(), [](bool v) { return v; });
 }
 
-Tour Tour::exchange(const std::vector<vertex_t> &alternatingWalk) const {
-    Tour tour(*this);
+void Tour::exchange(const std::vector<vertex_t> &alternatingWalk) {
     // Remove all edges in the alternatingWalk that are part of the tour (every edge with even i)
     for (vertex_t i = 0; i < alternatingWalk.size() - 1; i += 2) {
         // The current edge in the alternating walk is from vertex1 to vertex2
         vertex_t vertex1 = alternatingWalk.at(i);
         vertex_t vertex2 = alternatingWalk.at(i + 1);
-        tour.removeNeighbor(vertex1, vertex2);
-        tour.removeNeighbor(vertex2, vertex1);
+        removeNeighbor(vertex1, vertex2);
+        removeNeighbor(vertex2, vertex1);
     }
     // Add all edges in the alternatingWalk that are not part of the tour (every edge with odd i)
     for (vertex_t i = 1; i < alternatingWalk.size() - 1; i += 2) {
         // The current edge in the alternating walk is from vertex1 to vertex2
         vertex_t vertex1 = alternatingWalk.at(i);
         vertex_t vertex2 = alternatingWalk.at(i + 1);
-        tour.addNeighbor(vertex1, vertex2);
-        tour.addNeighbor(vertex2, vertex1);
+        addNeighbor(vertex1, vertex2);
+        addNeighbor(vertex2, vertex1);
     }
-    return tour;
 }
 
-bool Tour::isTourAfterExchange(const std::vector<vertex_t> &alternatingWalk) const {
-    return exchange(alternatingWalk).isHamiltonianTour();
+void Tour::undoExchange(const std::vector<vertex_t> &alternatingWalk) {
+    // Remove all edges in the alternatingWalk that are part of the tour (every edge with odd i)
+    for (vertex_t i = 1; i < alternatingWalk.size() - 1; i += 2) {
+        // The current edge in the alternating walk is from vertex1 to vertex2
+        vertex_t vertex1 = alternatingWalk.at(i);
+        vertex_t vertex2 = alternatingWalk.at(i + 1);
+        removeNeighbor(vertex1, vertex2);
+        removeNeighbor(vertex2, vertex1);
+    }
+    // Add all edges in the alternatingWalk that are not part of the tour (every edge with even i)
+    for (vertex_t i = 0; i < alternatingWalk.size() - 1; i += 2) {
+        // The current edge in the alternating walk is from vertex1 to vertex2
+        vertex_t vertex1 = alternatingWalk.at(i);
+        vertex_t vertex2 = alternatingWalk.at(i + 1);
+        addNeighbor(vertex1, vertex2);
+        addNeighbor(vertex2, vertex1);
+    }
+}
+
+bool Tour::isTourAfterExchange(const std::vector<vertex_t> &alternatingWalk) {
+    exchange(alternatingWalk);
+    bool result = isHamiltonianTour();
+    undoExchange(alternatingWalk);
+    return result;
 }
 
 
