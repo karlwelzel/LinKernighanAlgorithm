@@ -123,10 +123,10 @@ bool Tour::isHamiltonianTour() const {
     TourWalker tourWalker(*this, 0);
     vertex_t currentVertex = tourWalker.getNextVertex();
     do {
-        if (visited.at(currentVertex)) {
+        if (visited[currentVertex]) {
             return false;
         }
-        visited.at(currentVertex) = true;
+        visited[currentVertex] = true;
         currentVertex = tourWalker.getNextVertex();
     } while (currentVertex != 0);
     // Check if all elements in visited are true
@@ -164,8 +164,7 @@ bool Tour::isTourAfterExchange(const std::vector<vertex_t> &alternatingWalk) con
 
 TourWalker::TourWalker(const Tour &tour, vertex_t first) : TourWalker(tour, first, tour.next(first)) {}
 
-TourWalker::TourWalker(Tour tour, vertex_t first, vertex_t second) : tour(std::move(tour)),
-                                                                     current(first), next(second) {}
+TourWalker::TourWalker(const Tour &tour, vertex_t first, vertex_t second) : tour(tour), current(first), next(second) {}
 
 vertex_t TourWalker::getNextVertex() {
     const vertex_t previous = current;
@@ -182,6 +181,6 @@ std::ostream &operator<<(std::ostream &out, const Tour &tour) {
         output += std::to_string(currentVertex + 1) + ", ";
         currentVertex = tourWalker.getNextVertex();
     } while (currentVertex != 0);
-    out << output.substr(0, output.length() - 2) << std::endl;
+    out << output.substr(0, output.length() - 2);
     return out;
 }

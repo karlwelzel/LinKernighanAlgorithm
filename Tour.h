@@ -117,13 +117,13 @@ public:
 
 // =============================================== TourWalker class ====================================================
 
-// This class provides a way to walk through a Tour. It stores a copy of the tour, its current and next vertex (to store
-// the direction) and can be advanced by "getNextVertex".
+// This class provides a way to walk through a Tour. It stores a reference to the tour, its current and next vertex
+// (to store the direction) and can be advanced by "getNextVertex".
 
 
 class TourWalker {
 private:
-    const Tour tour;
+    const Tour &tour;
     vertex_t current;
     vertex_t next;
 
@@ -132,7 +132,7 @@ public:
     TourWalker(const Tour &tour, vertex_t first);
 
     // Create a TourWalker that starts the walk at vertex first and then walks in the direction of vertex second
-    TourWalker(Tour tour, vertex_t first, vertex_t second);
+    TourWalker(const Tour &tour, vertex_t first, vertex_t second);
 
     // Advance the walk and get the next vertex
     vertex_t getNextVertex();

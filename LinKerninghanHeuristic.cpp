@@ -36,9 +36,11 @@ bool AlternatingWalk::containsEdge(vertex_t vertex1, vertex_t vertex2) const {
 }
 
 std::ostream &operator<<(std::ostream &out, const AlternatingWalk &walk) {
+    std::string output;
     for (vertex_t vertex : walk) {
-        out << vertex << ", ";
+        output += std::to_string(vertex + 1) + ", ";
     }
+    out << output.substr(0, output.length() - 2);
     return out;
 }
 
@@ -72,8 +74,8 @@ Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &star
                     std::cout << "Exchange done: " << bestAlternatingWalk << std::endl;
                     std::cout << " with gain: " << tsplibProblem.exchangeGain(bestAlternatingWalk) << " (highestGain = "
                               << highestGain << ")" << std::endl;
-                    std::cout << " new tour: " << currentTour;
-                    std::cout << " with length: " << tsplibProblem.length(currentTour) << std::endl;
+                    std::cout << " new tour: " << currentTour << std::endl;
+                    std::cout << " new length: " << tsplibProblem.length(currentTour) << std::endl;
                     break;
                 } else { // highestGain == 0
                     if (i == 0) {
