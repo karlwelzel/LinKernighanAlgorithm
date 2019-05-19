@@ -44,3 +44,5 @@ while True:
             turtle.stamp()
         turtle.goto(coordinates[0])
         turtle.update()
+    elif line.startswith("The best tour found by the heuristic"):
+        break

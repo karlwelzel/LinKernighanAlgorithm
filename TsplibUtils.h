@@ -26,7 +26,7 @@ private:
     // and stored in a matrix or only the coordinates should be saved and the distances will be computed on every call
     // to TsplibProblem::dist. This is a trade-off between running time and memory usage
     // When set to true, the EDGE_WEIGHT_TYPE is automatically changed to EXPLICIT
-    const bool ALWALYS_STORE_IN_MATRIX = false;
+    const bool ALWALYS_STORE_IN_MATRIX = true;
 
     std::string name;
     std::string type;

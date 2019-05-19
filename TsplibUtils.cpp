@@ -231,7 +231,7 @@ distance_t TsplibProblem::dist(const vertex_t i, const vertex_t j) const {
     if (edgeWeightType == "EUC_2D") {
         double d = hypot(coordinates.at(i).at(0) - coordinates.at(j).at(0),
                          coordinates.at(i).at(1) - coordinates.at(j).at(1));
-        return static_cast<distance_t>(lround(d)); // lround(d) >= 0, so casting does not produce any
+        return static_cast<distance_t>(lround(d)); // lround(d) >= 0, so casting does not produce any errors
     } else if (edgeWeightType == "CEIL_2D") {
         double d = hypot(coordinates.at(i).at(0) - coordinates.at(j).at(0),
                          coordinates.at(i).at(1) - coordinates.at(j).at(1));

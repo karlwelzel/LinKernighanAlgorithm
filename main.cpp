@@ -66,8 +66,8 @@ int main(int argc, char *argv[]) {
 
     // Use the heuristic from the introduction assignment to get a tour to start with and optimize it with the
     // Lin-Kerninghan-heuristic
-    const Tour tour = linKerninghanHeuristic(problem, ascendingVerticesHeuristic(problem));
-    //const Tour tour = linKerninghanHeuristic(problem, simpleHeuristic(problem));
+    //const Tour tour = linKerninghanHeuristic(problem, ascendingVerticesHeuristic(problem));
+    const Tour tour = linKerninghanHeuristic(problem, simpleHeuristic(problem));
 
     // DEBUG: Check whether tour really is a hamiltonian tour
     if (!tour.isHamiltonianTour()) {
