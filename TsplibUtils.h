@@ -20,7 +20,13 @@ std::string trim(const std::string &str, const std::string &whitespace = " \t");
 
 class TsplibProblem {
 private:
-    const char delimiter = ':';
+    // The delimiter between a keyword and its value, used in the TSPLIB format
+    const char DELIMITER = ':';
+    // When the EDGE_WEIGHT_TYPE is not EXPLICIT, this parameter specifies whether all distances should be computed
+    // and stored in a matrix or only the coordinates should be saved and the distances will be computed on every call
+    // to TsplibProblem::dist. This is a trade-off between running time and memory usage
+    // When set to true, the EDGE_WEIGHT_TYPE is automatically changed to EXPLICIT
+    const bool ALWALYS_STORE_IN_MATRIX = false;
 
     std::string name;
     std::string type;
@@ -29,8 +35,8 @@ private:
     std::string edgeWeightFormat;
     std::string nodeCoordType = "TWOD_COORDS";
 
-    // if EDGE_WEIGHT_TYPE is EXPLICIT
-    // The matrix described in the TSPLIB file
+    // if EDGE_WEIGHT_TYPE is EXPLICIT or ALWAYS_STORE_IN_MATRIX is true
+    // The matrix that contains all pairs of distances
     std::vector<std::vector<distance_t>> matrix;
 
     // if EDGE_WEIGHT_TYPE is *_2D
@@ -77,7 +83,7 @@ public:
 
 class TsplibTour : public Tour {
 private:
-    const char delimiter = ':';
+    const char DELIMITER = ':';
 
     std::string name = "";
     std::string type = "";

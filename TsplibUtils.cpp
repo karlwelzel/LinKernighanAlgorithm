@@ -75,7 +75,7 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
         line = trim(line);
         if (line.empty()) {
             // ignore empty lines
-        } else if ((delimiterIndex = line.find(delimiter)) != std::string::npos) {
+        } else if ((delimiterIndex = line.find(DELIMITER)) != std::string::npos) {
             // The specification part with entries of the form <keyword> : <value>
             const std::string keyword = trim(line.substr(0, delimiterIndex));
             const std::string value = trim(line.substr(delimiterIndex + 1, std::string::npos));
@@ -202,6 +202,14 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
         } catch (std::out_of_range &error) {
             return "Too few numbers were specified under EDGE_WEIGHT_SECTION";
         }
+    } else if (ALWALYS_STORE_IN_MATRIX) {
+        matrix.assign(dimension, std::vector<distance_t>(dimension, 0));
+        for (vertex_t i = 0; i < dimension; ++i) {
+            for (vertex_t j = 0; j < dimension; ++j) {
+                matrix[i][j] = dist(i, j);
+            }
+        }
+        edgeWeightType = "EXPLICIT";
     }
 
     return "";
@@ -253,9 +261,9 @@ signed_distance_t TsplibProblem::exchangeGain(std::vector<vertex_t> &alternating
     signed_distance_t value = 0;
     for (size_t i = 0; i < alternatingWalk.size() - 1; ++i) {
         if (i % 2 == 0) {
-            value += dist(alternatingWalk.at(i), alternatingWalk.at(i + 1));
+            value += dist(alternatingWalk[i], alternatingWalk[i + 1]);
         } else {
-            value -= dist(alternatingWalk.at(i), alternatingWalk.at(i + 1));
+            value -= dist(alternatingWalk[i], alternatingWalk[i + 1]);
         }
     }
     return value;
@@ -297,7 +305,7 @@ std::string TsplibTour::readFile(std::ifstream &inputFile) {
         line = trim(line);
         if (line.empty()) {
             // ignore this line
-        } else if ((delimiterIndex = line.find(delimiter)) != std::string::npos) {
+        } else if ((delimiterIndex = line.find(DELIMITER)) != std::string::npos) {
             // The specification part with entries of the form <keyword> : <value>
             const std::string keyword = trim(line.substr(0, delimiterIndex));
             const std::string value = trim(line.substr(delimiterIndex + 1, std::string::npos));

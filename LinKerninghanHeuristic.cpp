@@ -27,8 +27,8 @@ AlternatingWalk AlternatingWalk::appendAndClose(vertex_t vertex) const {
 
 bool AlternatingWalk::containsEdge(vertex_t vertex1, vertex_t vertex2) const {
     for (dimension_t i = 0; i < size() - 1; ++i) {
-        if ((at(i) == vertex1 and at(i + 1) == vertex2) or
-            (at(i) == vertex2 and at(i + 1) == vertex1)) {
+        if ((operator[](i) == vertex1 and operator[](i + 1) == vertex2) or
+            (operator[](i) == vertex2 and operator[](i + 1) == vertex1)) {
             return true;
         }
     }
