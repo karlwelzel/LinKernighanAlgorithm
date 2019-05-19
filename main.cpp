@@ -61,14 +61,13 @@ int main(int argc, char *argv[]) {
 
 
     // Print the length of the tour 1, ..., n
-    std::vector<vertex_t> ascendingVertices(problem.getDimension());
-    std::iota(ascendingVertices.begin(), ascendingVertices.end(), 0);
-    distance_t ascendingLength = problem.length(Tour(ascendingVertices));
+    distance_t ascendingLength = problem.length(ascendingVerticesHeuristic(problem));
     std::cout << "The tour 1, 2, ..., n has length " << ascendingLength << "." << std::endl << std::endl;
 
     // Use the heuristic from the introduction assignment to get a tour to start with and optimize it with the
     // Lin-Kerninghan-heuristic
-    const Tour tour = linKerninghanHeuristic(problem, simpleHeuristic(problem));
+    const Tour tour = linKerninghanHeuristic(problem, ascendingVerticesHeuristic(problem));
+    //const Tour tour = linKerninghanHeuristic(problem, simpleHeuristic(problem));
 
     // DEBUG: Check whether tour really is a hamiltonian tour
     if (!tour.isHamiltonianTour()) {

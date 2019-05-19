@@ -8,6 +8,7 @@
 #include <tuple>
 #include <vector>
 #include <algorithm>
+#include <numeric>
 #include "SimpleHeuristic.h"
 
 
@@ -101,4 +102,10 @@ Tour simpleHeuristic(const TsplibProblem &tsplibProblem) {
 
     // This line will never be reached, because the graph is a complete graph
     throw std::runtime_error("SimpleHeuristic: Although every edge was checked, no tour has been found.");
+}
+
+Tour ascendingVerticesHeuristic(const TsplibProblem &tsplibProblem) {
+    std::vector<vertex_t> ascendingVertices(tsplibProblem.getDimension());
+    std::iota(ascendingVertices.begin(), ascendingVertices.end(), 0);
+    return Tour(ascendingVertices);
 }

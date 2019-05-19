@@ -61,4 +61,6 @@ public:
 
 Tour simpleHeuristic(const TsplibProblem &tsplibProblem);
 
+Tour ascendingVerticesHeuristic(const TsplibProblem &tsplibProblem);
+
 #endif //LINKERNINGHANALGORITHM_SIMPLEHEURISTIC_H
