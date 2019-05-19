@@ -31,6 +31,10 @@ class VertexList {
 protected:
     std::vector<std::vector<vertex_t>> neighbors;
 
+    // Returns the index of neighbor in neighbors[vertex] if present, otherwise -1
+    // Because every vertex has no more than 2 neighbors, it always returns -1, 0 or 1
+    int neighborIndex(vertex_t vertex, vertex_t neighbor) const;
+
     // Set newNeighbor as one of the neighbors of vertex.
     // Throws a runtime_error if both of the neighbors of vertex are already set
     void addNeighbor(vertex_t vertex, vertex_t newNeighbor);

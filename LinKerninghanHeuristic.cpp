@@ -93,15 +93,15 @@ Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &star
             vertexChoices.at(i).pop_back();
 
             // DEBUG:
-            if (vertexChoices.size() == i) {
+            if (vertexChoices.size() != i + 1) {
                 throw std::runtime_error(
-                        "vertexChoices.size() (=" + std::to_string(vertexChoices.size()) + ") is not i-1 (=" +
-                        std::to_string(i - 1) + ")");
+                        "vertexChoices.size() (=" + std::to_string(vertexChoices.size()) + ") is not i+1 (=" +
+                        std::to_string(i + 1) + ")");
             }
-            if (currentWalk.size() == i) {
+            if (currentWalk.size() != i + 1) {
                 throw std::runtime_error(
-                        "currentWalk.size() (=" + std::to_string(currentWalk.size()) + ") is not i-1 (=" +
-                        std::to_string(i - 1) + ")");
+                        "currentWalk.size() (=" + std::to_string(currentWalk.size()) + ") is not i+1 (=" +
+                        std::to_string(i + 1) + ")");
             }
 
             if (i % 2 == 1 and i >= 3) {

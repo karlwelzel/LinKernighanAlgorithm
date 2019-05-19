@@ -28,18 +28,29 @@ std::vector<vertex_t> VertexList::getNeighbors(vertex_t vertex) {
     return neighbors.at(vertex);
 }
 
+int VertexList::neighborIndex(vertex_t vertex, vertex_t neighbor) const {
+    const std::vector<vertex_t> &vertexNeighbors = neighbors.at(vertex);
+    if (!vertexNeighbors.empty() and vertexNeighbors[0] == neighbor) {
+        return 0;
+    } else if (vertexNeighbors.size() >= 2 and vertexNeighbors[1] == neighbor) {
+        return 1;
+    } else {
+        return -1;
+    }
+}
+
 vertex_t VertexList::next(const vertex_t previous, const vertex_t current) const {
     const std::vector<vertex_t> &currentNeighbors = neighbors.at(current);
     if (currentNeighbors.size() != 2) {
         throw std::runtime_error("current (" + std::to_string(current) + ") does not have two neighbors");
-    } else if (currentNeighbors[0] == previous) {
-        return currentNeighbors[1];
-    } else if (currentNeighbors[1] == previous) {
-        return currentNeighbors[0];
     } else {
-        throw std::runtime_error(
-                "previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
-                std::to_string(current) + ")");
+        int index = neighborIndex(current, previous);
+        if (index == -1) {
+            throw std::runtime_error("previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
+                                     std::to_string(current) + ")");
+        } else {
+            return currentNeighbors[(index + 1) % 2];
+        }
     }
 }
 
@@ -52,8 +63,7 @@ vertex_t VertexList::next(const vertex_t current) const {
 }
 
 bool VertexList::isNeighbor(vertex_t vertex, vertex_t neighbor) const {
-    const std::vector<vertex_t> &vertexNeighbors = neighbors.at(vertex);
-    return std::find(vertexNeighbors.begin(), vertexNeighbors.end(), neighbor) != vertexNeighbors.end();
+    return neighborIndex(vertex, neighbor) != -1;
 }
 
 bool VertexList::containsEdge(vertex_t vertex1, vertex_t vertex2) const {
@@ -72,13 +82,13 @@ void VertexList::addNeighbor(vertex_t vertex, vertex_t newNeighbor) {
 
 void VertexList::removeNeighbor(vertex_t vertex, vertex_t neighbor) {
     std::vector<vertex_t> &vertexNeighbors = neighbors.at(vertex);
-    const auto iterator = std::find(vertexNeighbors.begin(), vertexNeighbors.end(), neighbor);
-    if (iterator == vertexNeighbors.end()) {
+    int index = neighborIndex(vertex, neighbor);
+    if (index == -1) {
         throw std::runtime_error(
                 "removeNeighbor: neighbor (" + std::to_string(neighbor) + ") is not a neighbor of vertex (" +
                 std::to_string(vertex) + ").");
     } else {
-        vertexNeighbors.erase(iterator);
+        vertexNeighbors.erase(vertexNeighbors.begin() + index);
     }
 }
 
