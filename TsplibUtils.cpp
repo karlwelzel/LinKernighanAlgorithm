@@ -274,8 +274,8 @@ signed_distance_t TsplibProblem::exchangeGain(std::vector<vertex_t> &alternating
 
 TsplibTour::TsplibTour() = default;
 
-TsplibTour::TsplibTour(std::string name, const Tour &tour) : name(std::move(name)), type("TOUR"),
-                                                             dimension(tour.getDimension()), Tour(tour) {}
+TsplibTour::TsplibTour(std::string name, const Tour &tour) : Tour(tour), name(std::move(name)), type("TOUR"),
+                                                             dimension(tour.getDimension()) {}
 
 std::string TsplibTour::interpretKeyword(const std::string &keyword, const std::string &value) {
     if (keyword == "NAME") {

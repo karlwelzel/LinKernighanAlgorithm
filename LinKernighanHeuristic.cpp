@@ -120,7 +120,8 @@ Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &start
                     if (x != xi and x != currentWalk.at(0)
                         and !currentTour.containsEdge(xi, x)
                         and !currentWalk.containsEdge(xi, x)
-                        and tsplibProblem.exchangeGain(currentWalk) - tsplibProblem.dist(xi, x) > highestGain) {
+                        and tsplibProblem.exchangeGain(currentWalk) - (signed_distance_t) tsplibProblem.dist(xi, x) >
+                            highestGain) {
 
                         vertexChoices.at(i + 1).push_back(x);
                     }
