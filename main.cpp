@@ -5,7 +5,7 @@
 #include "Tour.h"
 #include "TsplibUtils.h"
 #include "SimpleHeuristic.h"
-#include "LinKerninghanHeuristic.h"
+#include "LinKernighanHeuristic.h"
 
 // TSPLIB test instances:
 // berlin52            EUC_2D
@@ -24,7 +24,7 @@ int main(int argc, char *argv[]) {
     if (argc < 2) {
         std::cerr << "No file supplied." << std::endl;
         std::cout << "Usage:" << std::endl;
-        std::cout << "    LinKerninghanAlgorithm tsplib_problem.tsp [tsplib_problem.opt.tour]" << std::endl;
+        std::cout << "    LinKernighanAlgorithm tsplib_problem.tsp [tsplib_problem.opt.tour]" << std::endl;
         return 1;
     } else {
         problemFile.open(argv[1]);
@@ -65,9 +65,9 @@ int main(int argc, char *argv[]) {
     std::cout << "The tour 1, 2, ..., n has length " << ascendingLength << "." << std::endl << std::endl;
 
     // Use the heuristic from the introduction assignment to get a tour to start with and optimize it with the
-    // Lin-Kerninghan-heuristic
-    //const Tour tour = linKerninghanHeuristic(problem, ascendingVerticesHeuristic(problem));
-    const Tour tour = linKerninghanHeuristic(problem, simpleHeuristic(problem));
+    // Lin-Kernighan-heuristic
+    //const Tour tour = linKernighanHeuristic(problem, ascendingVerticesHeuristic(problem));
+    const Tour tour = linKernighanHeuristic(problem, simpleHeuristic(problem));
 
     // DEBUG: Check whether tour really is a hamiltonian tour
     if (!tour.isHamiltonianTour()) {

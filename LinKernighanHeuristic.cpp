@@ -7,7 +7,7 @@
 #include <tuple>
 #include <utility>
 #include <numeric>
-#include "LinKerninghanHeuristic.h"
+#include "LinKernighanHeuristic.h"
 
 
 // ============================================= AlternatingWalk class =================================================
@@ -46,7 +46,7 @@ std::ostream &operator<<(std::ostream &out, const AlternatingWalk &walk) {
 
 // This is implemented as described in Combinatorial Optimization with p_1 = 5, p_2 = 2 and G = K_n
 
-Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &startTour) {
+Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &startTour) {
     const size_t backtrackingDepth = 5;
     const size_t infeasibilityDepth = 2;
 

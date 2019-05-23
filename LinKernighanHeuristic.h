@@ -2,8 +2,8 @@
 // Created by karl on 14.05.19.
 //
 
-#ifndef LINKERNINGHANALGORITHM_LINKERNINGHANHEURISTIC_H
-#define LINKERNINGHANALGORITHM_LINKERNINGHANHEURISTIC_H
+#ifndef LINKERNINGHANALGORITHM_LINKERNIGHANHEURISTIC_H
+#define LINKERNINGHANALGORITHM_LINKERNIGHANHEURISTIC_H
 
 #include <vector>
 #include "Tour.h"
@@ -31,6 +31,6 @@ public:
 std::ostream &operator<<(std::ostream &out, const AlternatingWalk &walk);
 
 
-Tour linKerninghanHeuristic(const TsplibProblem &tsplibProblem, const Tour &startTour);
+Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &startTour);
 
-#endif //LINKERNINGHANALGORITHM_LINKERNINGHANHEURISTIC_H
+#endif //LINKERNINGHANALGORITHM_LINKERNIGHANHEURISTIC_H
