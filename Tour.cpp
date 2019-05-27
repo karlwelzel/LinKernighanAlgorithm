@@ -88,7 +88,6 @@ void BaseTour::exchange(const std::vector<vertex_t> &alternatingWalk) {
 }
 
 
-
 // ================================================ ArrayTour class ====================================================
 
 dimension_t ArrayTour::getDimension() const {
