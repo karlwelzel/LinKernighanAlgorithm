@@ -7,6 +7,9 @@
 
 #include <utility>
 #include <vector>
+#include <limits>
+#include <list>
+#include <iostream>
 #include "Tour.h"
 #include "TsplibUtils.h"
 
@@ -26,6 +29,70 @@
  * path). At this point "closeTour" adds the unique edge that connects both ends of the path and returns the resulting
  * tour.
  */
+
+
+// ================================================ VertexList class ===================================================
+
+// This class maintains a map that stores a maximum of two neighbors of each vertex. There is no inherent direction
+// encoded in these neighbors. This gives additional flexibility when compared to std::list while still having similar
+// run times. It is possible to create tours that do not contain every vertex or multiple separate paths or even have a
+// vertex x with neighbor y while y does not have x as its neighbor, so extra caution is necessary when manipulating
+// these objects.
+// This class is the base class for Tour.
+
+class VertexList {
+protected:
+    std::vector<std::vector<vertex_t>> neighbors;
+
+    // Returns the index of neighbor in neighbors[vertex] if present, otherwise -1
+    // Because every vertex has no more than 2 neighbors, it always returns -1, 0 or 1
+    int neighborIndex(vertex_t vertex, vertex_t neighbor) const;
+
+    // Set newNeighbor as one of the neighbors of vertex.
+    // Throws a runtime_error if both of the neighbors of vertex are already set
+    void addNeighbor(vertex_t vertex, vertex_t newNeighbor);
+
+    // Deletes neighbor as a neighbor of vertex
+    // Throws a runtime_error if neighbor is not a neighbor of vertex
+    void removeNeighbor(vertex_t vertex, vertex_t neighbor);
+
+public:
+    VertexList();
+
+    // Create dimension vertices, each with no neighbors
+    explicit VertexList(dimension_t dimension);
+
+    // Create VertexList from a given neighbors map
+    explicit VertexList(std::vector<std::vector<vertex_t>> neighbors);
+
+    // Returns the number of vertices
+    dimension_t getDimension() const;
+
+    // Returns the neighbors of vertex in the tour
+    std::vector<vertex_t> getNeighbors(vertex_t vertex);
+
+    // Which vertex comes after current, when previous comes before it?
+    // previous is necessary to determine the direction
+    // Throws a runtime_error if the vertex cannot be determined
+    vertex_t next(vertex_t previous, vertex_t current) const;
+
+    // Returns some vertex, that is a neighbor of current
+    // Throws a runtime_error if current has no neighbor
+    vertex_t next(vertex_t current) const;
+
+    // Checks whether next is a neighbor of current
+    bool isNeighbor(vertex_t vertex, vertex_t neighbor) const;
+
+    // Checks whether the tour contains the edge {vertex1, vertex2}
+    // This function is an alias for isNeighbor
+    bool containsEdge(vertex_t vertex1, vertex_t vertex2) const;
+
+    // Tries to make vertex1 a neighbor of vertex2 and vertex2 a neighbor of vertex1 and returns whether this was
+    // successful. It only fails if one of them already has two neighbors.
+    bool makeNeighbors(vertex_t vertex1, vertex_t vertex2);
+
+    std::vector<vertex_t> toTourSequence() const;
+};
 
 
 // ============================================== TourParts class ======================================================
@@ -58,6 +125,7 @@ public:
     // not be used after this function was called
     Tour closeTour();
 };
+
 
 Tour simpleHeuristic(const TsplibProblem &tsplibProblem);
 

@@ -1,5 +1,5 @@
 //
-// Created by karl on 14.05.19.
+// Created by Karl Welzel on 14.05.19.
 //
 
 #include <algorithm>

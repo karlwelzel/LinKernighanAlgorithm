@@ -244,7 +244,7 @@ distance_t TsplibProblem::dist(const vertex_t i, const vertex_t j) const {
     }
 }
 
-distance_t TsplibProblem::length(const Tour &tour) const {
+distance_t TsplibProblem::length(const BaseTour &tour) const {
     distance_t sum = 0;
     TourWalker tourWalker(tour, 0);
     vertex_t currentVertex = tourWalker.getNextVertex();
@@ -345,11 +345,10 @@ std::string TsplibTour::readFile(std::ifstream &inputFile) {
     // Error checking
     if (dimension == 0) {
         return "The dimension cannot be 0";
-    }
-    setVertices(tourList);
-    if (neighbors.size() != dimension) {
+    } else if (dimension != tourList.size()) {
         return "The dimension does not fit to the number of vertices";
     }
+    setVertices(tourList);
 
     return "";
 }

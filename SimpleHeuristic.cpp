@@ -4,13 +4,122 @@
 
 // This library contains the code for the introduction assignment
 
+#include <iostream>
+#include <list>
+#include <limits>
 #include <utility>
 #include <tuple>
 #include <vector>
 #include <algorithm>
 #include <numeric>
+#include "Tour.h"
 #include "SimpleHeuristic.h"
 
+
+// ================================================ VertexList class ===================================================
+
+VertexList::VertexList() = default;
+
+VertexList::VertexList(const dimension_t dimension) : neighbors(dimension) {}
+
+VertexList::VertexList(std::vector<std::vector<vertex_t>> neighbors) :
+        neighbors(std::move(neighbors)) {}
+
+dimension_t VertexList::getDimension() const {
+    return neighbors.size();
+}
+
+std::vector<vertex_t> VertexList::getNeighbors(vertex_t vertex) {
+    return neighbors.at(vertex);
+}
+
+int VertexList::neighborIndex(vertex_t vertex, vertex_t neighbor) const {
+    const std::vector<vertex_t> &vertexNeighbors = neighbors.at(vertex);
+    if (!vertexNeighbors.empty() and vertexNeighbors[0] == neighbor) {
+        return 0;
+    } else if (vertexNeighbors.size() >= 2 and vertexNeighbors[1] == neighbor) {
+        return 1;
+    } else {
+        return -1;
+    }
+}
+
+vertex_t VertexList::next(const vertex_t previous, const vertex_t current) const {
+    const std::vector<vertex_t> &currentNeighbors = neighbors.at(current);
+    if (currentNeighbors.size() != 2) {
+        throw std::runtime_error("current (" + std::to_string(current) + ") does not have two neighbors");
+    } else {
+        int index = neighborIndex(current, previous);
+        if (index == -1) {
+            throw std::runtime_error("previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
+                                     std::to_string(current) + ")");
+        } else {
+            return currentNeighbors[(index + 1) % 2];
+        }
+    }
+}
+
+vertex_t VertexList::next(const vertex_t current) const {
+    const std::vector<vertex_t> &currentNeighbors = neighbors.at(current);
+    if (currentNeighbors.empty()) {
+        throw std::runtime_error("current (" + std::to_string(current) + ") does not have a neighbor");
+    }
+    return currentNeighbors[0];
+}
+
+bool VertexList::isNeighbor(vertex_t vertex, vertex_t neighbor) const {
+    return neighborIndex(vertex, neighbor) != -1;
+}
+
+bool VertexList::containsEdge(vertex_t vertex1, vertex_t vertex2) const {
+    return isNeighbor(vertex1, vertex2);
+}
+
+void VertexList::addNeighbor(vertex_t vertex, vertex_t newNeighbor) {
+    std::vector<vertex_t> &vertexNeighbors = neighbors.at(vertex);
+    if (vertexNeighbors.size() >= 2) {
+        throw std::runtime_error(
+                "Both neighbors of vertex (" + std::to_string(vertex) + ") are already set.");
+    } else {
+        vertexNeighbors.push_back(newNeighbor);
+    }
+}
+
+void VertexList::removeNeighbor(vertex_t vertex, vertex_t neighbor) {
+    std::vector<vertex_t> &vertexNeighbors = neighbors.at(vertex);
+    int index = neighborIndex(vertex, neighbor);
+    if (index == -1) {
+        throw std::runtime_error(
+                "removeNeighbor: neighbor (" + std::to_string(neighbor) + ") is not a neighbor of vertex (" +
+                std::to_string(vertex) + ").");
+    } else {
+        vertexNeighbors.erase(vertexNeighbors.begin() + index);
+    }
+}
+
+bool VertexList::makeNeighbors(const vertex_t vertex1, const vertex_t vertex2) {
+    if (neighbors.at(vertex1).size() >= 2 or neighbors.at(vertex2).size() >= 2) {
+        return false;
+    } else {
+        addNeighbor(vertex1, vertex2);
+        addNeighbor(vertex2, vertex1);
+        return true;
+    }
+}
+
+std::vector<vertex_t> VertexList::toTourSequence() const {
+    std::vector<vertex_t> result = std::vector<vertex_t>();
+    vertex_t previous = 0;
+    vertex_t current = next(0);
+    vertex_t next_;
+    do {
+        result.push_back(previous);
+        next_ = next(previous, current);
+        previous = current;
+        current = next_;
+    } while (previous != 0);
+    return result;
+}
 
 // ============================================== TourParts class ======================================================
 
@@ -72,7 +181,7 @@ Tour TourParts::closeTour() {
         if (!makeNeighbors(pathEnds.at(root).first, pathEnds.at(root).second)) {
             throw std::runtime_error("You cannot join neighbors when one of them already has two neighbors.");
         }
-        return Tour(neighbors);
+        return Tour(toTourSequence());
     } else {
         throw std::runtime_error("The tour cannot be closed while there are multiple connected components");
     }

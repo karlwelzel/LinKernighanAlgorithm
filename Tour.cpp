@@ -11,198 +11,153 @@
 #include "Tour.h"
 
 
-// ================================================ VertexList class ===================================================
-
-VertexList::VertexList() = default;
-
-VertexList::VertexList(const dimension_t dimension) : neighbors(dimension) {}
-
-VertexList::VertexList(std::vector<std::vector<vertex_t>> neighbors) :
-        neighbors(std::move(neighbors)) {}
-
-dimension_t VertexList::getDimension() const {
-    return neighbors.size();
-}
-
-std::vector<vertex_t> VertexList::getNeighbors(vertex_t vertex) {
-    return neighbors.at(vertex);
-}
-
-int VertexList::neighborIndex(vertex_t vertex, vertex_t neighbor) const {
-    const std::vector<vertex_t> &vertexNeighbors = neighbors.at(vertex);
-    if (!vertexNeighbors.empty() and vertexNeighbors[0] == neighbor) {
-        return 0;
-    } else if (vertexNeighbors.size() >= 2 and vertexNeighbors[1] == neighbor) {
-        return 1;
-    } else {
-        return -1;
-    }
-}
-
-vertex_t VertexList::next(const vertex_t previous, const vertex_t current) const {
-    const std::vector<vertex_t> &currentNeighbors = neighbors.at(current);
-    if (currentNeighbors.size() != 2) {
-        throw std::runtime_error("current (" + std::to_string(current) + ") does not have two neighbors");
-    } else {
-        int index = neighborIndex(current, previous);
-        if (index == -1) {
-            throw std::runtime_error("previous (" + std::to_string(previous) + ") is not a neighbor of current (" +
-                                     std::to_string(current) + ")");
-        } else {
-            return currentNeighbors[(index + 1) % 2];
-        }
-    }
-}
-
-vertex_t VertexList::next(const vertex_t current) const {
-    const std::vector<vertex_t> &currentNeighbors = neighbors.at(current);
-    if (currentNeighbors.empty()) {
-        throw std::runtime_error("current (" + std::to_string(current) + ") does not have a neighbor");
-    }
-    return currentNeighbors[0];
-}
-
-bool VertexList::isNeighbor(vertex_t vertex, vertex_t neighbor) const {
-    return neighborIndex(vertex, neighbor) != -1;
-}
-
-bool VertexList::containsEdge(vertex_t vertex1, vertex_t vertex2) const {
-    return isNeighbor(vertex1, vertex2);
-}
-
-void VertexList::addNeighbor(vertex_t vertex, vertex_t newNeighbor) {
-    std::vector<vertex_t> &vertexNeighbors = neighbors.at(vertex);
-    if (vertexNeighbors.size() >= 2) {
-        throw std::runtime_error(
-                "Both neighbors of vertex (" + std::to_string(vertex) + ") are already set.");
-    } else {
-        vertexNeighbors.push_back(newNeighbor);
-    }
-}
-
-void VertexList::removeNeighbor(vertex_t vertex, vertex_t neighbor) {
-    std::vector<vertex_t> &vertexNeighbors = neighbors.at(vertex);
-    int index = neighborIndex(vertex, neighbor);
-    if (index == -1) {
-        throw std::runtime_error(
-                "removeNeighbor: neighbor (" + std::to_string(neighbor) + ") is not a neighbor of vertex (" +
-                std::to_string(vertex) + ").");
-    } else {
-        vertexNeighbors.erase(vertexNeighbors.begin() + index);
-    }
-}
-
-bool VertexList::makeNeighbors(const vertex_t vertex1, const vertex_t vertex2) {
-    if (neighbors.at(vertex1).size() >= 2 or neighbors.at(vertex2).size() >= 2) {
-        return false;
-    } else {
-        addNeighbor(vertex1, vertex2);
-        addNeighbor(vertex2, vertex1);
-        return true;
-    }
-}
-
-
 // =================================================== Tour class ======================================================
 
-Tour::Tour() = default;
-
-Tour::Tour(std::vector<std::vector<vertex_t>> neighbors) : VertexList(std::move(neighbors)) {
-    if (!isHamiltonianTour()) {
-        throw std::runtime_error(
-                "A Tour object cannot be initialized with neighbors that do not describe a hamiltonian tour");
+std::vector<dimension_t> BaseTour::inversePermutation(const std::vector<dimension_t> &permutation) {
+    std::vector<dimension_t> result(permutation.size());
+    for (dimension_t i = 0; i < permutation.size(); ++i) {
+        result[permutation[i]] = i;
     }
+    return result;
 }
 
-Tour::Tour(const std::vector<vertex_t> &vertexList) {
+std::vector<vertex_t> BaseTour::getNeighbors(vertex_t vertex) {
+    return std::vector<vertex_t>({predecessor(vertex), successor(vertex)});
+}
+
+bool BaseTour::containsEdge(vertex_t vertex1, vertex_t vertex2) const {
+    return predecessor(vertex1) == vertex2 or successor(vertex1) == vertex2;
+}
+
+std::vector<dimension_t> BaseTour::cyclicPermutation(const std::vector<vertex_t> &alternatingWalk) const {
+    // For every out-edge in the alternating walk choose the vertex that is encountered first on the tour
+    // This cuts the number of vertices that need to be sorted in half
+    std::vector<dimension_t> outEdges; // contains all indices of the chosen vertices
+    vertex_t start = 0; // the vertex from which the order is determined
+    for (dimension_t i = 0; i < alternatingWalk.size(); i += 2) {
+        // start must be different from alternatingWalk[i] and alternatingWalk[i+1]
+        while (start == alternatingWalk[i] or start == alternatingWalk[i + 1]) {
+            start = (start + 1) % getDimension();
+        }
+        if (isBetween(start, alternatingWalk[i], alternatingWalk[i + 1])) {
+            outEdges.push_back(i);
+        } else {
+            outEdges.push_back(i + 1);
+        }
+    }
+
+    // Sort these vertices by the order the appear on the tour
+    std::sort(outEdges.begin(), outEdges.end(),
+              [this, alternatingWalk](dimension_t i, dimension_t j) {
+                  return isBetween(0, alternatingWalk[i], alternatingWalk[j]);
+              });
+
+    // Add all other vertices to get a complete permutation
+    std::vector<vertex_t> permutation;
+    for (dimension_t i : outEdges) {
+        permutation.push_back(i);
+        permutation.push_back((i % 2 == 0) ? i + 1 : i - 1);
+    }
+
+    return permutation;
+}
+
+bool BaseTour::isTourAfterExchange(const std::vector<vertex_t> &alternatingWalk) const {
+    std::vector<dimension_t> permutation = cyclicPermutation(alternatingWalk);
+    std::vector<dimension_t> indices = inversePermutation(permutation);
+    // {alternatingWalk[permutation[2i]], alternatingWalk[permutation[2i+1]]} are the out-edges in alternatingWalk
+
+    dimension_t i = alternatingWalk.size() - 1;
+    dimension_t j;
+    dimension_t count = 0;
+    do {
+        j = ((permutation[i] % 2 == 0) ? permutation[i] - 1 : permutation[i] + 1) % alternatingWalk.size();
+        // Walk along the in-edge {alternatingWalk[permutation[i]], alternatingWalk[j]}
+        i = ((indices[j] % 2 == 0) ? indices[j] - 1 : indices[j] + 1) % alternatingWalk.size();
+        // Walk along the segment alternatingWalk[j] -> alternatingWalk[permutation[i]]
+        // because with k = (indices[j] % 2 == 0) ? indices[j] + 1 : indices[j] - 1
+        // {alternatingWalk[j], alternatingWalk[permutation[k]]} would be an out-edge
+        count++;
+    } while (i != alternatingWalk.size() - 1);
+
+    return 2 * count == alternatingWalk.size();
+}
+
+void BaseTour::exchange(const std::vector<vertex_t> &alternatingWalk) {
+    // TODO: Implement an exchange step using Bergeron's algorithm and flip
+}
+
+
+
+// ================================================ ArrayTour class ====================================================
+
+dimension_t ArrayTour::getDimension() const {
+    return sequence.size();
+}
+
+void ArrayTour::setVertices(const std::vector<vertex_t> &vertexList) {
+    sequence = vertexList;
+    indices = inversePermutation(sequence);
+}
+
+ArrayTour::ArrayTour(const std::vector<vertex_t> &vertexList) {
     setVertices(vertexList);
 }
 
-void Tour::setVertices(const std::vector<vertex_t> &vertexList) {
-    neighbors.assign(vertexList.size(), std::vector<vertex_t>());
-    for (auto it = vertexList.begin(); it != vertexList.end() - 1; ++it) {
-        makeNeighbors(*it, *std::next(it));
-    }
-    makeNeighbors(vertexList.back(), vertexList.front());
+vertex_t ArrayTour::predecessor(vertex_t vertex) const {
+    return sequence[(indices[vertex] - 1) % getDimension()];
 }
 
-bool Tour::isHamiltonianTour() const {
-    dimension_t dimension = neighbors.size();
-    std::vector<bool> visited(dimension, false);
-    TourWalker tourWalker(*this, 0);
-    vertex_t currentVertex = tourWalker.getNextVertex();
-    do {
-        if (visited[currentVertex]) {
-            return false;
-        }
-        visited[currentVertex] = true;
-        currentVertex = tourWalker.getNextVertex();
-    } while (currentVertex != 0);
-    // Check if all elements in visited are true
-    return std::all_of(visited.begin(), visited.end(), [](bool v) { return v; });
+vertex_t ArrayTour::successor(vertex_t vertex) const {
+    return sequence[(indices[vertex] + 1) % getDimension()];
 }
 
-void Tour::exchange(const std::vector<vertex_t> &alternatingWalk) {
-    // Remove all edges in the alternatingWalk that are part of the tour (every edge with even i)
-    for (vertex_t i = 0; i < alternatingWalk.size() - 1; i += 2) {
-        // The current edge in the alternating walk is from vertex1 to vertex2
-        vertex_t vertex1 = alternatingWalk.at(i);
-        vertex_t vertex2 = alternatingWalk.at(i + 1);
-        removeNeighbor(vertex1, vertex2);
-        removeNeighbor(vertex2, vertex1);
-    }
-    // Add all edges in the alternatingWalk that are not part of the tour (every edge with odd i)
-    for (vertex_t i = 1; i < alternatingWalk.size() - 1; i += 2) {
-        // The current edge in the alternating walk is from vertex1 to vertex2
-        vertex_t vertex1 = alternatingWalk.at(i);
-        vertex_t vertex2 = alternatingWalk.at(i + 1);
-        addNeighbor(vertex1, vertex2);
-        addNeighbor(vertex2, vertex1);
-    }
+bool ArrayTour::isBetween(vertex_t before, vertex_t vertex, vertex_t after) const {
+    dimension_t distanceToVertex = (indices[vertex] - indices[before]) % getDimension();
+    dimension_t distanceToAfter = (indices[after] - indices[before]) % getDimension();
+    return distanceToVertex < distanceToAfter;
 }
 
-void Tour::undoExchange(const std::vector<vertex_t> &alternatingWalk) {
-    // Remove all edges in the alternatingWalk that are part of the tour (every edge with odd i)
-    for (vertex_t i = 1; i < alternatingWalk.size() - 1; i += 2) {
-        // The current edge in the alternating walk is from vertex1 to vertex2
-        vertex_t vertex1 = alternatingWalk.at(i);
-        vertex_t vertex2 = alternatingWalk.at(i + 1);
-        removeNeighbor(vertex1, vertex2);
-        removeNeighbor(vertex2, vertex1);
+void ArrayTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
+    // Calculate the length of the two segments to decide which of them will be reversed
+    dimension_t distanceSegment1 = (indices[c] - indices[a]) % getDimension();
+    dimension_t distanceSegment2 = (indices[b] - indices[d]) % getDimension();
+    vertex_t segmentStart, segmentEnd;
+    dimension_t segmentLength;
+    if (distanceSegment1 <= distanceSegment2) {
+        // The segment a-c will be reversed
+        segmentStart = a;
+        segmentEnd = c;
+        segmentLength = distanceSegment1;
+    } else {
+        // The segment d-b will be reversed
+        segmentStart = d;
+        segmentEnd = b;
+        segmentLength = distanceSegment2;
     }
-    // Add all edges in the alternatingWalk that are not part of the tour (every edge with even i)
-    for (vertex_t i = 0; i < alternatingWalk.size() - 1; i += 2) {
-        // The current edge in the alternating walk is from vertex1 to vertex2
-        vertex_t vertex1 = alternatingWalk.at(i);
-        vertex_t vertex2 = alternatingWalk.at(i + 1);
-        addNeighbor(vertex1, vertex2);
-        addNeighbor(vertex2, vertex1);
+    for (dimension_t i = 0; i < segmentLength / 2; ++i) {
+        // TODO: Check if this does only swap the contents of vertex1 and vertex2
+        vertex_t &vertex1 = sequence[(segmentStart + i) % getDimension()];
+        vertex_t &vertex2 = sequence[(segmentEnd - i) % getDimension()];
+        std::swap(vertex1, vertex2);
+        std::swap(indices[vertex1], indices[vertex2]);
     }
-}
 
-bool Tour::isTourAfterExchange(const std::vector<vertex_t> &alternatingWalk) {
-    exchange(alternatingWalk);
-    bool result = isHamiltonianTour();
-    undoExchange(alternatingWalk);
-    return result;
 }
 
 
 // =============================================== TourWalker class ====================================================
 
 
-TourWalker::TourWalker(const Tour &tour, vertex_t first) : TourWalker(tour, first, tour.next(first)) {}
-
-TourWalker::TourWalker(const Tour &tour, vertex_t first, vertex_t second) : tour(tour), current(first), next(second) {}
+TourWalker::TourWalker(const BaseTour &tour, vertex_t first) : tour(tour), current(first) {}
 
 vertex_t TourWalker::getNextVertex() {
     const vertex_t previous = current;
-    current = next;
-    next = tour.next(previous, current);
+    current = tour.successor(current);
     return previous;
 }
 
-std::ostream &operator<<(std::ostream &out, const Tour &tour) {
+std::ostream &operator<<(std::ostream &out, const BaseTour &tour) {
     std::string output;
     TourWalker tourWalker(tour, 0);
     vertex_t currentVertex = tourWalker.getNextVertex();

@@ -63,12 +63,11 @@ public:
     // Returns the number of vertices in the TSPLIB problem
     dimension_t getDimension() const;
 
-
     // Returns the distance of vertex i and vertex j
     distance_t dist(vertex_t i, vertex_t j) const;
 
     // Returns the length of tour
-    distance_t length(const Tour &tour) const;
+    distance_t length(const BaseTour &tour) const;
 
     // Returns the gain of an alternating walk
     // Expects a closed alternating walk that starts with an edge on the tour

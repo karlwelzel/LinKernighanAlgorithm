@@ -15,112 +15,101 @@ using vertex_t = size_t; // The type used for vertices
 using dimension_t = vertex_t; // The type used for counting vertices
 using distance_t = unsigned long; // The type used for distances and lengths
 using signed_distance_t = long long; // The type used for distances and lengths that can be negative
+// using Tour = ArrayTour; // The current implementation of a tour, that should be used
 
+// ================================================= BaseTour class ====================================================
 
-// ================================================ VertexList class ===================================================
+// This class represents a Tour. It is an abstract base class for different implementations of a tour.
 
-// This class maintains a map that stores a maximum of two neighbors of each vertex. There is no inherent direction
-// encoded in these neighbors. This gives additional flexibility when compared to std::list while still having similar
-// run times. It is possible to create tours that do not contain every vertex or multiple separate paths or even have a
-// vertex x with neighbor y while y does not have x as its neighbor, so extra caution is necessary when manipulating
-// these objects.
-// This class is the base class for Tour.
+class BaseTour {
+public: // pure virtual functions that need to be implemented by subclasses
 
+    virtual dimension_t getDimension() const = 0;
 
-class VertexList {
-protected:
-    std::vector<std::vector<vertex_t>> neighbors;
+    // Initialize the tour with a sequence of vertices
+    // This function expects a vector containing the numbers from 0 to tour.size()-1 and clears existing neighbors
+    virtual void setVertices(const std::vector<vertex_t> &vertexList) = 0;
 
-    // Returns the index of neighbor in neighbors[vertex] if present, otherwise -1
-    // Because every vertex has no more than 2 neighbors, it always returns -1, 0 or 1
-    int neighborIndex(vertex_t vertex, vertex_t neighbor) const;
+    // Returns the predecessor of vertex in the current tour
+    virtual vertex_t predecessor(vertex_t vertex) const = 0;
 
-    // Set newNeighbor as one of the neighbors of vertex.
-    // Throws a runtime_error if both of the neighbors of vertex are already set
-    void addNeighbor(vertex_t vertex, vertex_t newNeighbor);
+    // Returns the successor of vertex in the current tour
+    virtual vertex_t successor(vertex_t vertex) const = 0;
 
-    // Deletes neighbor as a neighbor of vertex
-    // Throws a runtime_error if neighbor is not a neighbor of vertex
-    void removeNeighbor(vertex_t vertex, vertex_t neighbor);
+    // Checks whether "vertex" is reached before "after" when walking in forward direction from "before"
+    virtual bool isBetween(vertex_t before, vertex_t vertex, vertex_t after) const = 0;
 
-public:
-    VertexList();
+    // Performs a 2-opt exchange: Replaces {a, b} and {c, d} by {b, c} and {d, a}
+    // The new tour is a-c, b-d
+    // Expects successor(b) = a and successor(c) = d
+    virtual void flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) = 0;
 
-    // Create dimension vertices, each with no neighbors
-    explicit VertexList(dimension_t dimension);
+public: // functions that all Tour classes have in common and that only depend on the functions above
 
-    // Create VertexList from a given neighbors map
-    explicit VertexList(std::vector<std::vector<vertex_t>> neighbors);
-
-    // Returns the number of vertices
-    dimension_t getDimension() const;
+    // Compute the inverse permutation to a permutation of the numbers 0 to n-1, i.e. a vector inv such that
+    // permutation[inv[i]] == i for all 0 <= i < n
+    // Expects that permutation contains every number 0 to n-1 exactly once
+    static std::vector<dimension_t> inversePermutation(const std::vector<dimension_t> &permutation);
 
     // Returns the neighbors of vertex in the tour
     std::vector<vertex_t> getNeighbors(vertex_t vertex);
 
-    // Which vertex comes after current, when previous comes before it?
-    // previous is necessary to determine the direction
-    // Throws a runtime_error if the vertex cannot be determined
-    vertex_t next(vertex_t previous, vertex_t current) const;
-
-    // Returns some vertex, that is a neighbor of current
-    // Throws a runtime_error if current has no neighbor
-    vertex_t next(vertex_t current) const;
-
-    // Checks whether next is a neighbor of current
-    bool isNeighbor(vertex_t vertex, vertex_t neighbor) const;
-
     // Checks whether the tour contains the edge {vertex1, vertex2}
-    // This function is an alias for isNeighbor
     bool containsEdge(vertex_t vertex1, vertex_t vertex2) const;
 
-    // Tries to make vertex1 a neighbor of vertex2 and vertex2 a neighbor of vertex1 and returns whether this was
-    // successful. It only fails if one of them already has two neighbors.
-    bool makeNeighbors(vertex_t vertex1, vertex_t vertex2);
-
-};
-
-
-// =================================================== Tour class ======================================================
-
-// This class represents a Tour. It is a subclass of VertexList, but avoids the problems of VertexList by only allowing
-// changes that don't destroy the tour property
-
-
-class Tour : public VertexList {
-protected:
-    // Initialize the neighbors map with a std::list that represents a tour. For each vertex x the neighbors are the
-    // adjacent entries in "vertexList" (start and end are also adjacent)
-    // This function expects a list containing the numbers from 0 to tour.size()-1 and clears existing neighbors
-    void setVertices(const std::vector<vertex_t> &vertexList);
-
-public:
-    Tour();
-
-    // Create VertexList from a given neighbors map, checks if the map represents a tour
-    explicit Tour(std::vector<std::vector<vertex_t>> neighbors);
-
-    // see setVertices
-    explicit Tour(const std::vector<vertex_t> &vertexList);
-
-    // Checks if this Tour really is a hamiltonian tour
-    bool isHamiltonianTour() const;
+    // Computes the cyclic permutation of the vertices in an alternating walk, i.e. a vector permutation such that
+    // the elements in alternatingWalk appear on the tour in the order
+    //   alternatingWalk[permutation[0]], alternatingWalk[permutation[1]], ..., alternatingWalk[permutation[n-1]]
+    // Expects a closed alternating walk that starts with an edge on the tour
+    std::vector<dimension_t> cyclicPermutation(const std::vector<vertex_t> &alternatingWalk) const;
 
     // Checks if the tour after exchanging all edges of alternatingWalk on the tour by edges not on the tour is still
     // a hamiltonian tour, does not change the tour itself
     // Expects a closed alternating walk that starts with an edge on the tour
-    bool isTourAfterExchange(const std::vector<vertex_t> &alternatingWalk);
+    bool isTourAfterExchange(const std::vector<vertex_t> &alternatingWalk) const;
 
     // Exchanges all edges of alternatingWalk on the tour by edges not on the tour
     // Expects a closed alternating walk that starts with an edge on the tour
     // Expects that the exchange will lead to a hamiltonian tour, check with isTourAfterExchange beforehand
     void exchange(const std::vector<vertex_t> &alternatingWalk);
-
-    // Undo an exchange, done by Tour::exchange
-    // Expects that the last exchange was called with the same alternating walk
-    void undoExchange(const std::vector<vertex_t> &alternatingWalk);
 };
 
+
+// ================================================ ArrayTour class ====================================================
+
+// This is the simplest implementation of a Tour using two vectors (as replacement for arrays)
+
+class ArrayTour : public BaseTour {
+private:
+    std::vector<vertex_t> sequence; // Stores the sequence of vertices in the tour
+    std::vector<dimension_t> indices; // Stores the index of each vertex in sequence: sequence[indices[i]] = i
+
+public:
+    ArrayTour() = default;
+
+    // Initialize the tour with a sequence of vertices
+    // This function expects a vector containing the numbers from 0 to tour.size()-1 and clears existing neighbors
+    void setVertices(const std::vector<vertex_t> &vertexList) override;
+
+    explicit ArrayTour(const std::vector<vertex_t> &vertexList);
+
+    // Returns the predecessor of vertex in the current tour
+    vertex_t predecessor(vertex_t vertex) const override;
+
+    // Returns the successor of vertex in the current tour
+    vertex_t successor(vertex_t vertex) const override;
+
+    dimension_t getDimension() const override;
+
+    // Checks whether "vertex" is reached before "after" when walking in forward direction from "before"
+    bool isBetween(vertex_t before, vertex_t vertex, vertex_t after) const override;
+
+    // Performs a 2-opt exchange: Replaces {a, b} and {c, d} by {b, c} and {d, a}
+    // Expects successor(b) = a and successor(c) = d
+    void flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) override;
+};
+
+using Tour = ArrayTour;
 
 // =============================================== TourWalker class ====================================================
 
@@ -130,22 +119,18 @@ public:
 
 class TourWalker {
 private:
-    const Tour &tour;
+    const BaseTour &tour;
     vertex_t current;
-    vertex_t next;
 
 public:
     // Create a TourWalker that starts the walk at vertex first
-    TourWalker(const Tour &tour, vertex_t first);
-
-    // Create a TourWalker that starts the walk at vertex first and then walks in the direction of vertex second
-    TourWalker(const Tour &tour, vertex_t first, vertex_t second);
+    TourWalker(const BaseTour &tour, vertex_t first);
 
     // Advance the walk and get the next vertex
     vertex_t getNextVertex();
 };
 
 // Output the tour to the stream out, typically used with std::cout
-std::ostream &operator<<(std::ostream &out, const Tour &tour);
+std::ostream &operator<<(std::ostream &out, const BaseTour &tour);
 
 #endif //LINKERNINGHANALGORITHM_TOUR_H
