@@ -26,7 +26,7 @@ SignedPermutation::SignedPermutation(std::vector<number_t> permutation, std::vec
 
 }
 
-std::vector<std::pair<number_t, number_t>> SignedPermutation::computeReversalSteps() {
+std::vector<std::pair<number_t, number_t>> SignedPermutation::reversalSteps() {
     std::vector<number_t> currentPermutation = permutation;
     std::vector<bool> currentPositiveSign = positiveSign;
     std::vector<std::pair<number_t, number_t>> reversalSteps;

@@ -33,7 +33,7 @@ public:
 
     // Computes reversal steps so that when these signed reversals are applied in this order the permutation will
     // become the identity permutation
-    std::vector<std::pair<number_t, number_t>> computeReversalSteps();
+    std::vector<std::pair<number_t, number_t>> reversalSteps();
 };
 
 
