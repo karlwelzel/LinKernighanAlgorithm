@@ -134,7 +134,7 @@ void ArrayTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
         segmentEnd = b;
         segmentLength = distanceSegment2;
     }
-    for (dimension_t i = 0; i < segmentLength / 2; ++i) {
+    for (dimension_t i = 0; i < (segmentLength + 1) / 2; ++i) {
         // TODO: Check if this does only swap the contents of vertex1 and vertex2
         vertex_t &vertex1 = sequence[(segmentStart + i) % getDimension()];
         vertex_t &vertex2 = sequence[(segmentEnd - i) % getDimension()];

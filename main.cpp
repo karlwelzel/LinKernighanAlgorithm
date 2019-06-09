@@ -5,6 +5,7 @@
 #include "Tour.h"
 #include "TsplibUtils.h"
 #include "SimpleHeuristic.h"
+#include "SignedPermutation.h"
 //#include "LinKernighanHeuristic.h"
 
 // TSPLIB test instances:
@@ -60,6 +61,16 @@ int main(int argc, char *argv[]) {
 */
 
 
+    std::cout << "Start reversals" << std::endl;
+    std::vector<unsigned long> permutation{0, 4, 2, 3, 1, 5};
+    std::vector<bool> positiveSign{true, true, false, true, true, false};
+    for (std::pair<unsigned long, unsigned long> reversal: SignedPermutation(permutation,
+                                                                             positiveSign).computeReversalSteps()) {
+        std::cout << "Reversal: " << reversal.first << ", " << reversal.second << std::endl;
+    }
+    std::cout << "Stop reversals" << std::endl;
+
+/*
     // Print the length of the tour 1, ..., n
     distance_t ascendingLength = problem.length(ascendingVerticesHeuristic(problem));
     std::cout << "The tour 1, 2, ..., n has length " << ascendingLength << "." << std::endl << std::endl;
@@ -105,6 +116,7 @@ int main(int argc, char *argv[]) {
         std::cout << "The best tour found by the heuristic is " << ((length / (double) optimalLength) - 1) * 100
                   << "% above the optimum of " << optimalLength << "." << std::endl;
     }
+*/
 
     return 0;
 }
