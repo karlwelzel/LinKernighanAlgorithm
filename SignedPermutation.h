@@ -18,8 +18,8 @@ using number_t = size_t; // The data type used for numbers in permutations
 // elements represents the sign (true = +, false = -)
 // A signed reversal reverses the order of consecutive elements in the permutation and changes their signs. The goal is
 // to find a number of signed reversals that transform a given signed permutation into the signed identity permutation
-// +0, +1, +2, ..., +n. A signed reversal is represented by a pair of indices i and j that indicate that the part of
-// permutation between i and j (possibly wrapping around the end) should be reversed.
+// +0, +1, +2, ..., +n. A signed reversal is represented by a pair of indices i <= j that indicate that the part of
+// permutation between i and j should be reversed.
 
 // The algorithm implemented here is an naive greedy approach:
 // The permutation is sorted in a way such that after the i-th step the i first elements are +1 to +i in the correct
@@ -48,6 +48,7 @@ public:
     std::pair<size_t, size_t> nextReversal() const;
 
     // Performs a signed reversal on the signed permutation
+    // Expects step.first <= step.second
     void performReversal(std::pair<size_t, size_t> step);
 };
 

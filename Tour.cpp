@@ -145,10 +145,10 @@ void BaseTour::exchange(const std::vector<vertex_t> &alternatingWalk) {
     vertex_t preStartVertex, startVertex, endVertex, postEndVertex;
     while (!signedPermutation.isIdentityPermutation()) {
         std::pair<size_t, size_t> reversal = signedPermutation.nextReversal();
-        preStartElement = signedPermutation.getElementAt((reversal.first - 1) % segmentPermutation.size());
+        preStartElement = signedPermutation.getElementAt((reversal.first + size - 1) % size);
         startElement = signedPermutation.getElementAt(reversal.first);
         endElement = signedPermutation.getElementAt(reversal.second);
-        postEndElement = signedPermutation.getElementAt((reversal.second + 1) % segmentPermutation.size());
+        postEndElement = signedPermutation.getElementAt((reversal.second + 1) % size);
 
         preStartSegment = segments[preStartElement.first];
         startSegment = segments[startElement.first];
@@ -195,7 +195,7 @@ ArrayTour::ArrayTour(const std::vector<vertex_t> &vertexList) {
 }
 
 vertex_t ArrayTour::predecessor(vertex_t vertex) const {
-    return sequence[(indices[vertex] - 1) % getDimension()];
+    return sequence[(indices[vertex] + getDimension() - 1) % getDimension()];
 }
 
 vertex_t ArrayTour::successor(vertex_t vertex) const {
@@ -227,7 +227,7 @@ void ArrayTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
     }
     for (dimension_t i = 0; i < (segmentLength + 1) / 2; ++i) {
         vertex_t &vertex1 = sequence[(segmentStartIndex + i) % getDimension()];
-        vertex_t &vertex2 = sequence[(segmentEndIndex - i) % getDimension()];
+        vertex_t &vertex2 = sequence[(segmentEndIndex + getDimension() - i) % getDimension()];
         std::swap(vertex1, vertex2);
         std::swap(indices[vertex1], indices[vertex2]);
     }
