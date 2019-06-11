@@ -68,6 +68,11 @@ public: // functions that all Tour classes have in common and that only depend o
     // Expects a closed alternating walk that starts with an edge on the tour
     bool isTourAfterExchange(const std::vector<vertex_t> &alternatingWalk) const;
 
+    // Performs a 2-opt exchange (flip) that reverses the segment between startVertex and endVertex in successor
+    // direction. It is not guaranteed this segment will be in the predecessor direction afterwards, the segment will
+    // be reversed relative to the rest of the tour.
+    void reverseSegment(vertex_t startVertex, vertex_t endVertex);
+
     // Exchanges all edges of alternatingWalk on the tour by edges not on the tour
     // Expects a closed alternating walk that starts with an edge on the tour
     // Expects that the exchange will lead to a hamiltonian tour, check with isTourAfterExchange beforehand

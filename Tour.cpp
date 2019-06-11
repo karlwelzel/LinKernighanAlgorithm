@@ -8,7 +8,9 @@
 #include <vector>
 #include <algorithm>
 #include <iostream>
+#include <unordered_map>
 #include "Tour.h"
+#include "SignedPermutation.h"
 
 
 // =================================================== Tour class ======================================================
@@ -83,8 +85,64 @@ bool BaseTour::isTourAfterExchange(const std::vector<vertex_t> &alternatingWalk)
     return 2 * count == alternatingWalk.size();
 }
 
+void BaseTour::reverseSegment(vertex_t startVertex, vertex_t endVertex) {
+    flip(startVertex, predecessor(startVertex), endVertex, successor(endVertex));
+}
+
 void BaseTour::exchange(const std::vector<vertex_t> &alternatingWalk) {
     // TODO: Implement an exchange step using Bergeron's algorithm and flip
+    std::vector<dimension_t> permutation = cyclicPermutation(alternatingWalk);
+    std::vector<dimension_t> indices = inversePermutation(permutation);
+    // {alternatingWalk[permutation[2i]], alternatingWalk[permutation[2i+1]]} are the out-edges in alternatingWalk
+
+    std::vector<std::pair<vertex_t, vertex_t>> segments;
+    std::unordered_map<vertex_t, number_t> segmentNumber;
+    std::vector<std::pair<number_t, bool>> segmentPermutation;
+
+    dimension_t i = permutation[1]; // index for alternatingWalk
+    dimension_t j;                  // index for permutation
+
+    // Traverse the segments on the new tour and number them
+    do {
+        j = ((indices[i] % 2 == 0) ? indices[i] - 1 : indices[i] + 1) % alternatingWalk.size();
+        // alternatingWalk[i] -> alternatingWalk[permutation[j]] is a segment on the tour
+        // because with k = (indices[i] % 2 == 0) ? indices[i] + 1 : indices[i] - 1
+        // {alternatingWalk[i], alternatingWalk[permutation[k]]} would be an out-edge
+
+        segments.emplace_back(alternatingWalk[i], alternatingWalk[permutation[j]]);
+        segmentNumber[alternatingWalk[i]] = segments.size() - 1;
+        // segmentNumber[segments[a].first] == a
+
+        i = ((permutation[j] % 2 == 0) ? permutation[j] - 1 : permutation[j] + 1) % alternatingWalk.size();
+        // {alternatingWalk[permutation[j]], alternatingWalk[i]} is an in-edge on the tour
+    } while (i != permutation[1]);
+
+    // Traverse the segments on the current tour and create a signed permutation
+    for (j = 1; j < alternatingWalk.size(); j += 2) {
+        // alternatingWalk[permutation[j]] -> alternatingWalk[permutation[j+1]] is a segment on the tour
+        std::unordered_map<vertex_t, number_t>::const_iterator it = segmentNumber.find(alternatingWalk[permutation[j]]);
+        if (it != segmentNumber.end()) { // The segment on the new tour has successor direction
+            segmentPermutation.emplace_back(it->second, true);
+        } else { // The segment on the new tour has predecessor direction
+            it = segmentNumber.find(alternatingWalk[permutation[j + 1]]);
+            segmentPermutation.emplace_back(it->second, false);
+        }
+        // {alternatingWalk[permutation[j+1]], alternatingWalk[permutation[j+2]]} is an out-edge on the tour
+    }
+
+    std::vector<std::pair<std::pair<number_t, bool>, std::pair<number_t, bool>>> reversalSteps;
+    reversalSteps = SignedPermutation(segmentPermutation).reversalSteps();
+
+    std::pair<vertex_t, vertex_t> startSegment, endSegment;
+    vertex_t startVertex, endVertex;
+    for (std::pair<std::pair<number_t, bool>, std::pair<number_t, bool>> step : reversalSteps) {
+        startSegment = segments[step.first.first];
+        endSegment = segments[step.second.first];
+        startVertex = step.first.second ? startSegment.first : startSegment.second;
+        endVertex = step.second.second ? endSegment.second : endSegment.first;
+        reverseSegment(startVertex, endVertex);
+    }
+
 }
 
 

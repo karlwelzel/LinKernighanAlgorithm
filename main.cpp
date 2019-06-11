@@ -60,7 +60,13 @@ int main(int argc, char *argv[]) {
     }
 */
 
+    Tour tour = ascendingVerticesHeuristic(problem);
+    tour.exchange(std::vector<vertex_t>{0, 1, 3, 2, 6, 7, 5, 4});
 
+    std::cout << tour << std::endl;
+
+
+/*
     // Print the length of the tour 1, ..., n
     distance_t ascendingLength = problem.length(ascendingVerticesHeuristic(problem));
     std::cout << "The tour 1, 2, ..., n has length " << ascendingLength << "." << std::endl << std::endl;
@@ -106,6 +112,7 @@ int main(int argc, char *argv[]) {
         std::cout << "The best tour found by the heuristic is " << ((length / (double) optimalLength) - 1) * 100
                   << "% above the optimum of " << optimalLength << "." << std::endl;
     }
+*/
 
     return 0;
 }

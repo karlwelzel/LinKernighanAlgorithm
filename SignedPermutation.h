@@ -23,17 +23,17 @@ using number_t = size_t; // The data type used for numbers in permutations
 
 class SignedPermutation {
 private:
-    std::vector<number_t> permutation;
-    std::vector<bool> positiveSign;
+    std::vector<std::pair<number_t, bool>> permutation;
 
 public:
     // Initialize the signed permutation with permutation
-    // Expects a vector of length n where for every 0 <= i < n either i or -i appears exactly once
-    explicit SignedPermutation(std::vector<number_t> permutation, std::vector<bool> positiveSign);
+    // Expects a vector of length n where for every 0 <= i < n either (i, true) or (i, false) appears exactly once
+    // (i, true) represents +i and (i, false) represents -i
+    explicit SignedPermutation(std::vector<std::pair<number_t, bool>> permutation);
 
     // Computes reversal steps so that when these signed reversals are applied in this order the permutation will
     // become the identity permutation
-    std::vector<std::pair<number_t, number_t>> reversalSteps();
+    std::vector<std::pair<std::pair<number_t, bool>, std::pair<number_t, bool>>> reversalSteps();
 };
 
 
