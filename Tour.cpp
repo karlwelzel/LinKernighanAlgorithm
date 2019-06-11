@@ -35,8 +35,8 @@ std::vector<dimension_t> BaseTour::cyclicPermutation(const std::vector<vertex_t>
     // For every out-edge in the alternating walk choose the vertex that is encountered first on the tour
     // This cuts the number of vertices that need to be sorted in half
     std::vector<dimension_t> outEdges; // contains all indices of the chosen vertices
-    vertex_t start = 0; // the vertex from which the order is determined
-    for (dimension_t i = 0; i < alternatingWalk.size(); i += 2) {
+    vertex_t start = 0; // the vertex from which the order of each out-edge is determined
+    for (dimension_t i = 0; i < alternatingWalk.size() - 1; i += 2) {
         // start must be different from alternatingWalk[i] and alternatingWalk[i+1]
         while (start == alternatingWalk[i] or start == alternatingWalk[i + 1]) {
             start = (start + 1) % getDimension();
@@ -69,20 +69,27 @@ bool BaseTour::isTourAfterExchange(const std::vector<vertex_t> &alternatingWalk)
     std::vector<dimension_t> indices = inversePermutation(permutation);
     // {alternatingWalk[permutation[2i]], alternatingWalk[permutation[2i+1]]} are the out-edges in alternatingWalk
 
-    dimension_t i = alternatingWalk.size() - 1;
-    dimension_t j;
+    dimension_t size = permutation.size();
+    dimension_t i = permutation[1]; // index for alternatingWalk
+    dimension_t j;                  // index for permutation
     dimension_t count = 0;
-    do {
-        j = ((permutation[i] % 2 == 0) ? permutation[i] - 1 : permutation[i] + 1) % alternatingWalk.size();
-        // Walk along the in-edge {alternatingWalk[permutation[i]], alternatingWalk[j]}
-        i = ((indices[j] % 2 == 0) ? indices[j] - 1 : indices[j] + 1) % alternatingWalk.size();
-        // Walk along the segment alternatingWalk[j] -> alternatingWalk[permutation[i]]
-        // because with k = (indices[j] % 2 == 0) ? indices[j] + 1 : indices[j] - 1
-        // {alternatingWalk[j], alternatingWalk[permutation[k]]} would be an out-edge
-        count++;
-    } while (i != alternatingWalk.size() - 1);
 
-    return 2 * count == alternatingWalk.size();
+    // Traverse the in-edges on the tour and skip the segments in between
+    // Count is a counter for the number of in-edges that are visited. The exchange produces a tour if and only if
+    // count is half as big as the number of edges in alternatingWalk.
+    do {
+        j = ((indices[i] % 2 == 0) ? indices[i] + size - 1 : indices[i] + 1) % size;
+        // alternatingWalk[i] -> alternatingWalk[permutation[j]] is a segment on the tour
+        // because with k = (indices[i] % 2 == 0) ? indices[i] + 1 : indices[i] - 1
+        // {alternatingWalk[i], alternatingWalk[permutation[k]]} would be an out-edge
+
+        i = ((permutation[j] % 2 == 0) ? permutation[j] + size - 1 : permutation[j] + 1) % size;
+        // {alternatingWalk[permutation[j]], alternatingWalk[i]} is an in-edge on the tour
+
+        count++;
+    } while (i != permutation[1]);
+
+    return 2 * count == size;
 }
 
 void BaseTour::exchange(const std::vector<vertex_t> &alternatingWalk) {
@@ -171,6 +178,12 @@ dimension_t ArrayTour::getDimension() const {
     return sequence.size();
 }
 
+dimension_t ArrayTour::distance(vertex_t vertex1, vertex_t vertex2) const {
+    // Avoid problems with negative values and modulo
+    ptrdiff_t diff = indices[vertex2] - indices[vertex1];
+    return (diff + getDimension()) % getDimension();
+}
+
 void ArrayTour::setVertices(const std::vector<vertex_t> &vertexList) {
     sequence = vertexList;
     indices = inversePermutation(sequence);
@@ -189,15 +202,15 @@ vertex_t ArrayTour::successor(vertex_t vertex) const {
 }
 
 bool ArrayTour::isBetween(vertex_t before, vertex_t vertex, vertex_t after) const {
-    dimension_t distanceToVertex = (indices[vertex] - indices[before]) % getDimension();
-    dimension_t distanceToAfter = (indices[after] - indices[before]) % getDimension();
+    dimension_t distanceToVertex = distance(before, vertex);
+    dimension_t distanceToAfter = distance(before, after);
     return distanceToVertex < distanceToAfter;
 }
 
 void ArrayTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
     // Calculate the length of the two segments to decide which of them will be reversed
-    dimension_t distanceSegment1 = (indices[c] - indices[a]) % getDimension();
-    dimension_t distanceSegment2 = (indices[b] - indices[d]) % getDimension();
+    dimension_t distanceSegment1 = distance(a, c);
+    dimension_t distanceSegment2 = distance(d, b);
     dimension_t segmentStartIndex, segmentEndIndex;
     dimension_t segmentLength;
     if (distanceSegment1 <= distanceSegment2) {
@@ -237,7 +250,7 @@ std::ostream &operator<<(std::ostream &out, const BaseTour &tour) {
     TourWalker tourWalker(tour, 0);
     vertex_t currentVertex = tourWalker.getNextVertex();
     do {
-        output += std::to_string(currentVertex) + ", ";
+        output += std::to_string(currentVertex + 1) + ", ";
         currentVertex = tourWalker.getNextVertex();
     } while (currentVertex != 0);
     out << output.substr(0, output.length() - 2);

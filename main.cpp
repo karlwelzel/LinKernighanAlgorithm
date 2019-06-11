@@ -6,7 +6,7 @@
 #include "TsplibUtils.h"
 #include "SimpleHeuristic.h"
 #include "SignedPermutation.h"
-//#include "LinKernighanHeuristic.h"
+#include "LinKernighanHeuristic.h"
 
 // TSPLIB test instances:
 // berlin52            EUC_2D
@@ -60,20 +60,13 @@ int main(int argc, char *argv[]) {
     }
 */
 
-    Tour tour = ascendingVerticesHeuristic(problem);
-    tour.exchange(std::vector<vertex_t>{0, 1, 3, 2, 6, 7, 5, 4});
-
-    std::cout << tour << std::endl;
-
-
-/*
     // Print the length of the tour 1, ..., n
     distance_t ascendingLength = problem.length(ascendingVerticesHeuristic(problem));
     std::cout << "The tour 1, 2, ..., n has length " << ascendingLength << "." << std::endl << std::endl;
 
     // Use the heuristic from the introduction assignment to get a tour to start with and optimize it with the
     // Lin-Kernighan-heuristic
-    const Tour tour = simpleHeuristic(problem);
+    const Tour tour = linKernighanHeuristic(problem, simpleHeuristic(problem));
 
     // Output the best tour found by the algorithm and compare it to the optimal tour if given
     distance_t length = problem.length(tour);
@@ -112,7 +105,7 @@ int main(int argc, char *argv[]) {
         std::cout << "The best tour found by the heuristic is " << ((length / (double) optimalLength) - 1) * 100
                   << "% above the optimum of " << optimalLength << "." << std::endl;
     }
-*/
+
 
     return 0;
 }

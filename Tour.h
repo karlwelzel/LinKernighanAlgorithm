@@ -84,6 +84,10 @@ private:
     std::vector<vertex_t> sequence; // Stores the sequence of vertices in the tour
     std::vector<dimension_t> indices; // Stores the index of each vertex in sequence: sequence[indices[i]] = i
 
+    // Compute the number of vertices between vertex1 and vertex2 in the successor direction (including vertex1 and
+    // excluding vertex2)
+    dimension_t distance(vertex_t vertex1, vertex_t vertex2) const;
+
 public:
     ArrayTour() = default;
 

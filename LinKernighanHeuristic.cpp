@@ -116,30 +116,35 @@ Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &start
             vertexChoices.emplace_back(); // Add set X_{i+1}
             vertex_t xi = currentWalk.at(i);
             if (i % 2 == 1) { // i is odd
+                // Determine possible in-edges
                 for (vertex_t x = 0; x < dimension; ++x) {
                     if (x != xi and x != currentWalk.at(0)
                         and !currentTour.containsEdge(xi, x)
                         and !currentWalk.containsEdge(xi, x)
-                        and tsplibProblem.exchangeGain(currentWalk) - (signed_distance_t) tsplibProblem.dist(xi, x) >
-                            highestGain) {
+                        and tsplibProblem.exchangeGain(currentWalk) -
+                            static_cast<signed_distance_t>(tsplibProblem.dist(xi, x)) > highestGain) {
 
                         vertexChoices.at(i + 1).push_back(x);
                     }
 
                 }
             } else { // i is even
-                // TODO: There is a problem that {x_i, x_0} can be in closedWalk twice
+                // Determine possible out-edges
+                // No out-edge should connect back to currentWalk[0], because at this point currentWalk is not a valid
+                // alternating walk (even number of elements) and can never be closed in the future
                 if (i <= infeasibilityDepth) {
                     for (vertex_t neighbor : currentTour.getNeighbors(xi)) {
-                        if (!currentWalk.containsEdge(xi, neighbor)) {
+                        if (neighbor != currentWalk.at(0) and !currentWalk.containsEdge(xi, neighbor)) {
                             vertexChoices.at(i + 1).push_back(neighbor);
                         }
                     }
                 } else {
                     for (vertex_t neighbor : currentTour.getNeighbors(xi)) {
-                        // For the above to_do check !currentWalk.containsEdge(neighbor, currentWalk.at(0))
-                        if (!currentWalk.containsEdge(xi, neighbor)
-                            // and neighbor != currentWalk.at(1)
+                        // currentWalk.appendAndClose(neighbor) is not a valid alternating walk if {neighbor, x_0}, but
+                        // this is only possible if neighbor is x_1, so we only need to exclude this special case
+                        if (neighbor != currentWalk.at(0)
+                            and !currentWalk.containsEdge(xi, neighbor)
+                            and neighbor != currentWalk.at(1)
                             and currentTour.isTourAfterExchange(currentWalk.appendAndClose(neighbor))) {
                             vertexChoices.at(i + 1).push_back(neighbor);
                         }
