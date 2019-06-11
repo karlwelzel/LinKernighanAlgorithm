@@ -85,12 +85,7 @@ bool BaseTour::isTourAfterExchange(const std::vector<vertex_t> &alternatingWalk)
     return 2 * count == alternatingWalk.size();
 }
 
-void BaseTour::reverseSegment(vertex_t startVertex, vertex_t endVertex) {
-    flip(startVertex, predecessor(startVertex), endVertex, successor(endVertex));
-}
-
 void BaseTour::exchange(const std::vector<vertex_t> &alternatingWalk) {
-    // TODO: Implement an exchange step using Bergeron's algorithm and flip
     std::vector<dimension_t> permutation = cyclicPermutation(alternatingWalk);
     std::vector<dimension_t> indices = inversePermutation(permutation);
     // {alternatingWalk[permutation[2i]], alternatingWalk[permutation[2i+1]]} are the out-edges in alternatingWalk
@@ -130,19 +125,43 @@ void BaseTour::exchange(const std::vector<vertex_t> &alternatingWalk) {
         // {alternatingWalk[permutation[j+1]], alternatingWalk[permutation[j+2]]} is an out-edge on the tour
     }
 
-    std::vector<std::pair<std::pair<number_t, bool>, std::pair<number_t, bool>>> reversalSteps;
-    reversalSteps = SignedPermutation(segmentPermutation).reversalSteps();
+    SignedPermutation signedPermutation(segmentPermutation);
 
-    std::pair<vertex_t, vertex_t> startSegment, endSegment;
-    vertex_t startVertex, endVertex;
-    for (std::pair<std::pair<number_t, bool>, std::pair<number_t, bool>> step : reversalSteps) {
-        startSegment = segments[step.first.first];
-        endSegment = segments[step.second.first];
-        startVertex = step.first.second ? startSegment.first : startSegment.second;
-        endVertex = step.second.second ? endSegment.second : endSegment.first;
-        reverseSegment(startVertex, endVertex);
+    // Compute the reversal steps needed to transform segmentPermutation to the identity permutation and translate
+    // these reversal steps to 2-opt exchanges
+
+    // preStartVertex and postStartVertex are needed, because the reversal of the signed permutation does not have to
+    // be in the successor direction on the tour
+    std::pair<number_t, bool> preStartElement, startElement, endElement, postEndElement;
+    std::pair<vertex_t, vertex_t> preStartSegment, startSegment, endSegment, postEndSegment;
+    vertex_t preStartVertex, startVertex, endVertex, postEndVertex;
+    while (!signedPermutation.isIdentityPermutation()) {
+        std::pair<size_t, size_t> reversal = signedPermutation.nextReversal();
+        preStartElement = signedPermutation.getElementAt((reversal.first - 1) % segmentPermutation.size());
+        startElement = signedPermutation.getElementAt(reversal.first);
+        endElement = signedPermutation.getElementAt(reversal.second);
+        postEndElement = signedPermutation.getElementAt((reversal.second + 1) % segmentPermutation.size());
+
+        preStartSegment = segments[preStartElement.first];
+        startSegment = segments[startElement.first];
+        endSegment = segments[endElement.first];
+        postEndSegment = segments[postEndElement.first];
+
+        preStartVertex = preStartElement.second ? preStartSegment.second : preStartSegment.first;
+        startVertex = startElement.second ? startSegment.first : startSegment.second;
+        endVertex = endElement.second ? endSegment.second : endSegment.first;
+        postEndVertex = postEndElement.second ? postEndSegment.first : postEndSegment.second;
+
+        if (preStartVertex != predecessor(startVertex)) {
+            std::swap(preStartVertex, startVertex);
+        }
+        if (postEndVertex != successor(endVertex)) {
+            std::swap(postEndVertex, endVertex);
+        }
+        flip(startVertex, preStartVertex, endVertex, postEndVertex);
+
+        signedPermutation.performReversal(reversal);
     }
-
 }
 
 
@@ -179,23 +198,22 @@ void ArrayTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
     // Calculate the length of the two segments to decide which of them will be reversed
     dimension_t distanceSegment1 = (indices[c] - indices[a]) % getDimension();
     dimension_t distanceSegment2 = (indices[b] - indices[d]) % getDimension();
-    vertex_t segmentStart, segmentEnd;
+    dimension_t segmentStartIndex, segmentEndIndex;
     dimension_t segmentLength;
     if (distanceSegment1 <= distanceSegment2) {
         // The segment a-c will be reversed
-        segmentStart = a;
-        segmentEnd = c;
+        segmentStartIndex = indices[a];
+        segmentEndIndex = indices[c];
         segmentLength = distanceSegment1;
     } else {
         // The segment d-b will be reversed
-        segmentStart = d;
-        segmentEnd = b;
+        segmentStartIndex = indices[d];
+        segmentEndIndex = indices[b];
         segmentLength = distanceSegment2;
     }
     for (dimension_t i = 0; i < (segmentLength + 1) / 2; ++i) {
-        // TODO: Check if this does only swap the contents of vertex1 and vertex2
-        vertex_t &vertex1 = sequence[(segmentStart + i) % getDimension()];
-        vertex_t &vertex2 = sequence[(segmentEnd - i) % getDimension()];
+        vertex_t &vertex1 = sequence[(segmentStartIndex + i) % getDimension()];
+        vertex_t &vertex2 = sequence[(segmentEndIndex - i) % getDimension()];
         std::swap(vertex1, vertex2);
         std::swap(indices[vertex1], indices[vertex2]);
     }
@@ -219,7 +237,7 @@ std::ostream &operator<<(std::ostream &out, const BaseTour &tour) {
     TourWalker tourWalker(tour, 0);
     vertex_t currentVertex = tourWalker.getNextVertex();
     do {
-        output += std::to_string(currentVertex + 1) + ", ";
+        output += std::to_string(currentVertex) + ", ";
         currentVertex = tourWalker.getNextVertex();
     } while (currentVertex != 0);
     out << output.substr(0, output.length() - 2);
