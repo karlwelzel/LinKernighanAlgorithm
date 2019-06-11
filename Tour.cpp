@@ -101,12 +101,13 @@ void BaseTour::exchange(const std::vector<vertex_t> &alternatingWalk) {
     std::unordered_map<vertex_t, number_t> segmentNumber;
     std::vector<std::pair<number_t, bool>> segmentPermutation;
 
+    dimension_t size = permutation.size();
     dimension_t i = permutation[1]; // index for alternatingWalk
     dimension_t j;                  // index for permutation
 
     // Traverse the segments on the new tour and number them
     do {
-        j = ((indices[i] % 2 == 0) ? indices[i] - 1 : indices[i] + 1) % alternatingWalk.size();
+        j = ((indices[i] % 2 == 0) ? indices[i] + size - 1 : indices[i] + 1) % size;
         // alternatingWalk[i] -> alternatingWalk[permutation[j]] is a segment on the tour
         // because with k = (indices[i] % 2 == 0) ? indices[i] + 1 : indices[i] - 1
         // {alternatingWalk[i], alternatingWalk[permutation[k]]} would be an out-edge
@@ -115,18 +116,18 @@ void BaseTour::exchange(const std::vector<vertex_t> &alternatingWalk) {
         segmentNumber[alternatingWalk[i]] = segments.size() - 1;
         // segmentNumber[segments[a].first] == a
 
-        i = ((permutation[j] % 2 == 0) ? permutation[j] - 1 : permutation[j] + 1) % alternatingWalk.size();
+        i = ((permutation[j] % 2 == 0) ? permutation[j] + size - 1 : permutation[j] + 1) % size;
         // {alternatingWalk[permutation[j]], alternatingWalk[i]} is an in-edge on the tour
     } while (i != permutation[1]);
 
     // Traverse the segments on the current tour and create a signed permutation
-    for (j = 1; j < alternatingWalk.size(); j += 2) {
+    for (j = 1; j < size; j += 2) {
         // alternatingWalk[permutation[j]] -> alternatingWalk[permutation[j+1]] is a segment on the tour
         std::unordered_map<vertex_t, number_t>::const_iterator it = segmentNumber.find(alternatingWalk[permutation[j]]);
         if (it != segmentNumber.end()) { // The segment on the new tour has successor direction
             segmentPermutation.emplace_back(it->second, true);
         } else { // The segment on the new tour has predecessor direction
-            it = segmentNumber.find(alternatingWalk[permutation[j + 1]]);
+            it = segmentNumber.find(alternatingWalk[permutation[(j + 1) % size]]);
             segmentPermutation.emplace_back(it->second, false);
         }
         // {alternatingWalk[permutation[j+1]], alternatingWalk[permutation[j+2]]} is an out-edge on the tour
