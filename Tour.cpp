@@ -134,6 +134,7 @@ void BaseTour::exchange(const std::vector<vertex_t> &alternatingWalk) {
     }
 
     SignedPermutation signedPermutation(segmentPermutation);
+    dimension_t segmentsSize = segments.size();
 
     // Compute the reversal steps needed to transform segmentPermutation to the identity permutation and translate
     // these reversal steps to 2-opt exchanges
@@ -145,10 +146,10 @@ void BaseTour::exchange(const std::vector<vertex_t> &alternatingWalk) {
     vertex_t preStartVertex, startVertex, endVertex, postEndVertex;
     while (!signedPermutation.isIdentityPermutation()) {
         std::pair<size_t, size_t> reversal = signedPermutation.nextReversal();
-        preStartElement = signedPermutation.getElementAt((reversal.first + size - 1) % size);
+        preStartElement = signedPermutation.getElementAt((reversal.first + segmentsSize - 1) % segmentsSize);
         startElement = signedPermutation.getElementAt(reversal.first);
         endElement = signedPermutation.getElementAt(reversal.second);
-        postEndElement = signedPermutation.getElementAt((reversal.second + 1) % size);
+        postEndElement = signedPermutation.getElementAt((reversal.second + 1) % segmentsSize);
 
         preStartSegment = segments[preStartElement.first];
         startSegment = segments[startElement.first];
