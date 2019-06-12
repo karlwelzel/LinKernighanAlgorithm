@@ -229,11 +229,11 @@ dimension_t TsplibProblem::getDimension() const {
 distance_t TsplibProblem::trueDistance(vertex_t i, vertex_t j) const {
     if (edgeWeightType == "EUC_2D") {
         double d = hypot(coordinates[i][0] - coordinates[j][0],
-                         coordinates[i][0] - coordinates[j][1]);
+                         coordinates[i][1] - coordinates[j][1]);
         return static_cast<distance_t>(lround(d)); // lround(d) >= 0, so casting does not produce any errors
     } else if (edgeWeightType == "CEIL_2D") {
         double d = hypot(coordinates[i][0] - coordinates[j][0],
-                         coordinates[i][0] - coordinates[j][1]);
+                         coordinates[i][1] - coordinates[j][1]);
         // ceil(d) returns a double and to prevent errors the result is rounded before casting to distance_t
         return static_cast<distance_t>(lround(ceil(d)));
     } else if (edgeWeightType == "EXPLICIT") {

@@ -2,9 +2,6 @@
 #include <fstream>
 #include <string>
 #include <numeric>
-#include <algorithm> // TODO: Remove later
-#include <list>
-#include <iterator>
 #include "Tour.h"
 #include "TsplibUtils.h"
 #include "SimpleHeuristic.h"
@@ -23,12 +20,6 @@
 // fri26               LOWER_DIAG_ROW
 // swiss42             FULL_MATRIX
 
-
-template<typename T>
-void print(std::list<T> &listObj) {
-    std::copy(listObj.begin(), listObj.end(), std::ostream_iterator<T>(std::cout, " , "));
-    std::cout << std::endl;
-}
 
 int main(int argc, char *argv[]) {
     std::ifstream problemFile;

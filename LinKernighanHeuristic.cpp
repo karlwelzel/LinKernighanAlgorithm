@@ -9,6 +9,9 @@
 #include <numeric>
 #include "LinKernighanHeuristic.h"
 
+// TODO: Remove these imports
+#include <chrono>
+#include <thread>
 
 // ============================================= AlternatingWalk class =================================================
 
@@ -70,12 +73,15 @@ Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &start
         while (true) {
             if (vertexChoices.at(i).empty()) {
                 if (highestGain > 0) {
+                    distance_t previousLength = tsplibProblem.length(currentTour);
                     currentTour.exchange(bestAlternatingWalk);
                     std::cout << "Exchange done: " << bestAlternatingWalk << std::endl;
                     std::cout << " with gain: " << tsplibProblem.exchangeGain(bestAlternatingWalk) << " (highestGain = "
                               << highestGain << ")" << std::endl;
-                    //std::cout << " new tour: " << currentTour << std::endl;
+                    std::cout << " new tour: " << currentTour << std::endl;
+                    std::cout << " previous length: " << previousLength << std::endl;
                     std::cout << " new length: " << tsplibProblem.length(currentTour) << std::endl;
+                    std::this_thread::sleep_for(std::chrono::seconds(1));
                     break;
                 } else { // highestGain == 0
                     if (i == 0) {
@@ -118,12 +124,12 @@ Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &start
             vertex_t xi = currentWalk.at(i);
             if (i % 2 == 1) { // i is odd
                 // Determine possible in-edges
+                signed_distance_t currentGain = tsplibProblem.exchangeGain(currentWalk);
                 for (vertex_t x = 0; x < dimension; ++x) {
                     if (x != xi and x != currentWalk.at(0)
                         and !currentTour.containsEdge(xi, x)
                         and !currentWalk.containsEdge(xi, x)
-                        and tsplibProblem.exchangeGain(currentWalk) -
-                            static_cast<signed_distance_t>(tsplibProblem.dist(xi, x)) > highestGain) {
+                        and currentGain - static_cast<signed_distance_t>(tsplibProblem.dist(xi, x)) > highestGain) {
 
                         vertexChoices.at(i + 1).push_back(x);
                     }
