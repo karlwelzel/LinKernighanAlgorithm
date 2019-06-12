@@ -63,13 +63,12 @@ int main(int argc, char *argv[]) {
     // DEBUG: Print out all distances in matrix form
     for (vertex_t i = 0; i < problem.getDimension(); ++i) {
         for (vertex_t j = 0; j < problem.getDimension(); ++j) {
-            std::cout.width(3);
+            std::cout.width(10);
             std::cout << problem.dist(i, j);
         }
         std::cout << std::endl;
     }
 */
-
 
     // Print the length of the tour 1, ..., n
     distance_t ascendingLength = problem.length(ascendingVerticesHeuristic(problem));

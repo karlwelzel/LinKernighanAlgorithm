@@ -22,10 +22,10 @@ class TsplibProblem {
 private:
     // The delimiter between a keyword and its value, used in the TSPLIB format
     const char DELIMITER = ':';
+
     // When the EDGE_WEIGHT_TYPE is not EXPLICIT, this parameter specifies whether all distances should be computed
     // and stored in a matrix or only the coordinates should be saved and the distances will be computed on every call
     // to TsplibProblem::dist. This is a trade-off between running time and memory usage
-    // When set to true, the EDGE_WEIGHT_TYPE is automatically changed to EXPLICIT
     const bool ALWALYS_STORE_IN_MATRIX = true;
 
     std::string name;
@@ -46,6 +46,10 @@ private:
     // Expects keyword and value to not have any superfluous whitespaces or line breaks
     // Returns an error message if an error occurred and an empty string otherwise
     std::string interpretKeyword(const std::string &keyword, const std::string &value);
+
+    // Returns the distance of vertex i and vertex j and ignores ALWAYS_STORE_IN_MATRIX
+    // Expects that i and j are in [0, dimension)
+    distance_t trueDistance(vertex_t i, vertex_t j) const;
 
 public:
     TsplibProblem();

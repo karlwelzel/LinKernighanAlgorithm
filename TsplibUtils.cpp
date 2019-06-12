@@ -206,10 +206,9 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
         matrix.assign(dimension, std::vector<distance_t>(dimension, 0));
         for (vertex_t i = 0; i < dimension; ++i) {
             for (vertex_t j = 0; j < dimension; ++j) {
-                matrix[i][j] = dist(i, j);
+                matrix[i][j] = trueDistance(i, j);
             }
         }
-        edgeWeightType = "EXPLICIT";
     }
 
     return "";
@@ -227,11 +226,7 @@ dimension_t TsplibProblem::getDimension() const {
     return dimension;
 }
 
-distance_t TsplibProblem::dist(const vertex_t i, const vertex_t j) const {
-    if (ALWALYS_STORE_IN_MATRIX) {
-        return matrix[i][j];
-    }
-
+distance_t TsplibProblem::trueDistance(vertex_t i, vertex_t j) const {
     if (edgeWeightType == "EUC_2D") {
         double d = hypot(coordinates[i][0] - coordinates[j][0],
                          coordinates[i][0] - coordinates[j][1]);
@@ -245,6 +240,14 @@ distance_t TsplibProblem::dist(const vertex_t i, const vertex_t j) const {
         return matrix[i][j];
     } else {
         throw std::runtime_error("The EDGE_WEIGHT_TYPE '" + edgeWeightType + "' is not supported.");
+    }
+}
+
+distance_t TsplibProblem::dist(const vertex_t i, const vertex_t j) const {
+    if (ALWALYS_STORE_IN_MATRIX) {
+        return matrix[i][j];
+    } else {
+        return trueDistance(i, j);
     }
 }
 
