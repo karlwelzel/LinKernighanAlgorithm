@@ -81,7 +81,7 @@ Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &start
                     std::cout << " new tour: " << currentTour << std::endl;
                     std::cout << " previous length: " << previousLength << std::endl;
                     std::cout << " new length: " << tsplibProblem.length(currentTour) << std::endl;
-                    std::this_thread::sleep_for(std::chrono::seconds(1));
+                    //std::this_thread::sleep_for(std::chrono::milliseconds(200));
                     break;
                 } else { // highestGain == 0
                     if (i == 0) {

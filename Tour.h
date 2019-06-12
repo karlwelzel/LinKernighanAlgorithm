@@ -117,8 +117,6 @@ public:
     void flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) override;
 };
 
-using Tour = ArrayTour;
-
 
 // ============================================ TwoLevelTreeTour class =================================================
 
@@ -201,6 +199,8 @@ public:
     void flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) override;
 };
 
+
+using Tour = TwoLevelTreeTour;
 
 // =============================================== TourWalker class ====================================================
 

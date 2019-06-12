@@ -21,7 +21,7 @@ maxY = max([y for (x, y) in coordinates])
 minXY = round(min(minX, minY))
 maxXY = round(max(maxX, maxY))
 
-# print(f"{minX} - {maxX}, {minY} - {maxY}")
+print(f"{minX} - {maxX}, {minY} - {maxY}")
 
 turtle.setup(800, 800, 0, 0)
 turtle.setworldcoordinates(minXY - 10, minXY - 10, maxXY + 10, maxXY + 10)

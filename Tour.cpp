@@ -329,18 +329,19 @@ void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
             segmentLength = vertexList.size() - vertexIndex;
         }
 
-        SegmentParent parent{};
+        parents.push_back(SegmentParent{});
+        SegmentParent &parent = parents.back();
         parent.reversed = false;
         parent.sequenceNumber = parentIndex;
-        parents.push_back(parent);
         auto parentIterator = std::prev(parents.end());
-        for (; vertexIndex < vertexIndex + segmentLength; vertexIndex++) {
-            parentIterator->vertices.push_back(
+        for (size_t i = vertexIndex; i < vertexIndex + segmentLength; ++i) {
+            parent.vertices.push_back(
                     SegmentVertex{vertexList[vertexIndex], parentIterator, static_cast<long>(vertexIndex)});
             iterators[vertexList[vertexIndex]] = std::prev(parent.vertices.end());
         }
 
         parentIndex++;
+        vertexIndex += segmentLength;
     }
 }
 
