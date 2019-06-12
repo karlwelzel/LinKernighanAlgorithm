@@ -236,6 +236,127 @@ void ArrayTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
 }
 
 
+// ============================================ TwoLevelTreeTour class =================================================
+
+void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
+    dimension = vertexList.size();
+    if (vertexList.size() <= 100000) {
+        groupSize = 100;
+    } else {
+        groupSize = 200;
+    }
+
+    indices.assign(vertexList.size(), std::make_pair(0, 0));
+
+    dimension_t segmentLength = groupSize;
+    size_t parentIndex = 0;
+    size_t vertexIndex = 0;
+    while (vertexIndex < dimension) {
+        // The last segment should have a length between groupSize and 2*groupSize
+        if (vertexList.size() - vertexIndex < 2 * groupSize) {
+            segmentLength = vertexList.size() - vertexIndex;
+        }
+
+        SegmentParent parent{};
+        for (; vertexIndex < vertexIndex + segmentLength; vertexIndex++) {
+            parent.segmentVertices.push_back(vertexList[vertexIndex]);
+            indices[vertexList[vertexIndex]] = std::make_pair(parentIndex,
+                                                              parent.segmentVertices.size() - 1);
+        }
+        parent.reversed = false;
+        parent.index = parentIndex;
+        parents.push_back(parent);
+
+        parentIndex++;
+    }
+}
+
+TwoLevelTreeTour::TwoLevelTreeTour(const std::vector<vertex_t> &vertexList) {
+    setVertices(vertexList);
+}
+
+dimension_t TwoLevelTreeTour::getDimension() const {
+    return dimension;
+}
+
+vertex_t TwoLevelTreeTour::predecessor(vertex_t vertex) const {
+    std::pair<dimension_t, dimension_t> index = indices[vertex];
+    SegmentParent parent = parents[index.first];
+    if ((!parent.reversed and index.second == 0) or (parent.reversed and index.second == parent.count() - 1)) {
+        dimension_t previousParentIndex = (parent.index + parents.size() - 1) % parents.size();
+        SegmentParent previousParent = parents[previousParentIndex];
+        return previousParent.segmentVertices[previousParent.reversed ? 0 : previousParent.count() - 1];
+    } else {
+        if (!parent.reversed) {
+            return parent.segmentVertices[index.second - 1];
+        } else {
+            return parent.segmentVertices[index.second + 1];
+        }
+    }
+}
+
+vertex_t TwoLevelTreeTour::successor(vertex_t vertex) const {
+    std::pair<dimension_t, dimension_t> index = indices[vertex];
+    SegmentParent parent = parents[index.first];
+    if ((!parent.reversed and index.second == parent.count() - 1) or (parent.reversed and index.second == 0)) {
+        dimension_t nextParentIndex = (parent.index + 1) % parents.size();
+        SegmentParent nextParent = parents[nextParentIndex];
+        return nextParent.segmentVertices[nextParent.reversed ? nextParent.count() - 1 : 0];
+    } else {
+        if (!parent.reversed) {
+            return parent.segmentVertices[index.second + 1];
+        } else {
+            return parent.segmentVertices[index.second - 1];
+        }
+    }
+}
+
+bool TwoLevelTreeTour::isBetween(vertex_t before, vertex_t vertex, vertex_t after) const {
+    std::pair<dimension_t, dimension_t> indexBefore = indices[before];
+    std::pair<dimension_t, dimension_t> indexVertex = indices[vertex];
+    std::pair<dimension_t, dimension_t> indexAfter = indices[after];
+    dimension_t parentDistanceToVertex = (indexVertex.first - indexBefore.second + parents.size()) % parents.size();
+    dimension_t parentDistanceToAfter = (indexAfter.first - indexBefore.second + parents.size()) % parents.size();
+    if (parentDistanceToVertex < parentDistanceToAfter) {
+        return true;
+    } else {
+        // vertex and after have the same parent
+        SegmentParent parent = parents[indexVertex.first];
+        if (indexBefore.first == indexVertex.first) {
+            // All three vertices have the same parent and are therefore in the same segment
+            dimension_t segmentDistanceToVertex =
+                    (indexVertex.second - indexBefore.second + parent.count()) % parent.count();
+            dimension_t segmentDistanceToAfter =
+                    (indexAfter.second - indexBefore.second + parent.count()) % parent.count();
+            if (!parent.reversed) {
+                return segmentDistanceToVertex < segmentDistanceToAfter;
+            } else {
+                return segmentDistanceToAfter < segmentDistanceToVertex;
+            }
+        } else {
+            // Since before is in a different segment, only the order inside the segment matters
+            if (!parent.reversed) {
+                return indexVertex.second < indexAfter.second;
+            } else {
+                return indexAfter.second < indexVertex.second;
+            }
+        }
+    }
+}
+
+void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
+    // Check if the path a-c is contained in one segment
+    if (indices[a].first == indices[c].first) {
+        SegmentParent parent = parents[indices[a].first];
+        if ((!parent.reversed and indices[a].second <= indices[c].second) or
+            (parent.reversed and indices[a].second >= indices[c].second)) {
+
+            return;
+        }
+    }
+}
+
+
 // =============================================== TourWalker class ====================================================
 
 
