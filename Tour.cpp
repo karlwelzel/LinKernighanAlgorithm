@@ -239,6 +239,10 @@ void ArrayTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
 
 // ============================================ TwoLevelTreeTour class =================================================
 
+bool operator==(const TwoLevelTreeTour::SegmentParent &parent, const TwoLevelTreeTour::SegmentParent &otherParent) {
+    return parent.sequenceNumber == otherParent.sequenceNumber;
+}
+
 dimension_t TwoLevelTreeTour::SegmentParent::count() const {
     return vertices.size();
 }
@@ -252,13 +256,13 @@ vertex_t TwoLevelTreeTour::SegmentParent::lastVertex() const {
 }
 
 const TwoLevelTreeTour::SegmentParent &TwoLevelTreeTour::getPreviousParent(
-        const TwoLevelTreeTour::SegmentParent &parent) const {
-    return parents[(parent.index + parents.size() - 1) % parents.size()];
+        std::list<SegmentParent>::iterator parentIterator) const {
+    return parentIterator != parents.begin() ? *std::prev(parentIterator) : parents.back();
 }
 
 const TwoLevelTreeTour::SegmentParent &TwoLevelTreeTour::getNextParent(
-        const TwoLevelTreeTour::SegmentParent &parent) const {
-    return parents[(parent.index + 1) % parents.size()];
+        std::list<SegmentParent>::iterator parentIterator) const {
+    return std::next(parentIterator) != parents.end() ? *std::next(parentIterator) : parents.front();
 }
 
 void TwoLevelTreeTour::reverse(std::list<SegmentVertex> &list) {
@@ -280,6 +284,32 @@ void TwoLevelTreeTour::reverse(std::list<SegmentVertex> &list, std::list<Segment
 
 }
 
+void TwoLevelTreeTour::reverse(std::list<SegmentParent> &list) {
+    list.reverse();
+    auto first = list.begin();
+    auto last = list.end();
+    while (first != last) {
+        if (first == --last) {
+            first->reversed = !first->reversed;
+            break;
+        }
+        first->reversed = !first->reversed;
+        last->reversed = !last->reversed;
+        std::swap(first->sequenceNumber, last->sequenceNumber);
+        first++;
+    }
+}
+
+void TwoLevelTreeTour::reverse(std::list<SegmentParent> &list, std::list<SegmentParent>::iterator first,
+                               std::list<SegmentParent>::iterator last) {
+    auto insertIterator = std::next(last);
+    std::list<SegmentParent> temporaryList;
+    temporaryList.splice(temporaryList.begin(), list, first, last);
+    reverse(temporaryList);
+    list.splice(insertIterator, temporaryList);
+}
+
+
 void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
     dimension = vertexList.size();
     if (vertexList.size() <= 100000) {
@@ -300,14 +330,15 @@ void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
         }
 
         SegmentParent parent{};
-        parent.index = parentIndex;
+        parent.reversed = false;
+        parent.sequenceNumber = parentIndex;
+        parents.push_back(parent);
+        auto parentIterator = std::prev(parents.end());
         for (; vertexIndex < vertexIndex + segmentLength; vertexIndex++) {
-            parent.vertices.push_back(
-                    SegmentVertex{vertexList[vertexIndex], parent, static_cast<long>(vertexIndex)});
+            parentIterator->vertices.push_back(
+                    SegmentVertex{vertexList[vertexIndex], parentIterator, static_cast<long>(vertexIndex)});
             iterators[vertexList[vertexIndex]] = std::prev(parent.vertices.end());
         }
-        parent.reversed = false;
-        parents.push_back(parent);
 
         parentIndex++;
     }
@@ -323,10 +354,10 @@ dimension_t TwoLevelTreeTour::getDimension() const {
 
 vertex_t TwoLevelTreeTour::predecessor(vertex_t vertex) const {
     auto iterator = iterators[vertex];
-    const SegmentParent &parent = iterator->parent;
+    const SegmentParent &parent = *(iterator->parentIterator);
     if ((!parent.reversed and iterator == parent.vertices.begin()) or
         (parent.reversed and std::next(iterator) == parent.vertices.end())) {
-        return getPreviousParent(parent).lastVertex();
+        return getPreviousParent(iterator->parentIterator).lastVertex();
     } else {
         return parent.reversed ? std::next(iterator)->vertex : std::prev(iterator)->vertex;
     }
@@ -334,10 +365,10 @@ vertex_t TwoLevelTreeTour::predecessor(vertex_t vertex) const {
 
 vertex_t TwoLevelTreeTour::successor(vertex_t vertex) const {
     auto iterator = iterators[vertex];
-    const SegmentParent &parent = iterator->parent;
+    const SegmentParent &parent = *(iterator->parentIterator);
     if ((!parent.reversed and std::next(iterator) == parent.vertices.end()) or
         (parent.reversed and iterator == parent.vertices.begin())) {
-        return getNextParent(parent).firstVertex();
+        return getNextParent(iterator->parentIterator).firstVertex();
     } else {
         return parent.reversed ? std::prev(iterator)->vertex : std::next(iterator)->vertex;
     }
@@ -347,17 +378,19 @@ bool TwoLevelTreeTour::isBetween(vertex_t before, vertex_t vertex, vertex_t afte
     auto beforeIterator = iterators[before];
     auto vertexIterator = iterators[vertex];
     auto afterIterator = iterators[after];
-    const SegmentParent &beforeParent = beforeIterator->parent;
-    const SegmentParent &vertexParent = vertexIterator->parent;
-    const SegmentParent &afterParent = afterIterator->parent;
-    dimension_t parentDistanceToVertex = (vertexParent.index - beforeParent.index + parents.size()) % parents.size();
-    dimension_t parentDistanceToAfter = (afterParent.index - beforeParent.index + parents.size()) % parents.size();
+    const SegmentParent &beforeParent = *(beforeIterator->parentIterator);
+    const SegmentParent &vertexParent = *(vertexIterator->parentIterator);
+    const SegmentParent &afterParent = *(afterIterator->parentIterator);
+    dimension_t parentDistanceToVertex =
+            (vertexParent.sequenceNumber - beforeParent.sequenceNumber + parents.size()) % parents.size();
+    dimension_t parentDistanceToAfter =
+            (afterParent.sequenceNumber - beforeParent.sequenceNumber + parents.size()) % parents.size();
     if (parentDistanceToVertex < parentDistanceToAfter) {
         return true;
     } else {
         // vertex and after have the same parent
         const SegmentParent &parent = vertexParent;
-        if (beforeParent.index == vertexParent.index) {
+        if (beforeParent == vertexParent) {
             // All three vertices have the same parent and are therefore in the same segment
             dimension_t segmentDistanceToVertex =
                     (vertexIterator->sequenceNumber - beforeIterator->sequenceNumber + parent.count()) % parent.count();
@@ -380,7 +413,8 @@ bool TwoLevelTreeTour::isBetween(vertex_t before, vertex_t vertex, vertex_t afte
 }
 
 void TwoLevelTreeTour::mergeHalfSegment(vertex_t v, bool mergeToTheRight) {
-    SegmentParent &parent = iterators[v]->parent;
+    auto parentIterator = iterators[v]->parentIterator;
+    SegmentParent &parent = *parentIterator;
 
     // Isolate the half segment we want to merge
     std::list<SegmentVertex> halfSegment;
@@ -391,13 +425,13 @@ void TwoLevelTreeTour::mergeHalfSegment(vertex_t v, bool mergeToTheRight) {
     }
 
     // Determine the other segment to merge with
-    dimension_t otherParentIndex;
+    std::list<SegmentParent>::iterator otherParentIterator;
     if (mergeToTheRight) {
-        otherParentIndex = parents[(parent.index + 1) % parents.size()].index;
+        otherParentIterator = std::next(parentIterator) != parents.end() ? std::next(parentIterator) : parents.begin();
     } else {
-        otherParentIndex = parents[(parent.index + parents.size() - 1) % parents.size()].index;
+        otherParentIterator = parentIterator != parents.begin() ? std::prev(parentIterator) : parents.end();
     }
-    SegmentParent &otherParent = parents[otherParentIndex];
+    SegmentParent &otherParent = *otherParentIterator;
 
     // Reverse the half segment, if necessary, so that the direction of segment and halfSegment are the same
     if (parent.reversed != otherParent.reversed) {
@@ -414,14 +448,14 @@ void TwoLevelTreeTour::mergeHalfSegment(vertex_t v, bool mergeToTheRight) {
         sequenceNumber = otherParent.vertices.front().sequenceNumber;
         for (auto it = halfSegment.rbegin(); it != halfSegment.rend(); ++it) {
             it->sequenceNumber = --sequenceNumber;
-            it->parent = otherParent;
+            it->parentIterator = otherParentIterator;
         }
     } else {
         insertIterator = otherParent.vertices.end();
         sequenceNumber = otherParent.vertices.back().sequenceNumber;
         for (auto it = halfSegment.begin(); it != halfSegment.end(); ++it) {
             it->sequenceNumber = ++sequenceNumber;
-            it->parent = otherParent;
+            it->parentIterator = otherParentIterator;
         }
     }
 
@@ -436,39 +470,36 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
     SegmentVertex &cVertex = *iterators[c];
     SegmentVertex &dVertex = *iterators[d];
 
+    SegmentParent &aParent = *(aVertex.parentIterator);
+    SegmentParent &bParent = *(bVertex.parentIterator);
+    SegmentParent &cParent = *(cVertex.parentIterator);
+    SegmentParent &dParent = *(dVertex.parentIterator);
+
     // Case 1: The paths a-c and d-b are made up of segments
-    if (aVertex.parent.firstVertex() == a and cVertex.parent.lastVertex() == c) {
+    if (aParent.firstVertex() == a and cParent.lastVertex() == c) {
         std::cout << "flip Case 1: " << a << ", " << b << ", " << c << ", " << d << std::endl;
-        dimension_t numberOfParentsAC = (cVertex.parent.index - aVertex.parent.index + parents.size()) % parents.size();
-        dimension_t numberOfParentsDB = (bVertex.parent.index - dVertex.parent.index + parents.size()) % parents.size();
-        dimension_t parentStartIndex, parentEndIndex;
-        dimension_t numberOfParents;
+        dimension_t numberOfParentsAC =
+                (cParent.sequenceNumber - aParent.sequenceNumber + parents.size()) % parents.size();
+        dimension_t numberOfParentsDB =
+                (bParent.sequenceNumber - dParent.sequenceNumber + parents.size()) % parents.size();
+
+        std::list<SegmentParent>::iterator parentStartIterator, parentEndIterator;
         if (numberOfParentsAC <= numberOfParentsDB) {
-            parentStartIndex = aVertex.parent.index;
-            parentEndIndex = cVertex.parent.index;
-            numberOfParents = numberOfParentsAC;
+            parentStartIterator = aVertex.parentIterator;
+            parentEndIterator = cVertex.parentIterator;
         } else {
-            parentEndIndex = dVertex.parent.index;
-            parentStartIndex = bVertex.parent.index;
-            numberOfParents = numberOfParentsDB;
+            parentStartIterator = dVertex.parentIterator;
+            parentEndIterator = bVertex.parentIterator;
         }
 
-        for (dimension_t i = 0; i < (numberOfParents + 1) / 2; ++i) {
-            SegmentParent &parent1 = parents[(parentStartIndex + i) % parents.size()];
-            SegmentParent &parent2 = parents[(parentEndIndex + parents.size() - i) % parents.size()];
-            std::swap(parent1, parent2);
-            std::swap(parent1.index, parent2.index);
-            parent1.reversed = !parent1.reversed;
-            parent2.reversed = !parent2.reversed;
-        }
+        reverse(parents, parentStartIterator, parentEndIterator);
+
         return;
     }
 
     // Case 2: The path a-c or d-b is contained in a single segment
-    bool acInOneSegment =
-            aVertex.parent.index == cVertex.parent.index and aVertex.sequenceNumber <= cVertex.sequenceNumber;
-    bool dbInOneSegment =
-            dVertex.parent.index == bVertex.parent.index and dVertex.sequenceNumber <= bVertex.sequenceNumber;
+    bool acInOneSegment = aParent == cParent and aVertex.sequenceNumber <= cVertex.sequenceNumber;
+    bool dbInOneSegment = dParent == bParent and dVertex.sequenceNumber <= bVertex.sequenceNumber;
     if (acInOneSegment or dbInOneSegment) {
         std::cout << "flip Case 2: " << a << ", " << b << ", " << c << ", " << d << std::endl;
         vertex_t start, end;
@@ -481,7 +512,7 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
         }
         SegmentVertex &startVertex = *iterators[start];
         SegmentVertex &endVertex = *iterators[end];
-        SegmentParent &parent = startVertex.parent;
+        SegmentParent &parent = *(startVertex.parentIterator);
         dimension_t length = endVertex.sequenceNumber - startVertex.sequenceNumber;
         if (length >= (parent.count() * 3) / 4) {
             if (start != parent.firstVertex()) {
@@ -500,10 +531,10 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
     // Case 3:
     // Split up the segments so that case 1 is applicable
     std::cout << "flip Case 3: " << a << ", " << b << ", " << c << ", " << d << std::endl;
-    if (aVertex.parent.index == bVertex.parent.index) {
-        // Split the segment of aVertex.parent and merge it into the neighboring segment
-        dimension_t aHalfSegmentLength = aVertex.parent.vertices.back().sequenceNumber - aVertex.sequenceNumber;
-        dimension_t bHalfSegmentLength = bVertex.sequenceNumber - bVertex.parent.vertices.front().sequenceNumber;
+    if (aParent == bParent) {
+        // Split the segment of aParent and merge it into the neighboring segment
+        dimension_t aHalfSegmentLength = aParent.vertices.back().sequenceNumber - aVertex.sequenceNumber;
+        dimension_t bHalfSegmentLength = bVertex.sequenceNumber - bParent.vertices.front().sequenceNumber;
         if (aHalfSegmentLength <= bHalfSegmentLength) {
             mergeHalfSegment(a, true);
         } else {
@@ -511,10 +542,10 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
         }
     }
 
-    if (cVertex.parent.index == dVertex.parent.index) {
-        // Split the segment of cVertex.parent and merge it into the neighboring segment
-        dimension_t dHalfSegmentLength = dVertex.parent.vertices.back().sequenceNumber - dVertex.sequenceNumber;
-        dimension_t cHalfSegmentLength = cVertex.sequenceNumber - cVertex.parent.vertices.front().sequenceNumber;
+    if (cParent == dParent) {
+        // Split the segment of cParent and merge it into the neighboring segment
+        dimension_t dHalfSegmentLength = dParent.vertices.back().sequenceNumber - dVertex.sequenceNumber;
+        dimension_t cHalfSegmentLength = cVertex.sequenceNumber - cParent.vertices.front().sequenceNumber;
         if (dHalfSegmentLength <= cHalfSegmentLength) {
             mergeHalfSegment(d, true);
         } else {

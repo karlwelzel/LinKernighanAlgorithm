@@ -129,15 +129,14 @@ private:
 
     struct SegmentVertex {
         vertex_t vertex;
-        SegmentParent &parent;
+        std::list<SegmentParent>::iterator parentIterator;
         long sequenceNumber;
-
     };
 
     struct SegmentParent {
         std::list<SegmentVertex> vertices;
         bool reversed;
-        dimension_t index; // Index inside of parents
+        dimension_t sequenceNumber; // Index inside of parents
 
         dimension_t count() const;
 
@@ -148,12 +147,14 @@ private:
 
     dimension_t dimension = 0;
     dimension_t groupSize = 0;
-    std::vector<SegmentParent> parents;
+    std::list<SegmentParent> parents;
     std::vector<std::list<SegmentVertex>::iterator> iterators;
 
-    const SegmentParent &getPreviousParent(const SegmentParent &parent) const;
+    friend bool operator==(const SegmentParent &parent, const SegmentParent &otherParent);
 
-    const SegmentParent &getNextParent(const SegmentParent &parent) const;
+    const SegmentParent &getPreviousParent(std::list<SegmentParent>::iterator parentIterator) const;
+
+    const SegmentParent &getNextParent(std::list<SegmentParent>::iterator parentIterator) const;
 
     // Reverses the elements in list while correctly changing the sequence numbers
     void reverse(std::list<SegmentVertex> &list);
@@ -161,6 +162,14 @@ private:
     // Reverses the elements in list from first to last while correctly changing the sequence numbers
     void reverse(std::list<SegmentVertex> &list, std::list<SegmentVertex>::iterator first,
                  std::list<SegmentVertex>::iterator last);
+
+    // Reverses the elements in list while correctly changing the sequence numbers and updating the revesal bits
+    void reverse(std::list<SegmentParent> &list);
+
+    // Reverses the elements in list from first to last while correctly changing the sequence numbers and updating the
+    // revesal bits
+    void reverse(std::list<SegmentParent> &list, std::list<SegmentParent>::iterator first,
+                 std::list<SegmentParent>::iterator last);
 
     // Merge the half-segment to right (or left) of vertex v (including v) with the right (or left) neighbor segment.
     // The direction is given with respect to the tour direction

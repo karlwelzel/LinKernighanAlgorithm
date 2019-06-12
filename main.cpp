@@ -71,21 +71,6 @@ int main(int argc, char *argv[]) {
 */
 
 
-
-    std::list<int> someList{1, 2, 3, 7, 8, 9};
-    print(someList);
-    someList.reverse();
-    print(someList);
-    std::reverse(std::next(someList.begin(), 3), someList.end());
-    print(someList);
-    std::reverse(std::prev(someList.end()), std::next(someList.begin(), 3));
-    print(someList);
-    auto it = someList.begin();
-    std::iter_swap(someList.begin(), std::prev(someList.end()));
-    print(someList);
-    std::cout << *it << std::endl;
-
-/*
     // Print the length of the tour 1, ..., n
     distance_t ascendingLength = problem.length(ascendingVerticesHeuristic(problem));
     std::cout << "The tour 1, 2, ..., n has length " << ascendingLength << "." << std::endl << std::endl;
@@ -131,7 +116,6 @@ int main(int argc, char *argv[]) {
         std::cout << "The best tour found by the heuristic is " << ((length / (double) optimalLength) - 1) * 100
                   << "% above the optimum of " << optimalLength << "." << std::endl;
     }
-*/
 
 
     return 0;
