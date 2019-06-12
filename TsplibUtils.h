@@ -64,6 +64,7 @@ public:
     dimension_t getDimension() const;
 
     // Returns the distance of vertex i and vertex j
+    // Expects that i and j are in [0, dimension)
     distance_t dist(vertex_t i, vertex_t j) const;
 
     // Returns the length of tour

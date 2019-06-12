@@ -14,11 +14,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ea2faef9-1e3e-415f-ac69-9bebb67db99c" name="Default Changelist" comment="">
+    <list default="true" id="ea2faef9-1e3e-415f-ac69-9bebb67db99c" name="Default Changelist" comment="Fixed error in BaseTour::exchange">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LinKernighanHeuristic.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/LinKernighanHeuristic.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SignedPermutation.h" beforeDir="false" afterPath="$PROJECT_DIR$/SignedPermutation.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Tour.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Tour.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tour.h" beforeDir="false" afterPath="$PROJECT_DIR$/Tour.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TsplibUtils.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/TsplibUtils.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TsplibUtils.h" beforeDir="false" afterPath="$PROJECT_DIR$/TsplibUtils.h" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/CMakeFiles/" />
@@ -38,10 +38,46 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/main.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1230">
+              <caret line="82" column="21" selection-start-line="82" selection-start-column="21" selection-end-line="82" selection-end-column="21" />
+              <folding>
+                <element signature="e#0#19#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/TsplibUtils.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="525">
+              <caret line="233" selection-start-line="233" selection-end-line="233" />
+              <folding>
+                <element signature="e#48#66#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/TsplibUtils.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="990">
+              <caret line="66" column="49" selection-start-line="66" selection-start-column="49" selection-end-line="66" selection-end-column="49" />
+              <folding>
+                <element signature="e#139#156#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="188">
-              <caret line="118" column="19" selection-start-line="118" selection-start-column="18" selection-end-line="118" selection-end-column="19" />
+            <state relative-caret-position="1140">
+              <caret line="76" column="22" selection-start-line="76" selection-start-column="22" selection-end-line="76" selection-end-column="22" />
             </state>
           </provider>
         </entry>
@@ -56,70 +92,22 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/TsplibUtils.cpp">
+        <entry file="file://$PROJECT_DIR$/Tour.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="188">
-              <caret line="262" column="15" selection-start-line="262" selection-start-column="14" selection-end-line="262" selection-end-column="15" />
+            <state relative-caret-position="-9">
+              <caret line="78" column="70" selection-start-line="78" selection-start-column="70" selection-end-line="78" selection-end-column="70" />
               <folding>
                 <element signature="e#48#66#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/TsplibUtils.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="333">
-              <caret line="64" selection-start-line="64" selection-end-line="64" />
-              <folding>
-                <element signature="e#139#156#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SimpleHeuristic.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="188">
-              <caret line="56" column="49" selection-start-line="56" selection-start-column="48" selection-end-line="56" selection-end-column="49" />
-              <folding>
-                <element signature="e#115#134#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/SimpleHeuristic.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="645">
-              <caret line="81" selection-start-line="81" selection-end-line="81" />
-              <folding>
-                <element signature="e#147#165#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Tour.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="352">
-              <caret line="232" column="5" lean-forward="true" selection-start-line="232" selection-start-column="5" selection-end-line="232" selection-end-column="5" />
-              <folding>
-                <element signature="e#48#66#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Tour.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1108">
-              <caret line="89" selection-start-line="89" selection-end-line="89" />
+            <state relative-caret-position="681">
+              <caret line="115" column="23" selection-start-line="115" selection-start-column="23" selection-end-line="115" selection-end-column="23" />
               <folding>
                 <element signature="e#125#143#0" expanded="true" />
               </folding>
@@ -194,16 +182,16 @@
         <option value="$PROJECT_DIR$/LinKernighanHeuristic.h" />
         <option value="$PROJECT_DIR$/SimpleHeuristic.h" />
         <option value="$PROJECT_DIR$/SimpleHeuristic.cpp" />
-        <option value="$PROJECT_DIR$/TsplibUtils.cpp" />
-        <option value="$PROJECT_DIR$/TsplibUtils.h" />
         <option value="$PROJECT_DIR$/SortingBySignedReversals.h" />
         <option value="$PROJECT_DIR$/SortingBySignedReversals.cpp" />
         <option value="$PROJECT_DIR$/main.cpp" />
-        <option value="$PROJECT_DIR$/Tour.h" />
-        <option value="$PROJECT_DIR$/LinKernighanHeuristic.cpp" />
         <option value="$PROJECT_DIR$/SignedPermutation.cpp" />
         <option value="$PROJECT_DIR$/SignedPermutation.h" />
         <option value="$PROJECT_DIR$/Tour.cpp" />
+        <option value="$PROJECT_DIR$/LinKernighanHeuristic.cpp" />
+        <option value="$PROJECT_DIR$/TsplibUtils.h" />
+        <option value="$PROJECT_DIR$/TsplibUtils.cpp" />
+        <option value="$PROJECT_DIR$/Tour.h" />
       </list>
     </option>
   </component>
@@ -236,6 +224,11 @@
               <item name="~/CLionProjects/LinKernighanAlgorithm" type="442cc68d:ScopeViewTreeModel$RootNode" />
               <item name=".idea" type="9f88c78c:ScopeViewTreeModel$FileNode" />
               <item name="dictionaries" type="9f88c78c:ScopeViewTreeModel$FileNode" />
+            </path>
+            <path>
+              <item name="LinKerninghanAlgorithm" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
+              <item name="~/CLionProjects/LinKernighanAlgorithm" type="442cc68d:ScopeViewTreeModel$RootNode" />
+              <item name="ExampleProblems" type="9f88c78c:ScopeViewTreeModel$FileNode" />
             </path>
           </expand>
           <select />
@@ -297,7 +290,7 @@
     </option>
   </component>
   <component name="RunManager" selected="CMake Application.LinKerninghanAlgorithm">
-    <configuration name="LinKerninghanAlgorithm" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="&quot;ExampleProblems/fri26.tsp&quot; &quot;ExampleProblems/fri26.opt.tour&quot;" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="LinKerninghanAlgorithm" TARGET_NAME="LinKerninghanAlgorithm" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="LinKerninghanAlgorithm" RUN_TARGET_NAME="LinKerninghanAlgorithm">
+    <configuration name="LinKerninghanAlgorithm" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="&quot;ExampleProblems/brg180.tsp&quot; &quot;ExampleProblems/brg180.opt.tour&quot;" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="LinKerninghanAlgorithm" TARGET_NAME="LinKerninghanAlgorithm" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="LinKerninghanAlgorithm" RUN_TARGET_NAME="LinKerninghanAlgorithm">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -362,6 +355,7 @@
       <workItem from="1558285810338" duration="8018000" />
       <workItem from="1558614292376" duration="2746000" />
       <workItem from="1558946782468" duration="22212000" />
+      <workItem from="1560326335863" duration="954000" />
     </task>
     <task id="LOCAL-00001" summary="Split up TsplibProblem and TsplibTour into different files&#10;&#10;Also added CLION project files and two sample TSPLIB files">
       <created>1555682925861</created>
@@ -608,11 +602,25 @@
       <option name="project" value="LOCAL" />
       <updated>1560277736099</updated>
     </task>
-    <option name="localTasksCounter" value="36" />
+    <task id="LOCAL-00036" summary="Fixed all additional modulo errors">
+      <created>1560279006975</created>
+      <option name="number" value="00036" />
+      <option name="presentableId" value="LOCAL-00036" />
+      <option name="project" value="LOCAL" />
+      <updated>1560279006975</updated>
+    </task>
+    <task id="LOCAL-00037" summary="Fixed error in BaseTour::exchange">
+      <created>1560285288087</created>
+      <option name="number" value="00037" />
+      <option name="presentableId" value="LOCAL-00037" />
+      <option name="project" value="LOCAL" />
+      <updated>1560285288087</updated>
+    </task>
+    <option name="localTasksCounter" value="38" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="169094000" />
+    <option name="totallyTimeSpent" value="174949000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -625,13 +633,14 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="1598" y="120" width="1924" height="1054" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.498" visible="true" weight="0.2353255" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.498" visible="true" weight="0.2379936" />
       <window_info id="Structure" order="1" sideWeight="0.502" side_tool="true" weight="0.2501681" />
       <window_info id="Favorites" order="2" sideWeight="0.502" side_tool="true" weight="0.2501681" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3275862" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.498713" visible="true" weight="0.32543105" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.498713" weight="0.32543105" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39655173" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -731,8 +740,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
-    <MESSAGE value="Changed the sample TSPLIB files to represent harder problems" />
-    <MESSAGE value="Added output of length of tour 1, ..., n" />
     <MESSAGE value="Removed the use of regex from readFile" />
     <MESSAGE value="Moved function and class comments from .cpp to .h files" />
     <MESSAGE value="Implemented some suggested improvements" />
@@ -756,7 +763,9 @@
     <MESSAGE value="Fixed errors in BaseTour::exchange and ArrayTour::flip&#10;&#10;Also refactored SignedPermutation added comments to SignedPermutation." />
     <MESSAGE value="Fixed error with double edge in linKernighanHeuristic&#10;&#10;Fixed problems in BaseTour::cyclicPermutation, ArrayTour::isBetween and&#10;BaseTour::isTourAfterExchange caused by modulo errors (a%b &lt;= 0 if &#10;a &lt; 0)" />
     <MESSAGE value="Fixed modulo error in BaseTour::exchange" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed modulo error in BaseTour::exchange" />
+    <MESSAGE value="Fixed all additional modulo errors" />
+    <MESSAGE value="Fixed error in BaseTour::exchange" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed error in BaseTour::exchange" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
@@ -769,22 +778,10 @@
           <line>71</line>
           <option name="timeStamp" value="23" />
         </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/Tour.cpp</url>
-          <line>97</line>
-          <option name="timeStamp" value="34" />
-        </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/.idea/workspace.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="89" selection-start-line="7" selection-start-column="89" selection-end-line="7" selection-end-column="89" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.idea/codeStyles/codeStyleConfig.xml">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -859,24 +856,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ExampleProblems/sample_FULL_MATRIX.tsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="18" selection-start-line="11" selection-start-column="18" selection-end-line="11" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ExampleProblems/brg180.opt.tour">
       <provider selected="true" editor-type-id="text-editor">
         <state>
           <caret column="19" selection-start-column="19" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ExampleProblems/si1032.tsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" column="9" selection-start-line="1" selection-start-column="9" selection-end-line="1" selection-end-column="9" />
         </state>
       </provider>
     </entry>
@@ -936,30 +919,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="141">
-          <caret line="68" column="79" selection-start-line="68" selection-start-column="79" selection-end-line="68" selection-end-column="79" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/include/c++/8.3.0/bits/stl_vector.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="192">
           <caret line="951" selection-start-line="951" selection-end-line="951" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Tour.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1108">
-          <caret line="89" selection-start-line="89" selection-end-line="89" />
-          <folding>
-            <element signature="e#125#143#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -970,51 +933,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="188">
-          <caret line="118" column="19" selection-start-line="118" selection-start-column="18" selection-end-line="118" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" column="25" selection-start-line="1" selection-start-column="25" selection-end-line="1" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/TsplibUtils.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="188">
-          <caret line="262" column="15" selection-start-line="262" selection-start-column="14" selection-end-line="262" selection-end-column="15" />
-          <folding>
-            <element signature="e#48#66#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SignedPermutation.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="313">
-          <caret line="68" column="17" selection-start-line="68" selection-start-column="16" selection-end-line="68" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/SignedPermutation.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="357">
           <caret line="50" column="40" selection-start-line="50" selection-start-column="40" selection-end-line="50" selection-end-column="40" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/TsplibUtils.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="333">
-          <caret line="64" selection-start-line="64" selection-end-line="64" />
-          <folding>
-            <element signature="e#139#156#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1028,9 +950,33 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/ExampleProblems/sample_FULL_MATRIX.tsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" column="12" selection-start-line="11" selection-start-column="10" selection-end-line="11" selection-end-column="12" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SignedPermutation.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="177">
+          <caret line="28" column="45" selection-start-line="28" selection-start-column="45" selection-end-line="28" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ExampleProblems/si1032.tsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="9" selection-start-line="1" selection-start-column="9" selection-end-line="1" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ExampleProblems/pla7397.tsp">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/SimpleHeuristic.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="188">
+        <state relative-caret-position="300">
           <caret line="56" column="49" selection-start-line="56" selection-start-column="48" selection-end-line="56" selection-end-column="49" />
           <folding>
             <element signature="e#115#134#0" expanded="true" />
@@ -1038,12 +984,66 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Tour.cpp">
+    <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
-          <caret line="232" column="5" lean-forward="true" selection-start-line="232" selection-start-column="5" selection-end-line="232" selection-end-column="5" />
+        <state relative-caret-position="1230">
+          <caret line="82" column="21" selection-start-line="82" selection-start-column="21" selection-end-line="82" selection-end-column="21" />
+          <folding>
+            <element signature="e#0#19#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TsplibUtils.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="990">
+          <caret line="66" column="49" selection-start-line="66" selection-start-column="49" selection-end-line="66" selection-end-column="49" />
+          <folding>
+            <element signature="e#139#156#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1140">
+          <caret line="76" column="22" selection-start-line="76" selection-start-column="22" selection-end-line="76" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="25" selection-start-line="1" selection-start-column="25" selection-end-line="1" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TsplibUtils.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="525">
+          <caret line="233" selection-start-line="233" selection-end-line="233" />
           <folding>
             <element signature="e#48#66#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Tour.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-9">
+          <caret line="78" column="70" selection-start-line="78" selection-start-column="70" selection-end-line="78" selection-end-column="70" />
+          <folding>
+            <element signature="e#48#66#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Tour.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="681">
+          <caret line="115" column="23" selection-start-line="115" selection-start-column="23" selection-end-line="115" selection-end-column="23" />
+          <folding>
+            <element signature="e#125#143#0" expanded="true" />
           </folding>
         </state>
       </provider>

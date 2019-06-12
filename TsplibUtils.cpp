@@ -228,17 +228,21 @@ dimension_t TsplibProblem::getDimension() const {
 }
 
 distance_t TsplibProblem::dist(const vertex_t i, const vertex_t j) const {
+    if (ALWALYS_STORE_IN_MATRIX) {
+        return matrix[i][j];
+    }
+
     if (edgeWeightType == "EUC_2D") {
-        double d = hypot(coordinates.at(i).at(0) - coordinates.at(j).at(0),
-                         coordinates.at(i).at(1) - coordinates.at(j).at(1));
+        double d = hypot(coordinates[i][0] - coordinates[j][0],
+                         coordinates[i][0] - coordinates[j][1]);
         return static_cast<distance_t>(lround(d)); // lround(d) >= 0, so casting does not produce any errors
     } else if (edgeWeightType == "CEIL_2D") {
-        double d = hypot(coordinates.at(i).at(0) - coordinates.at(j).at(0),
-                         coordinates.at(i).at(1) - coordinates.at(j).at(1));
+        double d = hypot(coordinates[i][0] - coordinates[j][0],
+                         coordinates[i][0] - coordinates[j][1]);
         // ceil(d) returns a double and to prevent errors the result is rounded before casting to distance_t
         return static_cast<distance_t>(lround(ceil(d)));
     } else if (edgeWeightType == "EXPLICIT") {
-        return matrix.at(i).at(j);
+        return matrix[i][j];
     } else {
         throw std::runtime_error("The EDGE_WEIGHT_TYPE '" + edgeWeightType + "' is not supported.");
     }
