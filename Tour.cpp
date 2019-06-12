@@ -255,6 +255,21 @@ vertex_t TwoLevelTreeTour::SegmentParent::lastVertex() const {
     return reversed ? vertices.front().vertex : vertices.back().vertex;
 }
 
+TwoLevelTreeTour::TwoLevelTreeTour(const TwoLevelTreeTour &otherTour) : dimension(otherTour.dimension),
+                                                                        groupSize(otherTour.groupSize),
+                                                                        parents(otherTour.parents),
+                                                                        iterators(otherTour.iterators) {
+
+    // Update all iterators because they still point to elements in otherTour
+    for (auto parentIterator = parents.begin(); parentIterator != parents.end(); ++parentIterator) {
+        std::list<SegmentVertex> &vertices = parentIterator->vertices;
+        for (auto vertexIterator = vertices.begin(); vertexIterator != vertices.end(); ++vertexIterator) {
+            vertexIterator->parentIterator = parentIterator;
+            iterators[vertexIterator->vertex] = vertexIterator;
+        }
+    }
+}
+
 const TwoLevelTreeTour::SegmentParent &TwoLevelTreeTour::getPreviousParent(
         std::list<SegmentParent>::iterator parentIterator) const {
     return parentIterator != parents.begin() ? *std::prev(parentIterator) : parents.back();
@@ -329,7 +344,7 @@ void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
             segmentLength = vertexList.size() - vertexIndex;
         }
 
-        parents.push_back(SegmentParent{});
+        parents.emplace_back(); // Create an empty SegmentParent
         auto parentIterator = std::prev(parents.end());
         SegmentParent &parent = *parentIterator;
         parent.reversed = false;
@@ -454,9 +469,9 @@ void TwoLevelTreeTour::mergeHalfSegment(vertex_t v, bool mergeToTheRight) {
     } else {
         insertIterator = otherParent.vertices.end();
         sequenceNumber = otherParent.vertices.back().sequenceNumber;
-        for (auto it = halfSegment.begin(); it != halfSegment.end(); ++it) {
-            it->sequenceNumber = ++sequenceNumber;
-            it->parentIterator = otherParentIterator;
+        for (auto &it : halfSegment) {
+            it.sequenceNumber = ++sequenceNumber;
+            it.parentIterator = otherParentIterator;
         }
     }
 

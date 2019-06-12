@@ -126,15 +126,15 @@ private:
     struct SegmentParent;
 
     struct SegmentVertex {
-        vertex_t vertex;
+        vertex_t vertex = 0;
         std::list<SegmentParent>::iterator parentIterator;
-        long sequenceNumber;
+        long sequenceNumber = 0;
     };
 
     struct SegmentParent {
         std::list<SegmentVertex> vertices;
-        bool reversed;
-        dimension_t sequenceNumber; // Index inside of parents
+        bool reversed = false;
+        dimension_t sequenceNumber = 0;
 
         dimension_t count() const;
 
@@ -175,6 +175,9 @@ private:
 
 public:
     TwoLevelTreeTour() = default;
+
+    // The copy-constructor: Copy the state of otherTour into this tour
+    TwoLevelTreeTour(const TwoLevelTreeTour &otherTour);
 
     // Initialize the tour with a sequence of vertices
     // This function expects a vector containing the numbers from 0 to tour.size()-1 and overrides all data
