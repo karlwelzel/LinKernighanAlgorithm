@@ -125,19 +125,26 @@ using Tour = ArrayTour;
 class TwoLevelTreeTour : public BaseTour {
 private:
     struct SegmentParent {
-        std::vector<vertex_t> segmentVertices;
+        std::vector<vertex_t> vertices;
+        std::unordered_map<vertex_t, dimension_t> indices;
         bool reversed;
-        dimension_t index;
+        dimension_t index; // Index inside of parents
 
-        dimension_t count() {
-            return segmentVertices.size();
-        }
+        dimension_t count() const;
+
+        vertex_t firstVertex() const;
+
+        vertex_t lastVertex() const;
     };
 
     dimension_t dimension = 0;
     dimension_t groupSize = 0;
     std::vector<SegmentParent> parents;
-    std::vector<std::pair<dimension_t, dimension_t>> indices;
+    std::vector<SegmentParent &> parentOfVertex;
+
+    const SegmentParent &previousParent(const SegmentParent &parent) const;
+
+    const SegmentParent &nextParent(const SegmentParent &parent) const;
 
 public:
     TwoLevelTreeTour() = default;
