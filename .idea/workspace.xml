@@ -14,7 +14,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ea2faef9-1e3e-415f-ac69-9bebb67db99c" name="Default Changelist" comment="Fixed bug in TwoLevelTreeTour::setVertices">
+    <list default="true" id="ea2faef9-1e3e-415f-ac69-9bebb67db99c" name="Default Changelist" comment="Fixed bug with the implicit copy-constructor of TwoLevelTreeTour">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Tour.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Tour.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Tour.h" beforeDir="false" afterPath="$PROJECT_DIR$/Tour.h" afterDir="false" />
@@ -94,8 +94,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Tour.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="319">
-              <caret line="268" column="9" lean-forward="true" selection-start-line="268" selection-start-column="9" selection-end-line="268" selection-end-column="9" />
+            <state relative-caret-position="-2126">
+              <caret line="283" selection-start-line="283" selection-end-line="283" />
               <folding>
                 <element signature="e#48#66#0" expanded="true" />
               </folding>
@@ -106,8 +106,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Tour.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="223">
-              <caret line="178" column="71" selection-start-line="178" selection-start-column="71" selection-end-line="178" selection-end-column="71" />
+            <state relative-caret-position="266">
+              <caret line="160" column="13" selection-start-line="160" selection-start-column="13" selection-end-line="160" selection-end-column="13" />
               <folding>
                 <element signature="e#125#143#0" expanded="true" />
               </folding>
@@ -357,7 +357,7 @@
       <workItem from="1558614292376" duration="2746000" />
       <workItem from="1558946782468" duration="22212000" />
       <workItem from="1560326335863" duration="33132000" />
-      <workItem from="1560370588116" duration="10818000" />
+      <workItem from="1560370588116" duration="12899000" />
     </task>
     <task id="LOCAL-00001" summary="Split up TsplibProblem and TsplibTour into different files&#10;&#10;Also added CLION project files and two sample TSPLIB files">
       <created>1555682925861</created>
@@ -688,11 +688,18 @@
       <option name="project" value="LOCAL" />
       <updated>1560376926443</updated>
     </task>
-    <option name="localTasksCounter" value="48" />
+    <task id="LOCAL-00048" summary="Fixed bug with the implicit copy-constructor of TwoLevelTreeTour">
+      <created>1560381613729</created>
+      <option name="number" value="00048" />
+      <option name="presentableId" value="LOCAL-00048" />
+      <option name="project" value="LOCAL" />
+      <updated>1560381613729</updated>
+    </task>
+    <option name="localTasksCounter" value="49" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="217945000" />
+    <option name="totallyTimeSpent" value="220026000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -812,7 +819,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
-    <MESSAGE value="Improved visualize.py and optimized Tour::isHamiltonianTour" />
     <MESSAGE value="Optimized VertexList::next" />
     <MESSAGE value="Optimized Tour::isTourAfterExchange" />
     <MESSAGE value="Added ascendingVerticesHeuristic" />
@@ -837,7 +843,8 @@
     <MESSAGE value="Fixed a bug in TsplibProblem::trueDistance&#10;&#10;and optimized the Lin-Kerninghan-Algorithm to not always recalculate the&#10;current gain." />
     <MESSAGE value="Fixed a bug in TsplibProblem::trueDistance&#10;&#10;and optimized the Lin-Kernighan-Algorithm to not always recalculate the&#10;current gain." />
     <MESSAGE value="Fixed bug in TwoLevelTreeTour::setVertices" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed bug in TwoLevelTreeTour::setVertices" />
+    <MESSAGE value="Fixed bug with the implicit copy-constructor of TwoLevelTreeTour" />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed bug with the implicit copy-constructor of TwoLevelTreeTour" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
@@ -846,79 +853,9 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/LinKernighanHeuristic.cpp</url>
-          <line>139</line>
-          <option name="timeStamp" value="13" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/Tour.cpp</url>
-          <line>278</line>
-          <option name="timeStamp" value="15" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/Tour.cpp</url>
-          <line>328</line>
-          <option name="timeStamp" value="16" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/Tour.cpp</url>
-          <line>273</line>
-          <option name="timeStamp" value="17" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/Tour.cpp</url>
-          <line>283</line>
-          <option name="timeStamp" value="18" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/Tour.cpp</url>
-          <line>292</line>
-          <option name="timeStamp" value="19" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/Tour.cpp</url>
-          <line>302</line>
-          <option name="timeStamp" value="20" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/Tour.cpp</url>
-          <line>318</line>
-          <option name="timeStamp" value="21" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/Tour.cpp</url>
-          <line>363</line>
-          <option name="timeStamp" value="22" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/Tour.cpp</url>
-          <line>367</line>
-          <option name="timeStamp" value="24" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/Tour.cpp</url>
-          <line>371</line>
-          <option name="timeStamp" value="25" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/Tour.cpp</url>
-          <line>382</line>
-          <option name="timeStamp" value="26" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/Tour.cpp</url>
-          <line>393</line>
-          <option name="timeStamp" value="27" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/Tour.cpp</url>
-          <line>431</line>
-          <option name="timeStamp" value="28" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/Tour.cpp</url>
-          <line>483</line>
-          <option name="timeStamp" value="29" />
+          <line>485</line>
+          <option name="timeStamp" value="32" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -1110,13 +1047,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file:///usr/include/c++/8.3.0/bits/stl_vector.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="338" column="10" selection-start-line="338" selection-start-column="10" selection-end-line="338" selection-end-column="10" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/TsplibUtils.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="358">
@@ -1219,10 +1149,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file:///usr/include/c++/8.3.0/bits/stl_vector.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="192">
+          <caret line="933" selection-start-line="933" selection-end-line="933" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Tour.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="223">
-          <caret line="178" column="71" selection-start-line="178" selection-start-column="71" selection-end-line="178" selection-end-column="71" />
+        <state relative-caret-position="266">
+          <caret line="160" column="13" selection-start-line="160" selection-start-column="13" selection-end-line="160" selection-end-column="13" />
           <folding>
             <element signature="e#125#143#0" expanded="true" />
           </folding>
@@ -1231,8 +1168,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Tour.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="319">
-          <caret line="268" column="9" lean-forward="true" selection-start-line="268" selection-start-column="9" selection-end-line="268" selection-end-column="9" />
+        <state relative-caret-position="-2126">
+          <caret line="283" selection-start-line="283" selection-end-line="283" />
           <folding>
             <element signature="e#48#66#0" expanded="true" />
           </folding>

@@ -126,9 +126,9 @@ private:
     struct SegmentParent;
 
     struct SegmentVertex {
-        vertex_t vertex = 0;
+        vertex_t vertex;
         std::list<SegmentParent>::iterator parentIterator;
-        long sequenceNumber = 0;
+        long sequenceNumber;
     };
 
     struct SegmentParent {
@@ -157,15 +157,15 @@ private:
     // Reverses the elements in list while correctly changing the sequence numbers
     void reverse(std::list<SegmentVertex> &list);
 
-    // Reverses the elements in list from first to last while correctly changing the sequence numbers
+    // Reverses the elements in list in the range [first, last] while correctly changing the sequence numbers
     void reverse(std::list<SegmentVertex> &list, std::list<SegmentVertex>::iterator first,
                  std::list<SegmentVertex>::iterator last);
 
-    // Reverses the elements in list while correctly changing the sequence numbers and updating the revesal bits
+    // Reverses the elements in list while correctly changing the sequence numbers and updating the reversal bits
     void reverse(std::list<SegmentParent> &list);
 
-    // Reverses the elements in list from first to last while correctly changing the sequence numbers and updating the
-    // revesal bits
+    // Reverses the elements in list in the range [first, last] while correctly changing the sequence numbers and
+    // updating the reversal bits
     void reverse(std::list<SegmentParent> &list, std::list<SegmentParent>::iterator first,
                  std::list<SegmentParent>::iterator last);
 
