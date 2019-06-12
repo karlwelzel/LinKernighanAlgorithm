@@ -9,6 +9,7 @@
 #include <limits>
 #include <list>
 #include <vector>
+#include <list>
 #include <iostream>
 
 using vertex_t = size_t; // The type used for vertices
@@ -124,9 +125,16 @@ using Tour = ArrayTour;
 
 class TwoLevelTreeTour : public BaseTour {
 private:
+    struct SegmentParent;
+
+    struct SegmentVertex {
+        vertex_t vertex;
+        SegmentParent &parent;
+        long sequenceNumber;
+    };
+
     struct SegmentParent {
-        std::vector<vertex_t> vertices;
-        std::unordered_map<vertex_t, dimension_t> indices;
+        std::list<SegmentVertex> vertices;
         bool reversed;
         dimension_t index; // Index inside of parents
 
@@ -140,7 +148,7 @@ private:
     dimension_t dimension = 0;
     dimension_t groupSize = 0;
     std::vector<SegmentParent> parents;
-    std::vector<SegmentParent &> parentOfVertex;
+    std::vector<std::list<SegmentVertex>::iterator> iterators;
 
     const SegmentParent &previousParent(const SegmentParent &parent) const;
 

@@ -242,13 +242,12 @@ dimension_t TwoLevelTreeTour::SegmentParent::count() const {
 }
 
 vertex_t TwoLevelTreeTour::SegmentParent::firstVertex() const {
-    return vertices[reversed ? count() - 1 : 0];
+    return reversed ? vertices.back().vertex : vertices.front().vertex;
 }
 
 vertex_t TwoLevelTreeTour::SegmentParent::lastVertex() const {
-    return vertices[reversed ? 0 : count() - 1];
+    return reversed ? vertices.front().vertex : vertices.back().vertex;
 }
-
 
 const TwoLevelTreeTour::SegmentParent &TwoLevelTreeTour::previousParent(
         const TwoLevelTreeTour::SegmentParent &parent) const {
@@ -268,6 +267,8 @@ void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
         groupSize = 200;
     }
 
+    iterators.assign(vertexList.size(), std::list<SegmentVertex>::iterator());
+
     dimension_t segmentLength = groupSize;
     size_t parentIndex = 0;
     size_t vertexIndex = 0;
@@ -279,8 +280,9 @@ void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
 
         SegmentParent parent{};
         for (; vertexIndex < vertexIndex + segmentLength; vertexIndex++) {
-            parent.vertices.push_back(vertexList[vertexIndex]);
-            parent.indices[vertexList[vertexIndex]] = parent.vertices.size() - 1;
+            parent.vertices.push_back(
+                    SegmentVertex{vertexList[vertexIndex], parent, static_cast<long>(vertexIndex)});
+            iterators[vertexList[vertexIndex]] = std::prev(parent.vertices.end());
         }
         parent.reversed = false;
         parent.index = parentIndex;
@@ -299,29 +301,34 @@ dimension_t TwoLevelTreeTour::getDimension() const {
 }
 
 vertex_t TwoLevelTreeTour::predecessor(vertex_t vertex) const {
-    SegmentParent &parent = parentOfVertex[vertex];
-    dimension_t segmentIndex = parent.indices[vertex]; // index of vertex inside of the segment
-    if ((!parent.reversed and segmentIndex == 0) or (parent.reversed and segmentIndex == parent.count() - 1)) {
+    auto iterator = iterators[vertex];
+    SegmentParent &parent = iterator->parent;
+    if ((!parent.reversed and iterator == parent.vertices.begin()) or
+        (parent.reversed and std::next(iterator) == parent.vertices.end())) {
         return previousParent(parent).lastVertex();
     } else {
-        return parent.vertices[parent.reversed ? segmentIndex + 1 : segmentIndex - 1];
+        return parent.reversed ? std::next(iterator)->vertex : std::prev(iterator)->vertex;
     }
 }
 
 vertex_t TwoLevelTreeTour::successor(vertex_t vertex) const {
-    SegmentParent &parent = parentOfVertex[vertex];
-    dimension_t segmentIndex = parent.indices[vertex]; // index of vertex inside of the segment
-    if ((!parent.reversed and segmentIndex == parent.count() - 1) or (parent.reversed and segmentIndex == 0)) {
+    auto iterator = iterators[vertex];
+    SegmentParent &parent = iterator->parent;
+    if ((!parent.reversed and std::next(iterator) == parent.vertices.end()) or
+        (parent.reversed and iterator == parent.vertices.begin())) {
         return nextParent(parent).firstVertex();
     } else {
-        return parent.vertices[parent.reversed ? segmentIndex - 1 : segmentIndex + 1];
+        return parent.reversed ? std::prev(iterator)->vertex : std::next(iterator)->vertex;
     }
 }
 
 bool TwoLevelTreeTour::isBetween(vertex_t before, vertex_t vertex, vertex_t after) const {
-    SegmentParent &beforeParent = parentOfVertex[before];
-    SegmentParent &vertexParent = parentOfVertex[vertex];
-    SegmentParent &afterParent = parentOfVertex[after];
+    auto beforeIterator = iterators[before];
+    auto vertexIterator = iterators[vertex];
+    auto afterIterator = iterators[after];
+    SegmentParent &beforeParent = beforeIterator->parent;
+    SegmentParent &vertexParent = vertexIterator->parent;
+    SegmentParent &afterParent = afterIterator->parent;
     dimension_t parentDistanceToVertex = (vertexParent.index - beforeParent.index + parents.size()) % parents.size();
     dimension_t parentDistanceToAfter = (afterParent.index - beforeParent.index + parents.size()) % parents.size();
     if (parentDistanceToVertex < parentDistanceToAfter) {
@@ -332,9 +339,9 @@ bool TwoLevelTreeTour::isBetween(vertex_t before, vertex_t vertex, vertex_t afte
         if (beforeParent.index == vertexParent.index) {
             // All three vertices have the same parent and are therefore in the same segment
             dimension_t segmentDistanceToVertex =
-                    (parent.indices[vertex] - parent.indices[before] + parent.count()) % parent.count();
+                    (vertexIterator->sequenceNumber - beforeIterator->sequenceNumber + parent.count()) % parent.count();
             dimension_t segmentDistanceToAfter =
-                    (parent.indices[after] - parent.indices[before] + parent.count()) % parent.count();
+                    (afterIterator->sequenceNumber - beforeIterator->sequenceNumber + parent.count()) % parent.count();
             if (!parent.reversed) {
                 return segmentDistanceToVertex < segmentDistanceToAfter;
             } else {
@@ -343,9 +350,9 @@ bool TwoLevelTreeTour::isBetween(vertex_t before, vertex_t vertex, vertex_t afte
         } else {
             // Since before is in a different segment, only the order inside the segment matters
             if (!parent.reversed) {
-                return parent.indices[vertex] < parent.indices[after];
+                return vertexIterator->sequenceNumber < afterIterator->sequenceNumber;
             } else {
-                return parent.indices[vertex] > parent.indices[after];
+                return vertexIterator->sequenceNumber > afterIterator->sequenceNumber;
             }
         }
     }
@@ -353,18 +360,22 @@ bool TwoLevelTreeTour::isBetween(vertex_t before, vertex_t vertex, vertex_t afte
 
 void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
     // Check if the paths a-c and d-b are made up of segments
-    if (parents[indices[a].first].firstVertex() == a and parents[indices[c].first].lastVertex() == c) {
-        dimension_t numberOfParentsAC = (indices[c].first - indices[a].first + parents.size()) % parents.size();
-        dimension_t numberOfParentsDB = (indices[b].first - indices[d].first + parents.size()) % parents.size();
+    SegmentVertex &aVertex = *iterators[a];
+    SegmentVertex &bVertex = *iterators[b];
+    SegmentVertex &cVertex = *iterators[c];
+    SegmentVertex &dVertex = *iterators[d];
+    if (aVertex.parent.firstVertex() == a and cVertex.parent.lastVertex() == c) {
+        dimension_t numberOfParentsAC = (cVertex.parent.index - aVertex.parent.index + parents.size()) % parents.size();
+        dimension_t numberOfParentsDB = (bVertex.parent.index - dVertex.parent.index + parents.size()) % parents.size();
         dimension_t parentStartIndex, parentEndIndex;
         dimension_t numberOfParents;
         if (numberOfParentsAC <= numberOfParentsDB) {
-            parentStartIndex = indices[a].first;
-            parentEndIndex = indices[c].first;
+            parentStartIndex = aVertex.parent.index;
+            parentEndIndex = cVertex.parent.index;
             numberOfParents = numberOfParentsAC;
         } else {
-            parentEndIndex = indices[d].first;
-            parentStartIndex = indices[b].first;
+            parentEndIndex = dVertex.parent.index;
+            parentStartIndex = bVertex.parent.index;
             numberOfParents = numberOfParentsDB;
         }
 
@@ -372,18 +383,9 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
             SegmentParent &parent1 = parents[(parentStartIndex + i) % parents.size()];
             SegmentParent &parent2 = parents[(parentEndIndex + parents.size() - i) % parents.size()];
             std::swap(parent1, parent2);
-            std::swap(indices[vertex1], indices[vertex2]);
-        }
-
-    }
-
-    // Check if the path a-c is contained in one segment
-    if (indices[a].first == indices[c].first) {
-        SegmentParent parent = parents[indices[a].first];
-        if ((!parent.reversed and indices[a].second <= indices[c].second) or
-            (parent.reversed and indices[a].second >= indices[c].second)) {
-
-            return;
+            std::swap(parent1.index, parent2.index);
+            parent1.reversed = !parent1.reversed;
+            parent2.reversed = !parent2.reversed;
         }
     }
 }
