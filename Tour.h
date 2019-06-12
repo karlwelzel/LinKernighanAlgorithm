@@ -131,6 +131,7 @@ private:
         vertex_t vertex;
         SegmentParent &parent;
         long sequenceNumber;
+
     };
 
     struct SegmentParent {
@@ -150,9 +151,20 @@ private:
     std::vector<SegmentParent> parents;
     std::vector<std::list<SegmentVertex>::iterator> iterators;
 
-    const SegmentParent &previousParent(const SegmentParent &parent) const;
+    const SegmentParent &getPreviousParent(const SegmentParent &parent) const;
 
-    const SegmentParent &nextParent(const SegmentParent &parent) const;
+    const SegmentParent &getNextParent(const SegmentParent &parent) const;
+
+    // Reverses the elements in list while correctly changing the sequence numbers
+    void reverse(std::list<SegmentVertex> &list);
+
+    // Reverses the elements in list from first to last while correctly changing the sequence numbers
+    void reverse(std::list<SegmentVertex> &list, std::list<SegmentVertex>::iterator first,
+                 std::list<SegmentVertex>::iterator last);
+
+    // Merge the half-segment to right (or left) of vertex v (including v) with the right (or left) neighbor segment.
+    // The direction is given with respect to the tour direction
+    void mergeHalfSegment(vertex_t v, bool mergeToTheRight);
 
 public:
     TwoLevelTreeTour() = default;
