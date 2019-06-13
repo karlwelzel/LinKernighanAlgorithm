@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <iostream>
 #include <unordered_map>
+#include <cmath>
 #include "Tour.h"
 #include "SignedPermutation.h"
 
@@ -293,6 +294,7 @@ TwoLevelTreeTour::TwoLevelTreeTour(const TwoLevelTreeTour &otherTour) : dimensio
 
 void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
     dimension = vertexList.size();
+    // TODO: Test different values
     if (vertexList.size() <= 1000) {
         groupSize = 2 * dimension; // Only one segment, essentially like ArrayTour
     } else if (vertexList.size() <= 100000) {
@@ -300,6 +302,13 @@ void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
     } else {
         groupSize = 500;
     }
+    /*
+    if (vertexList.size() <= 1000) {
+        groupSize = 2 * dimension; // Only one segment, essentially like ArrayTour
+    } else {
+        groupSize = std::lround(std::sqrt(vertexList.size()));
+    }
+     */
 
     iterators.resize(vertexList.size());
 
@@ -531,11 +540,11 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
     if (acInOneSegment or dbInOneSegment) {
         vertex_t start, end;
         if (acInOneSegment) {
-            start = aParent.reversed ? c : a;
-            end = aParent.reversed ? a : c;
+            start = a;
+            end = c;
         } else {
-            start = dParent.reversed ? b : d;
-            end = dParent.reversed ? d : b;
+            start = d;
+            end = b;
         }
         SegmentVertex &startVertex = *iterators[start];
         SegmentVertex &endVertex = *iterators[end];
@@ -556,6 +565,10 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
             flip(a, b, c, d); // This is now handled using case 1
         } else {
             // Flip the path inside of parent.vertices
+            if (parent.reversed) {
+                // iterators[start] needs to come before iterators[end] inside the segment
+                std::swap(start, end);
+            }
             parent.reverseVertices(iterators[start], iterators[end]);
         }
         return;
