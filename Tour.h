@@ -136,38 +136,40 @@ private:
         bool reversed = false;
         dimension_t sequenceNumber = 0;
 
+        // Counts the number of elements in this parent (= vertices.size())
         dimension_t count() const;
 
+        // Returns the first vertex in this segment with respect to the tour direction
         vertex_t firstVertex() const;
 
+        // Returns the last vertex in this segment with respect to the tour direction
         vertex_t lastVertex() const;
+
+        // Reverses the segment vertices in vertices in the range [first, last] while correctly changing the  sequence
+        // numbers
+        // Expects that first and last are iterators of vertices
+        void reverseVertices(std::list<SegmentVertex>::iterator first, std::list<SegmentVertex>::iterator last);
     };
 
-    dimension_t dimension = 0;
-    dimension_t groupSize = 0;
-    std::list<SegmentParent> parents;
+    dimension_t dimension = 0; // Stores the number of vertices
+    dimension_t groupSize = 0; // The average size the segments should have
+    std::list<SegmentParent> parents; // A list of the parents in the order their segments appear on the tour
+    // A map of each vertex to the iterator that points to its SegmentVertex in one of the parents vertices list
     std::vector<std::list<SegmentVertex>::iterator> iterators;
 
+    // Compare two segment parents by equality
     friend bool operator==(const SegmentParent &parent, const SegmentParent &otherParent);
 
+    // Returns the segment parent that comes before *parentIterator
     const SegmentParent &getPreviousParent(std::list<SegmentParent>::iterator parentIterator) const;
 
+    // Returns the segment parent that comes after *parentIterator
     const SegmentParent &getNextParent(std::list<SegmentParent>::iterator parentIterator) const;
 
-    // Reverses the elements in list while correctly changing the sequence numbers
-    void reverse(std::list<SegmentVertex> &list);
-
-    // Reverses the elements in list in the range [first, last] while correctly changing the sequence numbers
-    void reverse(std::list<SegmentVertex> &list, std::list<SegmentVertex>::iterator first,
-                 std::list<SegmentVertex>::iterator last);
-
-    // Reverses the elements in list while correctly changing the sequence numbers and updating the reversal bits
-    void reverse(std::list<SegmentParent> &list);
-
-    // Reverses the elements in list in the range [first, last] while correctly changing the sequence numbers and
-    // updating the reversal bits
-    void reverse(std::list<SegmentParent> &list, std::list<SegmentParent>::iterator first,
-                 std::list<SegmentParent>::iterator last);
+    // Reverses the segment parents in parents in the range [first, last] while correctly changing the sequence numbers
+    // and updating the reversal bits
+    // Expects that first and last are iterators of parents
+    void reverseParents(std::list<SegmentParent>::iterator first, std::list<SegmentParent>::iterator last);
 
     // Merge the half-segment to right (or left) of vertex v (including v) with the right (or left) neighbor segment.
     // The direction is given with respect to the tour direction

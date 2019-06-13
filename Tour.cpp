@@ -239,6 +239,8 @@ void ArrayTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
 
 // ============================================ TwoLevelTreeTour class =================================================
 
+//             ======================= TwoLevelTreeTour::SegmentParent class ===============================
+
 bool operator==(const TwoLevelTreeTour::SegmentParent &parent, const TwoLevelTreeTour::SegmentParent &otherParent) {
     return parent.sequenceNumber == otherParent.sequenceNumber;
 }
@@ -255,6 +257,21 @@ vertex_t TwoLevelTreeTour::SegmentParent::lastVertex() const {
     return reversed ? vertices.front().vertex : vertices.back().vertex;
 }
 
+void TwoLevelTreeTour::SegmentParent::reverseVertices(std::list<SegmentVertex>::iterator first,
+                                                      std::list<SegmentVertex>::iterator last) {
+    auto insertIterator = std::next(last);
+    std::list<SegmentVertex> temporaryList{};
+    temporaryList.splice(temporaryList.begin(), vertices, first, std::next(last));
+    temporaryList.reverse();
+    std::swap(first, last);
+    vertices.splice(insertIterator, temporaryList);
+    while ((first != last) && (first != --last)) {
+        std::swap((first++)->sequenceNumber, last->sequenceNumber);
+    }
+}
+
+//             ============================== TwoLevelTreeTour class =======================================
+
 TwoLevelTreeTour::TwoLevelTreeTour(const TwoLevelTreeTour &otherTour) : dimension(otherTour.dimension),
                                                                         groupSize(otherTour.groupSize),
                                                                         parents(otherTour.parents),
@@ -269,62 +286,6 @@ TwoLevelTreeTour::TwoLevelTreeTour(const TwoLevelTreeTour &otherTour) : dimensio
         }
     }
 }
-
-const TwoLevelTreeTour::SegmentParent &TwoLevelTreeTour::getPreviousParent(
-        std::list<SegmentParent>::iterator parentIterator) const {
-    return parentIterator != parents.begin() ? *std::prev(parentIterator) : parents.back();
-}
-
-const TwoLevelTreeTour::SegmentParent &TwoLevelTreeTour::getNextParent(
-        std::list<SegmentParent>::iterator parentIterator) const {
-    return std::next(parentIterator) != parents.end() ? *std::next(parentIterator) : parents.front();
-}
-
-void TwoLevelTreeTour::reverse(std::list<SegmentVertex> &list) {
-    list.reverse();
-    auto first = list.begin();
-    auto last = list.end();
-    while ((first != last) && (first != --last)) {
-        std::swap((first++)->sequenceNumber, last->sequenceNumber);
-    }
-}
-
-void TwoLevelTreeTour::reverse(std::list<SegmentVertex> &list, std::list<SegmentVertex>::iterator first,
-                               std::list<SegmentVertex>::iterator last) {
-    auto insertIterator = std::next(last);
-    std::list<SegmentVertex> temporaryList;
-    temporaryList.splice(temporaryList.begin(), list, first, std::next(last));
-    reverse(temporaryList);
-    list.splice(insertIterator, temporaryList);
-
-}
-
-// TODO: Move these functions to SegmentVertex / SegmentParent
-void TwoLevelTreeTour::reverse(std::list<SegmentParent> &list) {
-    list.reverse();
-    auto first = list.begin();
-    auto last = list.end();
-    while (first != last) {
-        if (first == --last) {
-            first->reversed = !first->reversed;
-            break;
-        }
-        first->reversed = !first->reversed;
-        last->reversed = !last->reversed;
-        std::swap(first->sequenceNumber, last->sequenceNumber);
-        first++;
-    }
-}
-
-void TwoLevelTreeTour::reverse(std::list<SegmentParent> &list, std::list<SegmentParent>::iterator first,
-                               std::list<SegmentParent>::iterator last) {
-    auto insertIterator = std::next(last);
-    std::list<SegmentParent> temporaryList;
-    temporaryList.splice(temporaryList.begin(), list, first, std::next(last));
-    reverse(temporaryList);
-    list.splice(insertIterator, temporaryList);
-}
-
 
 void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
     dimension = vertexList.size();
@@ -367,8 +328,19 @@ TwoLevelTreeTour::TwoLevelTreeTour(const std::vector<vertex_t> &vertexList) {
     setVertices(vertexList);
 }
 
+
 dimension_t TwoLevelTreeTour::getDimension() const {
     return dimension;
+}
+
+const TwoLevelTreeTour::SegmentParent &TwoLevelTreeTour::getPreviousParent(
+        std::list<SegmentParent>::iterator parentIterator) const {
+    return parentIterator != parents.begin() ? *std::prev(parentIterator) : parents.back();
+}
+
+const TwoLevelTreeTour::SegmentParent &TwoLevelTreeTour::getNextParent(
+        std::list<SegmentParent>::iterator parentIterator) const {
+    return std::next(parentIterator) != parents.end() ? *std::next(parentIterator) : parents.front();
 }
 
 vertex_t TwoLevelTreeTour::predecessor(vertex_t vertex) const {
@@ -469,8 +441,8 @@ void TwoLevelTreeTour::mergeHalfSegment(vertex_t v, bool mergeToTheRight) {
         halfSegment.reverse();
     }
 
-    // Determine where to insert the half-segment in the other segment and update sequence number and parent for all
-    // elements in halfSegment
+    // Determine where to insert the half-segment in the other segment and update sequenceNumber and parentIterator for
+    // all elements in halfSegment
     std::list<SegmentVertex>::iterator insertIterator;
     std::list<SegmentVertex>::iterator countStartIterator;
     long sequenceNumber;
@@ -492,6 +464,26 @@ void TwoLevelTreeTour::mergeHalfSegment(vertex_t v, bool mergeToTheRight) {
 
     // Merge
     otherParent.vertices.splice(insertIterator, halfSegment);
+}
+
+void TwoLevelTreeTour::reverseParents(std::list<SegmentParent>::iterator first,
+                                      std::list<SegmentParent>::iterator last) {
+    auto insertIterator = std::next(last);
+    std::list<SegmentParent> temporaryList{};
+    temporaryList.splice(temporaryList.begin(), parents, first, std::next(last));
+    temporaryList.reverse();
+    std::swap(first, last);
+    parents.splice(insertIterator, temporaryList);
+    while (first != last) {
+        if (first == --last) {
+            first->reversed = !first->reversed;
+            break;
+        }
+        first->reversed = !first->reversed;
+        last->reversed = !last->reversed;
+        std::swap(first->sequenceNumber, last->sequenceNumber);
+        first++;
+    }
 }
 
 
@@ -529,7 +521,7 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
             parentEndIterator = bVertex.parentIterator;
         }
 
-        reverse(parents, parentStartIterator, parentEndIterator);
+        reverseParents(parentStartIterator, parentEndIterator);
 
         return;
     }
@@ -563,9 +555,9 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
             if (end != parent.lastVertex()) {
                 mergeHalfSegment(successor(end), true);
             }
-            flip(a, b, c, d); // This is now handled using case 3
+            flip(a, b, c, d); // This is now handled using case 1
         } else {
-            reverse(parent.vertices, iterators[start], iterators[end]);
+            parent.reverseVertices(iterators[start], iterators[end]);
         }
         return;
     }

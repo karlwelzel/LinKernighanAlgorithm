@@ -14,9 +14,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ea2faef9-1e3e-415f-ac69-9bebb67db99c" name="Default Changelist" comment="Fixed bug in TwoLevelTreeTour::isBetween&#10;&#10;The case analysis was not complete. Also added groupSize = 30 for &#10;testing purposes (for n &lt;= 1000) and an error if flip is called with&#10;illegal arguments.">
+    <list default="true" id="ea2faef9-1e3e-415f-ac69-9bebb67db99c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Tour.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Tour.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tour.h" beforeDir="false" afterPath="$PROJECT_DIR$/Tour.h" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/CMakeFiles/" />
@@ -93,8 +94,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Tour.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="325">
-              <caret line="566" column="61" lean-forward="true" selection-start-line="566" selection-start-column="61" selection-end-line="566" selection-end-column="61" />
+            <state relative-caret-position="-180">
+              <caret line="557" column="65" selection-start-line="557" selection-start-column="65" selection-end-line="557" selection-end-column="65" />
               <folding>
                 <element signature="e#48#66#0" expanded="true" />
               </folding>
@@ -105,8 +106,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Tour.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="561">
-              <caret line="173" column="21" selection-start-line="173" selection-start-column="21" selection-end-line="173" selection-end-column="21" />
+            <state relative-caret-position="250">
+              <caret line="185" column="36" selection-start-line="185" selection-start-column="36" selection-end-line="185" selection-end-column="36" />
               <folding>
                 <element signature="e#125#143#0" expanded="true" />
               </folding>
@@ -189,8 +190,8 @@
         <option value="$PROJECT_DIR$/TsplibUtils.cpp" />
         <option value="$PROJECT_DIR$/main.cpp" />
         <option value="$PROJECT_DIR$/visualize.py" />
-        <option value="$PROJECT_DIR$/Tour.h" />
         <option value="$PROJECT_DIR$/LinKernighanHeuristic.cpp" />
+        <option value="$PROJECT_DIR$/Tour.h" />
         <option value="$PROJECT_DIR$/Tour.cpp" />
       </list>
     </option>
@@ -357,14 +358,7 @@
       <workItem from="1558946782468" duration="22212000" />
       <workItem from="1560326335863" duration="33132000" />
       <workItem from="1560370588116" duration="16737000" />
-      <workItem from="1560413979230" duration="1131000" />
-    </task>
-    <task id="LOCAL-00002" summary="Introduced vertex_t, dimension_t and distance_t as types">
-      <created>1555703631616</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1555703631616</updated>
+      <workItem from="1560413979230" duration="3436000" />
     </task>
     <task id="LOCAL-00003" summary="Changed type of neighbors from std::map to std::vector">
       <created>1555705877401</created>
@@ -702,11 +696,18 @@
       <option name="project" value="LOCAL" />
       <updated>1560386710443</updated>
     </task>
-    <option name="localTasksCounter" value="51" />
+    <task id="LOCAL-00051" summary="Fixed a bug in TwoLevelTreeTour::flip&#10;&#10;The comparison of sequence numbers needs to respect the reversal bit.">
+      <created>1560415372011</created>
+      <option name="number" value="00051" />
+      <option name="presentableId" value="LOCAL-00051" />
+      <option name="project" value="LOCAL" />
+      <updated>1560415372011</updated>
+    </task>
+    <option name="localTasksCounter" value="52" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="224995000" />
+    <option name="totallyTimeSpent" value="227300000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -719,7 +720,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="1598" y="120" width="1924" height="1054" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.498" visible="true" weight="0.24332978" />
       <window_info id="Structure" order="1" sideWeight="0.502" side_tool="true" weight="0.2501681" />
@@ -826,7 +826,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
-    <MESSAGE value="Added ascendingVerticesHeuristic" />
     <MESSAGE value="Added AlWAYS_STORE_IN_MATRIX parameter and optimized AlternatingWalk::containsEdge" />
     <MESSAGE value="Added VertexList::neighborIndex to replace std::find" />
     <MESSAGE value="Fixed g++ warnings" />
@@ -851,7 +850,8 @@
     <MESSAGE value="Fixed bug with the implicit copy-constructor of TwoLevelTreeTour" />
     <MESSAGE value="Fixed bug in TwoLevelTreeTour::reverse" />
     <MESSAGE value="Fixed bug in TwoLevelTreeTour::isBetween&#10;&#10;The case analysis was not complete. Also added groupSize = 30 for &#10;testing purposes (for n &lt;= 1000) and an error if flip is called with&#10;illegal arguments." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed bug in TwoLevelTreeTour::isBetween&#10;&#10;The case analysis was not complete. Also added groupSize = 30 for &#10;testing purposes (for n &lt;= 1000) and an error if flip is called with&#10;illegal arguments." />
+    <MESSAGE value="Fixed a bug in TwoLevelTreeTour::flip&#10;&#10;The comparison of sequence numbers needs to respect the reversal bit." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed a bug in TwoLevelTreeTour::flip&#10;&#10;The comparison of sequence numbers needs to respect the reversal bit." />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
@@ -1165,8 +1165,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Tour.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="561">
-          <caret line="173" column="21" selection-start-line="173" selection-start-column="21" selection-end-line="173" selection-end-column="21" />
+        <state relative-caret-position="250">
+          <caret line="185" column="36" selection-start-line="185" selection-start-column="36" selection-end-line="185" selection-end-column="36" />
           <folding>
             <element signature="e#125#143#0" expanded="true" />
           </folding>
@@ -1175,8 +1175,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Tour.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="325">
-          <caret line="566" column="61" lean-forward="true" selection-start-line="566" selection-start-column="61" selection-end-line="566" selection-end-column="61" />
+        <state relative-caret-position="-180">
+          <caret line="557" column="65" selection-start-line="557" selection-start-column="65" selection-end-line="557" selection-end-column="65" />
           <folding>
             <element signature="e#48#66#0" expanded="true" />
           </folding>
