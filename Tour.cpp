@@ -265,6 +265,7 @@ void TwoLevelTreeTour::SegmentParent::reverseVertices(std::list<SegmentVertex>::
     temporaryList.reverse();
     std::swap(first, last);
     vertices.splice(insertIterator, temporaryList);
+    last++;
     while ((first != last) && (first != --last)) {
         std::swap((first++)->sequenceNumber, last->sequenceNumber);
     }
@@ -474,6 +475,7 @@ void TwoLevelTreeTour::reverseParents(std::list<SegmentParent>::iterator first,
     temporaryList.reverse();
     std::swap(first, last);
     parents.splice(insertIterator, temporaryList);
+    last++;
     while (first != last) {
         if (first == --last) {
             first->reversed = !first->reversed;
