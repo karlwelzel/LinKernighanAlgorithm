@@ -205,7 +205,7 @@ public:
 };
 
 
-using Tour = TwoLevelTreeTour;
+using Tour = ArrayTour;
 
 // =============================================== TourWalker class ====================================================
 

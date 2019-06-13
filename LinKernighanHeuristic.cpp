@@ -41,7 +41,7 @@ bool AlternatingWalk::containsEdge(vertex_t vertex1, vertex_t vertex2) const {
 std::ostream &operator<<(std::ostream &out, const AlternatingWalk &walk) {
     std::string output;
     for (vertex_t vertex : walk) {
-        output += std::to_string(vertex + 1) + ", ";
+        output += std::to_string(vertex) + ", ";
     }
     out << output.substr(0, output.length() - 2);
     return out;

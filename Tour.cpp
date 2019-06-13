@@ -291,11 +291,11 @@ TwoLevelTreeTour::TwoLevelTreeTour(const TwoLevelTreeTour &otherTour) : dimensio
 void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
     dimension = vertexList.size();
     if (vertexList.size() <= 1000) {
-        groupSize = 30;
+        groupSize = 2 * dimension; // Only one segment, essentially like ArrayTour
     } else if (vertexList.size() <= 100000) {
         groupSize = 100;
     } else {
-        groupSize = 200;
+        groupSize = 500;
     }
 
     iterators.assign(vertexList.size(), std::list<SegmentVertex>::iterator());
@@ -625,7 +625,7 @@ std::ostream &operator<<(std::ostream &out, const BaseTour &tour) {
     TourWalker tourWalker(tour, 0);
     vertex_t currentVertex = tourWalker.getNextVertex();
     do {
-        output += std::to_string(currentVertex + 1) + ", ";
+        output += std::to_string(currentVertex) + ", ";
         currentVertex = tourWalker.getNextVertex();
     } while (currentVertex != 0);
     out << output.substr(0, output.length() - 2);
