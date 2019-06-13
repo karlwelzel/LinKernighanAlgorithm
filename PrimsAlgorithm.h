@@ -9,7 +9,9 @@
 #include <tuple>
 #include <functional>
 
-std::tuple<std::vector<std::vector<vertex_t>>, std::vector<vertex_t>>
-primsAlgorithm(dimension_t dimension, std::function<distance_t(vertex_t, vertex_t)> dist, vertex_t root);
+// TODO: Add comments
+
+std::tuple<std::vector<std::vector<vertex_t>>, std::vector<vertex_t>, std::vector<vertex_t>>
+primsAlgorithm(dimension_t dimension, const std::function<distance_t(vertex_t, vertex_t)> &dist);
 
 #endif //LINKERNINGHANALGORITHM_PRIMSALGORITHM_H

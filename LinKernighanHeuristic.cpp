@@ -47,37 +47,79 @@ std::ostream &operator<<(std::ostream &out, const AlternatingWalk &walk) {
 
 // ============================================= CandidateEdges class =================================================
 
-CandidateEdges CandidateEdges::allNeighbors(const TsplibProblem &tsplibProblem) {
+CandidateEdges CandidateEdges::allNeighbors(const TsplibProblem &problem) {
     CandidateEdges result;
-    std::vector<vertex_t> allVertices(tsplibProblem.getDimension());
+    std::vector<vertex_t> allVertices(problem.getDimension());
     std::iota(allVertices.begin(), allVertices.end(), 0);
-    result.assign(tsplibProblem.getDimension(), allVertices);
+    result.assign(problem.getDimension(), allVertices);
     return result;
 }
 
-CandidateEdges CandidateEdges::nearestNeighbors(const TsplibProblem &tsplibProblem, size_t k) {
-    std::vector<vertex_t> allVertices(tsplibProblem.getDimension());
+CandidateEdges CandidateEdges::nearestNeighbors(const TsplibProblem &problem, size_t k) {
+    std::vector<vertex_t> allVertices(problem.getDimension());
     std::iota(allVertices.begin(), allVertices.end(), 0);
 
     CandidateEdges result;
-    result.resize(tsplibProblem.getDimension());
-    for (vertex_t v = 0; v < tsplibProblem.getDimension(); ++v) {
+    result.resize(problem.getDimension());
+    for (vertex_t v = 0; v < problem.getDimension(); ++v) {
         result[v].resize(k);
         std::partial_sort_copy(allVertices.begin(), allVertices.end(), result[v].begin(), result[v].end(),
-                               [&tsplibProblem, v](vertex_t w1, vertex_t w2) {
-                                   return tsplibProblem.dist(v, w1) < tsplibProblem.dist(v, w2);
+                               [&problem, v](vertex_t w1, vertex_t w2) {
+                                   return problem.dist(v, w1) < problem.dist(v, w2);
                                });
     }
     return result;
 }
 
-CandidateEdges CandidateEdges::alphaNearestNeighbors(const TsplibProblem &tsplibProblem, size_t k) {
+CandidateEdges CandidateEdges::alphaNearestNeighbors(const TsplibProblem &problem, size_t k) {
+    dimension_t dimension = problem.getDimension();
+    std::vector<vertex_t> allVertices(problem.getDimension());
+    std::iota(allVertices.begin(), allVertices.end(), 0);
+
     std::vector<std::vector<vertex_t>> adjacentVertices;
     std::vector<vertex_t> topologicalOrder;
+    std::vector<vertex_t> parent;
 
-    std::tie(adjacentVertices, topologicalOrder) = primsAlgorithm(tsplibProblem.getDimension(), tsplibProblem, 0);
+    // Generate a minimum spanning tree for vertices 0, ..., dimension-2
+    auto distFunction = [&problem](vertex_t i, vertex_t j) { return problem.dist(i, j); };
+    std::tie(adjacentVertices, topologicalOrder, parent) = primsAlgorithm(dimension - 1, distFunction);
 
-    for (vertex_t v = 0; v < tsplibProblem.getDimension(); ++v) {
+    // Add edges to form a 1-tree
+    vertex_t special = dimension - 1; // The special node "1" in the 1-tree
+    std::vector<vertex_t> specialNeighbors(2);
+    auto specialDistanceComparator = [&problem, special](vertex_t w1, vertex_t w2) {
+        return problem.dist(special, w1) < problem.dist(special, w2);
+    };
+    std::partial_sort_copy(topologicalOrder.begin(), topologicalOrder.end(), specialNeighbors.begin(),
+                           specialNeighbors.end(), specialDistanceComparator);
+    adjacentVertices.emplace_back(); // Create empty list of vertices adjacent to special (= dimension-1)
+    for (vertex_t neighbor : specialNeighbors) {
+        adjacentVertices[special].push_back(neighbor);
+        adjacentVertices[neighbor].push_back(special);
+    }
+
+    // Initialize the beta array
+    std::vector<std::vector<distance_t>> beta(dimension, std::vector<distance_t>(dimension, 0));
+
+    // Set the beta values for edges (special, v)
+    for (vertex_t vertex : topologicalOrder) {
+        if (vertex == specialNeighbors[0]) {
+            beta[special][vertex] = beta[vertex][special] = problem.dist(special, vertex);
+        } else {
+            beta[special][vertex] = beta[vertex][special] = problem.dist(special, specialNeighbors[1]);
+        }
+    }
+
+    // Compute the beta values for all other edges
+    for (size_t i = 0; i < topologicalOrder.size(); ++i) {
+        for (size_t j = i + 1; j < topologicalOrder.size(); ++j) {
+            // beta[i][i] has the smallest possible value 0, so it will never be chosen here
+            beta[i][j] = beta[j][i] = std::max(beta[i][parent[j]], problem.dist(j, parent[j]));
+        }
+    }
+
+/*
+    for (vertex_t v = 0; v < dimension; ++v) {
         std::cout << v << " : ";
         for (vertex_t w : adjacentVertices[v]) {
             std::cout << w << ", ";
@@ -86,11 +128,28 @@ CandidateEdges CandidateEdges::alphaNearestNeighbors(const TsplibProblem &tsplib
     }
     std::cout << "==========" << std::endl;
     for (vertex_t v : topologicalOrder) {
-        std::cout << v << std::endl;
+        std::cout << v << ", parent: " << parent[v] << std::endl;
+    }
+    std::cout << "==========" << std::endl;
+    for (vertex_t v = 0; v < dimension; ++v) {
+        for (vertex_t w = 0; w < dimension; ++w) {
+            std::cout << tsplibProblem.dist(v, w) - beta[v][w] << ", ";
+        }
+        std::cout << std::endl;
+    }
+*/
+
+    CandidateEdges result;
+    result.resize(problem.getDimension());
+    for (vertex_t v = 0; v < problem.getDimension(); ++v) {
+        result[v].resize(k);
+        std::partial_sort_copy(allVertices.begin(), allVertices.end(), result[v].begin(), result[v].end(),
+                               [&problem, &beta, v](vertex_t w1, vertex_t w2) {
+                                   return problem.dist(v, w1) - beta[v][w1] < problem.dist(v, w2) - beta[v][w2];
+                               });
     }
 
-
-    return allNeighbors(tsplibProblem);
+    return result;
 }
 
 // ============================================= linKernighanHeuristic =================================================
@@ -102,7 +161,7 @@ Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &start
     const size_t infeasibilityDepth = 2;
 
     const dimension_t dimension = tsplibProblem.getDimension();
-    CandidateEdges candidateEdges = CandidateEdges::nearestNeighbors(tsplibProblem);
+    CandidateEdges candidateEdges = CandidateEdges::alphaNearestNeighbors(tsplibProblem);
 
     Tour currentTour = startTour;
     std::vector<std::vector<vertex_t>> vertexChoices;

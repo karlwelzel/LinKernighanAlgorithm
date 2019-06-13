@@ -37,11 +37,11 @@ std::ostream &operator<<(std::ostream &out, const AlternatingWalk &walk);
 
 class CandidateEdges : public std::vector<std::vector<vertex_t>> {
 public:
-    static CandidateEdges allNeighbors(const TsplibProblem &tsplibProblem);
+    static CandidateEdges allNeighbors(const TsplibProblem &problem);
 
-    static CandidateEdges nearestNeighbors(const TsplibProblem &tsplibProblem, size_t k = 5);
+    static CandidateEdges nearestNeighbors(const TsplibProblem &problem, size_t k = 5);
 
-    static CandidateEdges alphaNearestNeighbors(const TsplibProblem &tsplibProblem, size_t k = 5);
+    static CandidateEdges alphaNearestNeighbors(const TsplibProblem &problem, size_t k = 5);
 };
 
 
