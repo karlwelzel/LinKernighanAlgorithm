@@ -1,5 +1,5 @@
 //
-// Created by Karl Welzel on 29/03/2019.
+// Created by Karl Welzel on 29.03.2019.
 //
 
 #ifndef LINKERNINGHANALGORITHM_SIMPLEHEURISTIC_H

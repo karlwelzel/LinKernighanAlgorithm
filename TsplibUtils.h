@@ -1,5 +1,5 @@
 //
-// Created by Karl Welzel on 19/04/2019.
+// Created by Karl Welzel on 19.04.2019.
 //
 
 #ifndef LINKERNINGHANALGORITHM_TSPLIBUTILS_H
