@@ -260,11 +260,15 @@ vertex_t TwoLevelTreeTour::SegmentParent::lastVertex() const {
 void TwoLevelTreeTour::SegmentParent::reverseVertices(std::list<SegmentVertex>::iterator first,
                                                       std::list<SegmentVertex>::iterator last) {
     auto insertIterator = std::next(last);
+
+    // Move the elements to a separate list, reverse this list and move them back to vertices
     std::list<SegmentVertex> temporaryList{};
     temporaryList.splice(temporaryList.begin(), vertices, first, std::next(last));
     temporaryList.reverse();
-    std::swap(first, last);
     vertices.splice(insertIterator, temporaryList);
+
+    // Reverse the sequenceNumbers, so that they stay consecutive within the segment
+    std::swap(first, last);
     last++;
     while ((first != last) && (first != --last)) {
         std::swap((first++)->sequenceNumber, last->sequenceNumber);
@@ -315,8 +319,8 @@ void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
         parent.reversed = false;
         parent.sequenceNumber = parentIndex;
         for (size_t i = vertexIndex; i < vertexIndex + segmentLength; ++i) {
-            parent.vertices.push_back(
-                    SegmentVertex{vertexList[i], parentIterator, static_cast<long>(i)});
+            // Create a new SegmentVertex and append it to parent.vertices
+            parent.vertices.push_back(SegmentVertex{vertexList[i], parentIterator, static_cast<long>(i)});
             iterators[vertexList[i]] = std::prev(parent.vertices.end());
         }
 
@@ -468,11 +472,15 @@ void TwoLevelTreeTour::mergeHalfSegment(vertex_t v, bool mergeToTheRight) {
 void TwoLevelTreeTour::reverseParents(std::list<SegmentParent>::iterator first,
                                       std::list<SegmentParent>::iterator last) {
     auto insertIterator = std::next(last);
+
+    // Move the elements to a separate list, reverse this list and move them back to parents
     std::list<SegmentParent> temporaryList{};
     temporaryList.splice(temporaryList.begin(), parents, first, std::next(last));
     temporaryList.reverse();
-    std::swap(first, last);
     parents.splice(insertIterator, temporaryList);
+
+    // Reverse the sequenceNumbers, so that they stay consecutive and swap the reversal bits for the affected parents
+    std::swap(first, last);
     last++;
     while (first != last) {
         if (first == --last) {
@@ -488,10 +496,6 @@ void TwoLevelTreeTour::reverseParents(std::list<SegmentParent>::iterator first,
 
 
 void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
-    if (!(successor(b) == a and successor(c) == d)) {
-        throw std::runtime_error("Illegal call to flip");
-    }
-
     SegmentVertex &aVertex = *iterators[a];
     SegmentVertex &bVertex = *iterators[b];
     SegmentVertex &cVertex = *iterators[c];
@@ -502,31 +506,24 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
     SegmentParent &cParent = *(cVertex.parentIterator);
     SegmentParent &dParent = *(dVertex.parentIterator);
 
-    std::cout << "flip parents.size(): " << parents.size() << std::endl;
-    std::cout << "flip current tour " << *this << std::endl;
     // Case 1: The paths a-c and d-b are made up of segments
     if (aParent.firstVertex() == a and cParent.lastVertex() == c) {
-        std::cout << "flip Case 1: " << a << ", " << b << ", " << c << ", " << d << std::endl;
+        // Determine which part of parents is shorter and reverse it
         dimension_t numberOfParentsAC =
                 (cParent.sequenceNumber - aParent.sequenceNumber + parents.size()) % parents.size();
         dimension_t numberOfParentsDB =
                 (bParent.sequenceNumber - dParent.sequenceNumber + parents.size()) % parents.size();
 
-        std::list<SegmentParent>::iterator parentStartIterator, parentEndIterator;
         if (numberOfParentsAC <= numberOfParentsDB) {
-            parentStartIterator = aVertex.parentIterator;
-            parentEndIterator = cVertex.parentIterator;
+            reverseParents(aVertex.parentIterator, cVertex.parentIterator);
         } else {
-            parentStartIterator = dVertex.parentIterator;
-            parentEndIterator = bVertex.parentIterator;
+            reverseParents(dVertex.parentIterator, bVertex.parentIterator);
         }
-
-        reverseParents(parentStartIterator, parentEndIterator);
 
         return;
     }
 
-    // Case 2: The path a-c or d-b is contained in a single segment
+    // Case 2: One of the paths a-c and d-b is contained in a single segment
     bool acInOneSegment = aParent == cParent and
                           ((!aParent.reversed and aVertex.sequenceNumber <= cVertex.sequenceNumber) or
                            (aParent.reversed and aVertex.sequenceNumber >= cVertex.sequenceNumber));
@@ -534,7 +531,6 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
                           ((!dParent.reversed and dVertex.sequenceNumber <= bVertex.sequenceNumber) or
                            (dParent.reversed and dVertex.sequenceNumber >= bVertex.sequenceNumber));
     if (acInOneSegment or dbInOneSegment) {
-        std::cout << "flip Case 2: " << a << ", " << b << ", " << c << ", " << d << std::endl;
         vertex_t start, end;
         if (acInOneSegment) {
             start = aParent.reversed ? c : a;
@@ -546,9 +542,13 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
         SegmentVertex &startVertex = *iterators[start];
         SegmentVertex &endVertex = *iterators[end];
         SegmentParent &parent = *(startVertex.parentIterator);
+
         dimension_t length = std::abs(endVertex.sequenceNumber - startVertex.sequenceNumber);
         if (length >= (groupSize * 3) / 4) {
-            std::cout << "flip Case 2.2: " << a << ", " << b << ", " << c << ", " << d << std::endl;
+            // This is a special case to reduce running time and achieve implicit rebalancing
+            // Split off the two ends of the segments and merge them with their neighboring segments, so that the
+            // complete segment only consists of the path that needs to be flipped. The actual flip (case 1) is
+            // done with a new call to flip.
             if (start != parent.firstVertex()) {
                 mergeHalfSegment(predecessor(start), false);
             }
@@ -557,14 +557,14 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
             }
             flip(a, b, c, d); // This is now handled using case 1
         } else {
+            // Flip the path inside of parent.vertices
             parent.reverseVertices(iterators[start], iterators[end]);
         }
         return;
     }
 
-    // Case 3:
+    // Case 3: None of the above
     // Split up the segments so that case 1 is applicable
-    std::cout << "flip Case 3: " << a << ", " << b << ", " << c << ", " << d << std::endl;
     if (aParent == bParent) {
         // Split the segment of aParent and merge one half into the neighboring segment
         long frontSequenceNumber = aParent.vertices.front().sequenceNumber;
@@ -594,7 +594,7 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
             mergeHalfSegment(c, false);
         }
     }
-    flip(a, b, c, d);
+    flip(a, b, c, d); // Now a-b and c-d are the boundaries of segments, so it can be handled by case 1
 }
 
 

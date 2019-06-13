@@ -20,11 +20,13 @@ minY = min([y for (x, y) in coordinates])
 maxY = max([y for (x, y) in coordinates])
 minXY = round(min(minX, minY))
 maxXY = round(max(maxX, maxY))
+rangeXY = maxXY - minXY
 
 print(f"{minX} - {maxX}, {minY} - {maxY}")
 
-turtle.setup(800, 800, 0, 0)
-turtle.setworldcoordinates(minXY - 10, minXY - 10, maxXY + 10, maxXY + 10)
+turtle.setup(1597, 1173, 0, 0)
+turtle.setworldcoordinates(minXY - 0.05 * rangeXY, minXY - 0.05 * rangeXY, maxXY + 0.05 * rangeXY,
+                           maxXY + 0.05 * rangeXY)
 turtle.shape('circle')
 turtle.shapesize(0.2, 0.2, 0)
 turtle.speed(0)

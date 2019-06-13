@@ -30,7 +30,7 @@ public: // pure virtual functions that need to be implemented by subclasses
     virtual dimension_t getDimension() const = 0;
 
     // Initialize the tour with a sequence of vertices
-    // This function expects a vector containing the numbers from 0 to tour.size()-1 and clears existing neighbors
+    // This function expects a vector containing the numbers from 0 to tour.size()-1 and overrides all data
     virtual void setVertices(const std::vector<vertex_t> &vertexList) = 0;
 
     // Returns the predecessor of vertex in the current tour
@@ -80,7 +80,9 @@ public: // functions that all Tour classes have in common and that only depend o
 
 // ================================================ ArrayTour class ====================================================
 
-// This is the simplest implementation of a Tour using two vectors (as replacement for arrays)
+// This is the simplest implementation of a Tour using a vector to store the tour order and a second one to store the
+// index of each vertex in the former vector. The running times for predecessor, successor and isBetween is O(1) while
+// flip has running time O(n)
 
 class ArrayTour : public BaseTour {
 private:
@@ -98,6 +100,8 @@ public:
     // This function expects a vector containing the numbers from 0 to tour.size()-1 and overrides all data
     void setVertices(const std::vector<vertex_t> &vertexList) override;
 
+    // Initialize the tour with a sequence of vertices
+    // This function expects a vector containing the numbers from 0 to tour.size()-1 and overrides all data
     explicit ArrayTour(const std::vector<vertex_t> &vertexList);
 
     // Returns the number of vertices in the tour
@@ -120,20 +124,47 @@ public:
 
 // ============================================ TwoLevelTreeTour class =================================================
 
+// This tour implementation uses a tree with two levels to store the vertices. The first level is a list of parent
+// nodes (here: SegmentParent) and the second level is a segment of the tour for every parent node. Each vertex in a
+// segment (here: SegmentVertex) has a pointer to its parent and there is a map that stores a pointer to the
+// SegmentVertex inside one of the segments corresponding to a vertex (of type vertex_t). The advantage over the
+// ArrayTour implementation is that each parent node stores a reversal bit, which indicates if the complete segment
+// should be traversed in the opposite direction. So, when the complete segment needs to be reversed, it takes only
+// O(1) time instead of a linear running time in the segment length.
+
+// The implementation was adapted from the paper
+// Fredman, M.L., Johnson, D.S., McGeoch, L.A., & Ostheimer, G. (1993). Data Structures for Traveling Salesmen. SODA.
+// which is available here: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.49.570&rep=rep1&type=pdf
+// It sacrifices the tight O(sqrt(n)) worst-case bound for a flip operation for a simpler and faster implementation.
+
+// groupSize is a parameter for how long a single segment should be. The choice in setVertices is similar to the one
+// suggested in the paper.
 
 class TwoLevelTreeTour : public BaseTour {
 private:
     struct SegmentParent;
 
     struct SegmentVertex {
+        // The represented vertex
         vertex_t vertex;
+
+        // A pointer to its parent
         std::list<SegmentParent>::iterator parentIterator;
+
+        // Used to order the elements in the segment (in isBetween). Inside a segment the numbers are consecutive,
+        // but they might start and end with arbitrary numbers.
         long sequenceNumber;
     };
 
     struct SegmentParent {
+        // A list of the vertices in this segment
         std::list<SegmentVertex> vertices;
+
+        // The reversal bit, indicates whether this segments orientation is opposite to the tour
         bool reversed = false;
+
+        // Used to order the parent nodes (in isBetween). The numbers are consecutive between 0 and the number of
+        // segments
         dimension_t sequenceNumber = 0;
 
         // Counts the number of elements in this parent (= vertices.size())
@@ -145,34 +176,43 @@ private:
         // Returns the last vertex in this segment with respect to the tour direction
         vertex_t lastVertex() const;
 
-        // Reverses the segment vertices in vertices in the range [first, last] while correctly changing the  sequence
+        // Reverses the segment vertices in vertices in the range [first, last] while correctly changing the sequence
         // numbers
         // Expects that first and last are iterators of vertices
         void reverseVertices(std::list<SegmentVertex>::iterator first, std::list<SegmentVertex>::iterator last);
     };
 
-    dimension_t dimension = 0; // Stores the number of vertices
-    dimension_t groupSize = 0; // The average size the segments should have
-    std::list<SegmentParent> parents; // A list of the parents in the order their segments appear on the tour
-    // A map of each vertex to the iterator that points to its SegmentVertex in one of the parents vertices list
+    // Stores the number of vertices
+    dimension_t dimension = 0;
+
+    // The average size the segments should have. The parameter is described in more detail in the paper above
+    dimension_t groupSize = 0;
+
+    // A list of the parents in the order their segments appear on the tour
+    std::list<SegmentParent> parents;
+
+    // A map of each vertex to the pointer that points to its SegmentVertex in one of the parents vertices list
+    // Invariant: iterators[v]->vertex == v. These iterators do not have to be updated, because they are list iterators
+    // and will not be invalidated even when the elements are moved between different lists.
     std::vector<std::list<SegmentVertex>::iterator> iterators;
 
-    // Compare two segment parents by equality
+    // Compare two SegmentParents by equality
     friend bool operator==(const SegmentParent &parent, const SegmentParent &otherParent);
 
-    // Returns the segment parent that comes before *parentIterator
+    // Returns the SegmentParent that comes before *parentIterator
     const SegmentParent &getPreviousParent(std::list<SegmentParent>::iterator parentIterator) const;
 
-    // Returns the segment parent that comes after *parentIterator
+    // Returns the SegmentParent that comes after *parentIterator
     const SegmentParent &getNextParent(std::list<SegmentParent>::iterator parentIterator) const;
 
-    // Reverses the segment parents in parents in the range [first, last] while correctly changing the sequence numbers
+    // Reverses the SegmentParent in parents in the range [first, last] while correctly changing the sequence numbers
     // and updating the reversal bits
     // Expects that first and last are iterators of parents
     void reverseParents(std::list<SegmentParent>::iterator first, std::list<SegmentParent>::iterator last);
 
-    // Merge the half-segment to right (or left) of vertex v (including v) with the right (or left) neighbor segment.
-    // The direction is given with respect to the tour direction
+    // Merge the half-segment to the right (or left) of vertex v including v with the right (or left) neighbor segment.
+    // The direction is given with respect to the tour direction (right = successor-direction,
+    // left = predecessor-direction)
     void mergeHalfSegment(vertex_t v, bool mergeToTheRight);
 
 public:
@@ -185,6 +225,8 @@ public:
     // This function expects a vector containing the numbers from 0 to tour.size()-1 and overrides all data
     void setVertices(const std::vector<vertex_t> &vertexList) override;
 
+    // Initialize the tour with a sequence of vertices
+    // This function expects a vector containing the numbers from 0 to tour.size()-1 and overrides all data
     explicit TwoLevelTreeTour(const std::vector<vertex_t> &vertexList);
 
     // Returns the number of vertices in the tour
@@ -205,8 +247,10 @@ public:
 };
 
 
-using Tour = ArrayTour;
+using Tour = TwoLevelTreeTour;
 
+
+// TODO: Delete TourWalker class
 // =============================================== TourWalker class ====================================================
 
 // This class provides a way to walk through a Tour. It stores a reference to the tour, its current and next vertex
