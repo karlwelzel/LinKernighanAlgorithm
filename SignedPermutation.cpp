@@ -20,7 +20,7 @@ SignedPermutation::SignedPermutation(std::vector<std::pair<number_t, bool>> perm
     }
 
     // Calculate the index of each element
-    indices.assign(this->permutation.size(), 0);
+    indices.resize(this->permutation.size());
     for (size_t i = 0; i < this->permutation.size(); ++i) {
         indices[this->permutation[i].first] = i;
     }

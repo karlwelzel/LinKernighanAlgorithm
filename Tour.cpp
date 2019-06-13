@@ -176,8 +176,6 @@ void BaseTour::exchange(const std::vector<vertex_t> &alternatingWalk) {
 
 // ================================================ ArrayTour class ====================================================
 
-// TODO: Replace swap with std::reverse
-
 dimension_t ArrayTour::getDimension() const {
     return sequence.size();
 }
@@ -302,7 +300,7 @@ void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
         groupSize = 500;
     }
 
-    iterators.assign(vertexList.size(), std::list<SegmentVertex>::iterator());
+    iterators.resize(vertexList.size());
 
     dimension_t segmentLength = groupSize;
     size_t parentIndex = 0;
