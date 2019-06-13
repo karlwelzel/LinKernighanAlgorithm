@@ -327,7 +327,9 @@ void TwoLevelTreeTour::reverse(std::list<SegmentParent> &list, std::list<Segment
 
 void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
     dimension = vertexList.size();
-    if (vertexList.size() <= 100000) {
+    if (vertexList.size() <= 1000) {
+        groupSize = 30;
+    } else if (vertexList.size() <= 100000) {
         groupSize = 100;
     } else {
         groupSize = 200;
@@ -397,34 +399,45 @@ bool TwoLevelTreeTour::isBetween(vertex_t before, vertex_t vertex, vertex_t afte
     const SegmentParent &beforeParent = *(beforeIterator->parentIterator);
     const SegmentParent &vertexParent = *(vertexIterator->parentIterator);
     const SegmentParent &afterParent = *(afterIterator->parentIterator);
-    dimension_t parentDistanceToVertex =
-            (vertexParent.sequenceNumber - beforeParent.sequenceNumber + parents.size()) % parents.size();
-    dimension_t parentDistanceToAfter =
-            (afterParent.sequenceNumber - beforeParent.sequenceNumber + parents.size()) % parents.size();
-    if (parentDistanceToVertex < parentDistanceToAfter) {
-        return true;
-    } else {
-        // vertex and after have the same parent
+    if (beforeParent == vertexParent and vertexParent == afterParent) {
+        // All three vertices are in the same segment, so only the relative positions in the segment matter
         const SegmentParent &parent = vertexParent;
-        if (beforeParent == vertexParent) {
-            // All three vertices have the same parent and are therefore in the same segment
-            dimension_t segmentDistanceToVertex =
-                    (vertexIterator->sequenceNumber - beforeIterator->sequenceNumber + parent.count()) % parent.count();
-            dimension_t segmentDistanceToAfter =
-                    (afterIterator->sequenceNumber - beforeIterator->sequenceNumber + parent.count()) % parent.count();
-            if (!parent.reversed) {
-                return segmentDistanceToVertex < segmentDistanceToAfter;
-            } else {
-                return segmentDistanceToVertex > segmentDistanceToAfter;
-            }
+        dimension_t segmentDistanceToVertex =
+                (vertexIterator->sequenceNumber - beforeIterator->sequenceNumber + parent.count()) % parent.count();
+        dimension_t segmentDistanceToAfter =
+                (afterIterator->sequenceNumber - beforeIterator->sequenceNumber + parent.count()) % parent.count();
+        if (!parent.reversed) {
+            return segmentDistanceToVertex < segmentDistanceToAfter;
         } else {
-            // Since before is in a different segment, only the order inside the segment matters
-            if (!parent.reversed) {
-                return vertexIterator->sequenceNumber < afterIterator->sequenceNumber;
-            } else {
-                return vertexIterator->sequenceNumber > afterIterator->sequenceNumber;
-            }
+            return segmentDistanceToVertex > segmentDistanceToAfter;
         }
+    } else if (beforeParent == vertexParent) {
+        // before and vertex are in the same segment, while after is not, so we only need to compare before and vertex
+        if (!vertexParent.reversed) {
+            return vertexIterator->sequenceNumber >= beforeIterator->sequenceNumber;
+        } else {
+            return vertexIterator->sequenceNumber <= beforeIterator->sequenceNumber;
+        }
+    } else if (vertexParent == afterParent) {
+        // vertex and after are in the same segment, while before is not, so we only need to compare vertex and after
+        if (!vertexParent.reversed) {
+            return vertexIterator->sequenceNumber < afterIterator->sequenceNumber;
+        } else {
+            return vertexIterator->sequenceNumber > afterIterator->sequenceNumber;
+        }
+    } else if (beforeParent == afterParent) {
+        // before and after are in the same segment, while vertex is not, so we only need to compare before and after
+        if (!beforeParent.reversed) {
+            return afterIterator->sequenceNumber < beforeIterator->sequenceNumber;
+        } else {
+            return afterIterator->sequenceNumber > beforeIterator->sequenceNumber;
+        }
+    } else {
+        dimension_t parentDistanceToVertex =
+                (vertexParent.sequenceNumber - beforeParent.sequenceNumber + parents.size()) % parents.size();
+        dimension_t parentDistanceToAfter =
+                (afterParent.sequenceNumber - beforeParent.sequenceNumber + parents.size()) % parents.size();
+        return parentDistanceToVertex < parentDistanceToAfter;
     }
 }
 
@@ -481,6 +494,10 @@ void TwoLevelTreeTour::mergeHalfSegment(vertex_t v, bool mergeToTheRight) {
 
 
 void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
+    if (!(successor(b) == a and successor(c) == d)) {
+        throw std::runtime_error("Illegal call to flip");
+    }
+
     SegmentVertex &aVertex = *iterators[a];
     SegmentVertex &bVertex = *iterators[b];
     SegmentVertex &cVertex = *iterators[c];

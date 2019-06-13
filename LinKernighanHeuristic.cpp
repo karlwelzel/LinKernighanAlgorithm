@@ -74,8 +74,8 @@ Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &start
             if (vertexChoices.at(i).empty()) {
                 if (highestGain > 0) {
                     distance_t previousLength = tsplibProblem.length(currentTour);
-                    currentTour.exchange(bestAlternatingWalk);
                     std::cout << "Exchange done: " << bestAlternatingWalk << std::endl;
+                    currentTour.exchange(bestAlternatingWalk);
                     std::cout << " with gain: " << tsplibProblem.exchangeGain(bestAlternatingWalk) << " (highestGain = "
                               << highestGain << ")" << std::endl;
                     std::cout << " new tour: " << currentTour << std::endl;
