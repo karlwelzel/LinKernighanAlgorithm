@@ -77,6 +77,9 @@ public: // functions that all Tour classes have in common and that only depend o
     void exchange(const std::vector<vertex_t> &alternatingWalk);
 };
 
+// Output the tour to the stream out, typically used with std::cout
+std::ostream &operator<<(std::ostream &out, const BaseTour &tour);
+
 
 // ================================================ ArrayTour class ====================================================
 
@@ -248,29 +251,5 @@ public:
 
 
 using Tour = TwoLevelTreeTour;
-
-
-// TODO: Delete TourWalker class
-// =============================================== TourWalker class ====================================================
-
-// This class provides a way to walk through a Tour. It stores a reference to the tour, its current and next vertex
-// (to store the direction) and can be advanced by "getNextVertex".
-
-
-class TourWalker {
-private:
-    const BaseTour &tour;
-    vertex_t current;
-
-public:
-    // Create a TourWalker that starts the walk at vertex first
-    TourWalker(const BaseTour &tour, vertex_t first);
-
-    // Advance the walk and get the next vertex
-    vertex_t getNextVertex();
-};
-
-// Output the tour to the stream out, typically used with std::cout
-std::ostream &operator<<(std::ostream &out, const BaseTour &tour);
 
 #endif //LINKERNINGHANALGORITHM_TOUR_H

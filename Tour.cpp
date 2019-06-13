@@ -601,32 +601,12 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
 // =============================================== TourWalker class ====================================================
 
 
-// TODO: Use std::ostream_iterator to make std::ostream &operator<< more beautiful
-/*
-template <typename T>
-void print(std::list<T> & listObj)
-{
-    std::copy(listObj.begin(), listObj.end(), std::ostream_iterator<T>(std::cout, " , "));
-    std::cout<<std::endl;
-}
-*/
-
-
-TourWalker::TourWalker(const BaseTour &tour, vertex_t first) : tour(tour), current(first) {}
-
-vertex_t TourWalker::getNextVertex() {
-    const vertex_t previous = current;
-    current = tour.successor(current);
-    return previous;
-}
-
 std::ostream &operator<<(std::ostream &out, const BaseTour &tour) {
     std::string output;
-    TourWalker tourWalker(tour, 0);
-    vertex_t currentVertex = tourWalker.getNextVertex();
+    vertex_t currentVertex = 0;
     do {
         output += std::to_string(currentVertex) + ", ";
-        currentVertex = tourWalker.getNextVertex();
+        currentVertex = tour.successor(currentVertex);
     } while (currentVertex != 0);
     out << output.substr(0, output.length() - 2);
     return out;

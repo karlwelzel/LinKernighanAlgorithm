@@ -253,13 +253,12 @@ distance_t TsplibProblem::dist(const vertex_t i, const vertex_t j) const {
 
 distance_t TsplibProblem::length(const BaseTour &tour) const {
     distance_t sum = 0;
-    TourWalker tourWalker(tour, 0);
-    vertex_t currentVertex = tourWalker.getNextVertex();
-    vertex_t nextVertex = tourWalker.getNextVertex();
+    vertex_t currentVertex = 0;
+    vertex_t nextVertex = tour.successor(currentVertex);
     do {
         sum += dist(currentVertex, nextVertex);
         currentVertex = nextVertex;
-        nextVertex = tourWalker.getNextVertex();
+        nextVertex = tour.successor(currentVertex);
     } while (currentVertex != 0);
     return sum;
 }
@@ -366,11 +365,10 @@ std::string TsplibTour::toTsplibTourFile() {
     output += "TYPE : " + type + "\n";
     output += "DIMENSION : " + std::to_string(dimension) + "\n";
     output += "TOUR_SECTION\n";
-    TourWalker tourWalker(*this, 0);
-    vertex_t currentVertex = tourWalker.getNextVertex();
+    vertex_t currentVertex = 0;
     do {
         output += std::to_string(currentVertex + 1) + "\n";
-        currentVertex = tourWalker.getNextVertex();
+        currentVertex = successor(currentVertex);
     } while (currentVertex != 0);
     output += "-1\n";
     return output;
