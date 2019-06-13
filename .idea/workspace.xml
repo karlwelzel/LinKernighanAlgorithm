@@ -14,10 +14,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ea2faef9-1e3e-415f-ac69-9bebb67db99c" name="Default Changelist" comment="Fixed bug with the implicit copy-constructor of TwoLevelTreeTour">
+    <list default="true" id="ea2faef9-1e3e-415f-ac69-9bebb67db99c" name="Default Changelist" comment="Fixed bug in TwoLevelTreeTour::isBetween&#10;&#10;The case analysis was not complete. Also added groupSize = 30 for &#10;testing purposes (for n &lt;= 1000) and an error if flip is called with&#10;illegal arguments.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Tour.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Tour.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Tour.h" beforeDir="false" afterPath="$PROJECT_DIR$/Tour.h" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/CMakeFiles/" />
@@ -39,7 +38,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/main.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="191">
+            <state relative-caret-position="1035">
               <caret line="69" selection-start-line="69" selection-end-line="69" />
               <folding>
                 <element signature="e#0#19#0" expanded="true" />
@@ -51,7 +50,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/visualize.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="259">
+            <state relative-caret-position="330">
               <caret line="23" selection-start-line="23" selection-end-line="23" />
             </state>
           </provider>
@@ -60,7 +59,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/TsplibUtils.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="191">
+            <state relative-caret-position="4260">
               <caret line="284" selection-start-line="284" selection-end-line="284" />
               <folding>
                 <element signature="e#48#66#0" expanded="true" />
@@ -72,8 +71,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="169">
-              <caret line="141" selection-start-line="141" selection-end-line="141" />
+            <state relative-caret-position="1170">
+              <caret line="78" selection-start-line="78" selection-end-line="78" />
               <folding>
                 <element signature="e#46#66#0" expanded="true" />
                 <element signature="e#179#196#0" expanded="true" />
@@ -85,7 +84,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-11">
+            <state relative-caret-position="15">
               <caret line="1" column="25" selection-start-line="1" selection-start-column="25" selection-end-line="1" selection-end-column="25" />
             </state>
           </provider>
@@ -94,8 +93,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Tour.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2126">
-              <caret line="283" selection-start-line="283" selection-end-line="283" />
+            <state relative-caret-position="325">
+              <caret line="566" column="61" lean-forward="true" selection-start-line="566" selection-start-column="61" selection-end-line="566" selection-end-column="61" />
               <folding>
                 <element signature="e#48#66#0" expanded="true" />
               </folding>
@@ -106,8 +105,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Tour.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="266">
-              <caret line="160" column="13" selection-start-line="160" selection-start-column="13" selection-end-line="160" selection-end-column="13" />
+            <state relative-caret-position="561">
+              <caret line="173" column="21" selection-start-line="173" selection-start-column="21" selection-end-line="173" selection-end-column="21" />
               <folding>
                 <element signature="e#125#143#0" expanded="true" />
               </folding>
@@ -190,8 +189,8 @@
         <option value="$PROJECT_DIR$/TsplibUtils.cpp" />
         <option value="$PROJECT_DIR$/main.cpp" />
         <option value="$PROJECT_DIR$/visualize.py" />
-        <option value="$PROJECT_DIR$/LinKernighanHeuristic.cpp" />
         <option value="$PROJECT_DIR$/Tour.h" />
+        <option value="$PROJECT_DIR$/LinKernighanHeuristic.cpp" />
         <option value="$PROJECT_DIR$/Tour.cpp" />
       </list>
     </option>
@@ -291,7 +290,7 @@
     </option>
   </component>
   <component name="RunManager" selected="CMake Application.LinKerninghanAlgorithm">
-    <configuration name="LinKerninghanAlgorithm" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="&quot;ExampleProblems/fri26.tsp&quot;" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="LinKerninghanAlgorithm" TARGET_NAME="LinKerninghanAlgorithm" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="LinKerninghanAlgorithm" RUN_TARGET_NAME="LinKerninghanAlgorithm">
+    <configuration name="LinKerninghanAlgorithm" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="&quot;ExampleProblems/ch130.tsp&quot; &quot;ExampleProblems/ch130.opt.tour&quot;" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="LinKerninghanAlgorithm" TARGET_NAME="LinKerninghanAlgorithm" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="LinKerninghanAlgorithm" RUN_TARGET_NAME="LinKerninghanAlgorithm">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -357,14 +356,8 @@
       <workItem from="1558614292376" duration="2746000" />
       <workItem from="1558946782468" duration="22212000" />
       <workItem from="1560326335863" duration="33132000" />
-      <workItem from="1560370588116" duration="12899000" />
-    </task>
-    <task id="LOCAL-00001" summary="Split up TsplibProblem and TsplibTour into different files&#10;&#10;Also added CLION project files and two sample TSPLIB files">
-      <created>1555682925861</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1555682925861</updated>
+      <workItem from="1560370588116" duration="16737000" />
+      <workItem from="1560413979230" duration="1131000" />
     </task>
     <task id="LOCAL-00002" summary="Introduced vertex_t, dimension_t and distance_t as types">
       <created>1555703631616</created>
@@ -695,11 +688,25 @@
       <option name="project" value="LOCAL" />
       <updated>1560381613729</updated>
     </task>
-    <option name="localTasksCounter" value="49" />
+    <task id="LOCAL-00049" summary="Fixed bug in TwoLevelTreeTour::reverse">
+      <created>1560383626995</created>
+      <option name="number" value="00049" />
+      <option name="presentableId" value="LOCAL-00049" />
+      <option name="project" value="LOCAL" />
+      <updated>1560383626995</updated>
+    </task>
+    <task id="LOCAL-00050" summary="Fixed bug in TwoLevelTreeTour::isBetween&#10;&#10;The case analysis was not complete. Also added groupSize = 30 for &#10;testing purposes (for n &lt;= 1000) and an error if flip is called with&#10;illegal arguments.">
+      <created>1560386710442</created>
+      <option name="number" value="00050" />
+      <option name="presentableId" value="LOCAL-00050" />
+      <option name="project" value="LOCAL" />
+      <updated>1560386710443</updated>
+    </task>
+    <option name="localTasksCounter" value="51" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="220026000" />
+    <option name="totallyTimeSpent" value="224995000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -714,16 +721,16 @@
     <frame x="1598" y="120" width="1924" height="1054" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.498" visible="true" weight="0.24066168" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.498" visible="true" weight="0.24332978" />
       <window_info id="Structure" order="1" sideWeight="0.502" side_tool="true" weight="0.2501681" />
       <window_info id="Favorites" order="2" sideWeight="0.502" side_tool="true" weight="0.2501681" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3275862" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.498713" weight="0.32543105" />
-      <window_info active="true" anchor="bottom" id="Debug" order="3" visible="true" weight="0.39655173" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.39655173" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" weight="0.3275862" />
+      <window_info active="true" anchor="bottom" id="TODO" order="6" visible="true" weight="0.3275862" />
       <window_info anchor="bottom" id="Database Changes" order="7" />
       <window_info anchor="bottom" id="Inspection Results" order="8" weight="0.3297587" />
       <window_info anchor="bottom" id="Messages" order="9" sideWeight="0.49966374" weight="0.32543105" />
@@ -819,8 +826,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
-    <MESSAGE value="Optimized VertexList::next" />
-    <MESSAGE value="Optimized Tour::isTourAfterExchange" />
     <MESSAGE value="Added ascendingVerticesHeuristic" />
     <MESSAGE value="Added AlWAYS_STORE_IN_MATRIX parameter and optimized AlternatingWalk::containsEdge" />
     <MESSAGE value="Added VertexList::neighborIndex to replace std::find" />
@@ -844,7 +849,9 @@
     <MESSAGE value="Fixed a bug in TsplibProblem::trueDistance&#10;&#10;and optimized the Lin-Kernighan-Algorithm to not always recalculate the&#10;current gain." />
     <MESSAGE value="Fixed bug in TwoLevelTreeTour::setVertices" />
     <MESSAGE value="Fixed bug with the implicit copy-constructor of TwoLevelTreeTour" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed bug with the implicit copy-constructor of TwoLevelTreeTour" />
+    <MESSAGE value="Fixed bug in TwoLevelTreeTour::reverse" />
+    <MESSAGE value="Fixed bug in TwoLevelTreeTour::isBetween&#10;&#10;The case analysis was not complete. Also added groupSize = 30 for &#10;testing purposes (for n &lt;= 1000) and an error if flip is called with&#10;illegal arguments." />
+    <option name="LAST_COMMIT_MESSAGE" value="Fixed bug in TwoLevelTreeTour::isBetween&#10;&#10;The case analysis was not complete. Also added groupSize = 30 for &#10;testing purposes (for n &lt;= 1000) and an error if flip is called with&#10;illegal arguments." />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
@@ -854,8 +861,8 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/Tour.cpp</url>
-          <line>485</line>
-          <option name="timeStamp" value="32" />
+          <line>95</line>
+          <option name="timeStamp" value="38" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -1070,13 +1077,6 @@
     <entry file="file://$PROJECT_DIR$/ExampleProblems/d198.tsp">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/visualize.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="259">
-          <caret line="23" selection-start-line="23" selection-end-line="23" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ExampleProblems/pla7397.tsp">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -1111,26 +1111,16 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.h">
+    <entry file="file:///usr/include/c++/8.3.0/bits/stl_vector.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-11">
-          <caret line="1" column="25" selection-start-line="1" selection-start-column="25" selection-end-line="1" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/TsplibUtils.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
-          <caret line="284" selection-start-line="284" selection-end-line="284" />
-          <folding>
-            <element signature="e#48#66#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="159">
+          <caret line="951" selection-start-line="951" selection-end-line="951" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="191">
+        <state relative-caret-position="1035">
           <caret line="69" selection-start-line="69" selection-end-line="69" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
@@ -1138,10 +1128,27 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/visualize.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="23" selection-start-line="23" selection-end-line="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TsplibUtils.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="4260">
+          <caret line="284" selection-start-line="284" selection-end-line="284" />
+          <folding>
+            <element signature="e#48#66#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="169">
-          <caret line="141" selection-start-line="141" selection-end-line="141" />
+        <state relative-caret-position="1170">
+          <caret line="78" selection-start-line="78" selection-end-line="78" />
           <folding>
             <element signature="e#46#66#0" expanded="true" />
             <element signature="e#179#196#0" expanded="true" />
@@ -1149,17 +1156,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file:///usr/include/c++/8.3.0/bits/stl_vector.h">
+    <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="192">
-          <caret line="933" selection-start-line="933" selection-end-line="933" />
+        <state relative-caret-position="15">
+          <caret line="1" column="25" selection-start-line="1" selection-start-column="25" selection-end-line="1" selection-end-column="25" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Tour.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="266">
-          <caret line="160" column="13" selection-start-line="160" selection-start-column="13" selection-end-line="160" selection-end-column="13" />
+        <state relative-caret-position="561">
+          <caret line="173" column="21" selection-start-line="173" selection-start-column="21" selection-end-line="173" selection-end-column="21" />
           <folding>
             <element signature="e#125#143#0" expanded="true" />
           </folding>
@@ -1168,8 +1175,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Tour.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2126">
-          <caret line="283" selection-start-line="283" selection-end-line="283" />
+        <state relative-caret-position="325">
+          <caret line="566" column="61" lean-forward="true" selection-start-line="566" selection-start-column="61" selection-end-line="566" selection-end-column="61" />
           <folding>
             <element signature="e#48#66#0" expanded="true" />
           </folding>

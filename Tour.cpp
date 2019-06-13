@@ -299,6 +299,7 @@ void TwoLevelTreeTour::reverse(std::list<SegmentVertex> &list, std::list<Segment
 
 }
 
+// TODO: Move these functions to SegmentVertex / SegmentParent
 void TwoLevelTreeTour::reverse(std::list<SegmentParent> &list) {
     list.reverse();
     auto first = list.begin();
@@ -433,6 +434,7 @@ bool TwoLevelTreeTour::isBetween(vertex_t before, vertex_t vertex, vertex_t afte
             return afterIterator->sequenceNumber > beforeIterator->sequenceNumber;
         }
     } else {
+        // All three vertices are in different segments, so only the parent positions matter
         dimension_t parentDistanceToVertex =
                 (vertexParent.sequenceNumber - beforeParent.sequenceNumber + parents.size()) % parents.size();
         dimension_t parentDistanceToAfter =
@@ -533,23 +535,26 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
     }
 
     // Case 2: The path a-c or d-b is contained in a single segment
-    // TODO: Check if sequenceNumber comparison depends on reversed
-    bool acInOneSegment = aParent == cParent and aVertex.sequenceNumber <= cVertex.sequenceNumber;
-    bool dbInOneSegment = dParent == bParent and dVertex.sequenceNumber <= bVertex.sequenceNumber;
+    bool acInOneSegment = aParent == cParent and
+                          ((!aParent.reversed and aVertex.sequenceNumber <= cVertex.sequenceNumber) or
+                           (aParent.reversed and aVertex.sequenceNumber >= cVertex.sequenceNumber));
+    bool dbInOneSegment = dParent == bParent and
+                          ((!dParent.reversed and dVertex.sequenceNumber <= bVertex.sequenceNumber) or
+                           (dParent.reversed and dVertex.sequenceNumber >= bVertex.sequenceNumber));
     if (acInOneSegment or dbInOneSegment) {
         std::cout << "flip Case 2: " << a << ", " << b << ", " << c << ", " << d << std::endl;
         vertex_t start, end;
         if (acInOneSegment) {
-            start = a;
-            end = c;
+            start = aParent.reversed ? c : a;
+            end = aParent.reversed ? a : c;
         } else {
-            start = d;
-            end = b;
+            start = dParent.reversed ? b : d;
+            end = dParent.reversed ? d : b;
         }
         SegmentVertex &startVertex = *iterators[start];
         SegmentVertex &endVertex = *iterators[end];
         SegmentParent &parent = *(startVertex.parentIterator);
-        dimension_t length = endVertex.sequenceNumber - startVertex.sequenceNumber;
+        dimension_t length = std::abs(endVertex.sequenceNumber - startVertex.sequenceNumber);
         if (length >= (groupSize * 3) / 4) {
             std::cout << "flip Case 2.2: " << a << ", " << b << ", " << c << ", " << d << std::endl;
             if (start != parent.firstVertex()) {
@@ -558,7 +563,7 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
             if (end != parent.lastVertex()) {
                 mergeHalfSegment(successor(end), true);
             }
-            flip(a, b, c, d);
+            flip(a, b, c, d); // This is now handled using case 3
         } else {
             reverse(parent.vertices, iterators[start], iterators[end]);
         }
@@ -569,7 +574,7 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
     // Split up the segments so that case 1 is applicable
     std::cout << "flip Case 3: " << a << ", " << b << ", " << c << ", " << d << std::endl;
     if (aParent == bParent) {
-        // Split the segment of aParent and merge it into the neighboring segment
+        // Split the segment of aParent and merge one half into the neighboring segment
         dimension_t aHalfSegmentLength = aParent.vertices.back().sequenceNumber - aVertex.sequenceNumber;
         dimension_t bHalfSegmentLength = bVertex.sequenceNumber - bParent.vertices.front().sequenceNumber;
         if (aHalfSegmentLength <= bHalfSegmentLength) {
@@ -580,7 +585,7 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
     }
 
     if (cParent == dParent) {
-        // Split the segment of cParent and merge it into the neighboring segment
+        // Split the segment of cParent and merge one half into the neighboring segment
         dimension_t dHalfSegmentLength = dParent.vertices.back().sequenceNumber - dVertex.sequenceNumber;
         dimension_t cHalfSegmentLength = cVertex.sequenceNumber - cParent.vertices.front().sequenceNumber;
         if (dHalfSegmentLength <= cHalfSegmentLength) {
