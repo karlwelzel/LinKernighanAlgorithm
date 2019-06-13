@@ -14,13 +14,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ea2faef9-1e3e-415f-ac69-9bebb67db99c" name="Default Changelist" comment="Fixed a bug in TwoLevelTreeTour for small instances (&lt;= 1000)">
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/karl.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/karl.xml" afterDir="false" />
+    <list default="true" id="ea2faef9-1e3e-415f-ac69-9bebb67db99c" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LinKernighanHeuristic.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/LinKernighanHeuristic.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Tour.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Tour.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Tour.h" beforeDir="false" afterPath="$PROJECT_DIR$/Tour.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/visualize.py" beforeDir="false" afterPath="$PROJECT_DIR$/visualize.py" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/CMakeFiles/" />
@@ -55,7 +51,7 @@
         <entry file="file://$PROJECT_DIR$/visualize.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="390">
-              <caret line="27" column="113" selection-start-line="27" selection-start-column="113" selection-end-line="27" selection-end-column="113" />
+              <caret line="28" column="49" selection-start-line="28" selection-start-column="49" selection-end-line="28" selection-end-column="49" />
             </state>
           </provider>
         </entry>
@@ -63,8 +59,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/TsplibUtils.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4260">
-              <caret line="284" selection-start-line="284" selection-end-line="284" />
+            <state relative-caret-position="467">
+              <caret line="379" selection-start-line="379" selection-end-line="379" />
               <folding>
                 <element signature="e#48#66#0" expanded="true" />
               </folding>
@@ -72,11 +68,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="318">
-              <caret line="122" column="24" selection-start-line="122" selection-start-column="24" selection-end-line="122" selection-end-column="24" />
+            <state relative-caret-position="265">
+              <caret line="124" selection-start-line="124" selection-end-line="124" />
               <folding>
                 <element signature="e#46#66#0" expanded="true" />
               </folding>
@@ -93,11 +89,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Tour.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-86">
-              <caret line="596" column="103" selection-start-line="596" selection-start-column="103" selection-end-line="596" selection-end-column="103" />
+            <state relative-caret-position="145">
+              <caret line="26" column="75" lean-forward="true" selection-start-line="26" selection-start-column="75" selection-end-line="26" selection-end-column="75" />
               <folding>
                 <element signature="e#48#66#0" expanded="true" />
               </folding>
@@ -108,8 +104,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Tour.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1140">
-              <caret line="145" lean-forward="true" selection-start-line="145" selection-end-line="145" />
+            <state relative-caret-position="225">
+              <caret line="82" selection-start-line="82" selection-end-line="82" />
               <folding>
                 <element signature="e#125#143#0" expanded="true" />
               </folding>
@@ -189,12 +185,12 @@
         <option value="$PROJECT_DIR$/SignedPermutation.cpp" />
         <option value="$PROJECT_DIR$/SignedPermutation.h" />
         <option value="$PROJECT_DIR$/TsplibUtils.h" />
-        <option value="$PROJECT_DIR$/TsplibUtils.cpp" />
         <option value="$PROJECT_DIR$/main.cpp" />
         <option value="$PROJECT_DIR$/visualize.py" />
-        <option value="$PROJECT_DIR$/LinKernighanHeuristic.cpp" />
+        <option value="$PROJECT_DIR$/TsplibUtils.cpp" />
         <option value="$PROJECT_DIR$/Tour.h" />
         <option value="$PROJECT_DIR$/Tour.cpp" />
+        <option value="$PROJECT_DIR$/LinKernighanHeuristic.cpp" />
       </list>
     </option>
   </component>
@@ -293,7 +289,7 @@
     </option>
   </component>
   <component name="RunManager" selected="CMake Application.LinKerninghanAlgorithm">
-    <configuration name="LinKerninghanAlgorithm" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="&quot;ExampleProblems/si1032.tsp&quot;" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="LinKerninghanAlgorithm" TARGET_NAME="LinKerninghanAlgorithm" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="LinKerninghanAlgorithm" RUN_TARGET_NAME="LinKerninghanAlgorithm">
+    <configuration name="LinKerninghanAlgorithm" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="&quot;ExampleProblems/ch130.tsp&quot; &quot;ExampleProblems/ch130.opt.tour&quot;" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="LinKerninghanAlgorithm" TARGET_NAME="LinKerninghanAlgorithm" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="LinKerninghanAlgorithm" RUN_TARGET_NAME="LinKerninghanAlgorithm">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -361,21 +357,7 @@
       <workItem from="1560326335863" duration="33132000" />
       <workItem from="1560370588116" duration="16737000" />
       <workItem from="1560413979230" duration="16572000" />
-      <workItem from="1560434078529" duration="4451000" />
-    </task>
-    <task id="LOCAL-00007" summary="Refactored Tour::setVertices by using makeNeighbors">
-      <created>1555760672200</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1555760672200</updated>
-    </task>
-    <task id="LOCAL-00008" summary="Added all include necessary include statements to .cpp files&#10;&#10;instead of relying on the includes from the .h files">
-      <created>1555761518196</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1555761518196</updated>
+      <workItem from="1560434078529" duration="5133000" />
     </task>
     <task id="LOCAL-00009" summary="Added some TSPLIB problems for testing">
       <created>1555765652920</created>
@@ -706,11 +688,25 @@
       <option name="project" value="LOCAL" />
       <updated>1560432107592</updated>
     </task>
-    <option name="localTasksCounter" value="56" />
+    <task id="LOCAL-00056" summary="Added comments for TwoLevelTreeTour&#10;&#10;Also added TODOs and improved visualize.py">
+      <created>1560438678818</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1560438678819</updated>
+    </task>
+    <task id="LOCAL-00057" summary="Deleted the TourWalker class">
+      <created>1560439049253</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1560439049253</updated>
+    </task>
+    <option name="localTasksCounter" value="58" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="244887000" />
+    <option name="totallyTimeSpent" value="245569000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -729,8 +725,8 @@
       <window_info id="Structure" order="1" sideWeight="0.502" side_tool="true" weight="0.2501681" />
       <window_info id="Favorites" order="2" sideWeight="0.502" side_tool="true" weight="0.2501681" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.3275862" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.498713" visible="true" weight="0.32543105" />
+      <window_info active="true" anchor="bottom" id="Find" order="1" visible="true" weight="0.3275862" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.498713" weight="0.32543105" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39655173" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -830,8 +826,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
-    <MESSAGE value="Added a greedy algorithm for sorting by signed reversals" />
-    <MESSAGE value="Implemented BaseTour::exchange and refactored SignedPermutation&#10;&#10;The signed numbers in SignedPermutation are now represented with &#10;std::pair&lt;number_t, bool&gt;. BaseTour::exchange might contain errors,&#10;the actual reversal is untested." />
     <MESSAGE value="Fixed errors in BaseTour::exchange and ArrayTour::flip&#10;&#10;Also refactored SignedPermutation added comments to SignedPermutation." />
     <MESSAGE value="Fixed error with double edge in linKernighanHeuristic&#10;&#10;Fixed problems in BaseTour::cyclicPermutation, ArrayTour::isBetween and&#10;BaseTour::isTourAfterExchange caused by modulo errors (a%b &lt;= 0 if &#10;a &lt; 0)" />
     <MESSAGE value="Fixed modulo error in BaseTour::exchange" />
@@ -855,7 +849,9 @@
     <MESSAGE value="Fixed a bug in reverseVertices / reverseParents" />
     <MESSAGE value="Fixed a bug in flip, mergeHalfSegment and isBetween" />
     <MESSAGE value="Fixed a bug in TwoLevelTreeTour for small instances (&lt;= 1000)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed a bug in TwoLevelTreeTour for small instances (&lt;= 1000)" />
+    <MESSAGE value="Added comments for TwoLevelTreeTour&#10;&#10;Also added TODOs and improved visualize.py" />
+    <MESSAGE value="Deleted the TourWalker class" />
+    <option name="LAST_COMMIT_MESSAGE" value="Deleted the TourWalker class" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
@@ -1213,12 +1209,29 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/visualize.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="390">
+          <caret line="28" column="49" selection-start-line="28" selection-start-column="49" selection-end-line="28" selection-end-column="49" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/TsplibUtils.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4260">
-          <caret line="284" selection-start-line="284" selection-end-line="284" />
+        <state relative-caret-position="467">
+          <caret line="379" selection-start-line="379" selection-end-line="379" />
           <folding>
             <element signature="e#48#66#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Tour.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="82" selection-start-line="82" selection-end-line="82" />
+          <folding>
+            <element signature="e#125#143#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1230,39 +1243,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/visualize.py">
+    <entry file="file://$PROJECT_DIR$/Tour.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="390">
-          <caret line="27" column="113" selection-start-line="27" selection-start-column="113" selection-end-line="27" selection-end-column="113" />
+        <state relative-caret-position="145">
+          <caret line="26" column="75" lean-forward="true" selection-start-line="26" selection-start-column="75" selection-end-line="26" selection-end-column="75" />
+          <folding>
+            <element signature="e#48#66#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="318">
-          <caret line="122" column="24" selection-start-line="122" selection-start-column="24" selection-end-line="122" selection-end-column="24" />
+        <state relative-caret-position="265">
+          <caret line="124" selection-start-line="124" selection-end-line="124" />
           <folding>
             <element signature="e#46#66#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Tour.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1140">
-          <caret line="145" lean-forward="true" selection-start-line="145" selection-end-line="145" />
-          <folding>
-            <element signature="e#125#143#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Tour.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-86">
-          <caret line="596" column="103" selection-start-line="596" selection-start-column="103" selection-end-line="596" selection-end-column="103" />
-          <folding>
-            <element signature="e#48#66#0" expanded="true" />
           </folding>
         </state>
       </provider>

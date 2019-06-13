@@ -120,10 +120,11 @@ Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &start
             if (i % 2 == 1) { // i is odd
                 // Determine possible in-edges
                 signed_distance_t currentGain = tsplibProblem.exchangeGain(currentWalk);
-                // TODO: curentTour.containsEdge, repeatedly calls predecessor and successor of xi
+                vertex_t xiPredecessor = currentTour.predecessor(xi);
+                vertex_t xiSuccessor = currentTour.successor(xi);
                 for (vertex_t x = 0; x < dimension; ++x) {
                     if (x != xi and x != currentWalk.at(0)
-                        and !currentTour.containsEdge(xi, x)
+                        and x != xiPredecessor and x != xiSuccessor // equivalent to !currentTour.containsEdge(xi, x)
                         and !currentWalk.containsEdge(xi, x)
                         and currentGain - static_cast<signed_distance_t>(tsplibProblem.dist(xi, x)) > highestGain) {
 
