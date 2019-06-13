@@ -167,6 +167,7 @@ void BaseTour::exchange(const std::vector<vertex_t> &alternatingWalk) {
         if (postEndVertex != successor(endVertex)) {
             std::swap(postEndVertex, endVertex);
         }
+
         flip(startVertex, preStartVertex, endVertex, postEndVertex);
 
         signedPermutation.performReversal(reversal);
@@ -494,6 +495,10 @@ void TwoLevelTreeTour::reverseParents(std::list<SegmentParent>::iterator first,
 
 
 void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
+    if (!(successor(b) == a and successor(c) == d)) {
+        throw std::runtime_error("Illegal call to flip");
+    }
+
     SegmentVertex &aVertex = *iterators[a];
     SegmentVertex &bVertex = *iterators[b];
     SegmentVertex &cVertex = *iterators[c];

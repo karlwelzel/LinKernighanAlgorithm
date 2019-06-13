@@ -43,6 +43,35 @@ std::ostream &operator<<(std::ostream &out, const AlternatingWalk &walk) {
     return out;
 }
 
+
+// ============================================= CandidateEdges class =================================================
+
+CandidateEdges CandidateEdges::allNeighbors(const TsplibProblem &tsplibProblem) {
+    CandidateEdges result;
+    std::vector<vertex_t> allVertices(tsplibProblem.getDimension());
+    std::iota(allVertices.begin(), allVertices.end(), 0);
+    result.assign(tsplibProblem.getDimension(), allVertices);
+    return result;
+}
+
+CandidateEdges CandidateEdges::nearestNeighbors(const TsplibProblem &tsplibProblem, size_t k) {
+    std::vector<vertex_t> allVertices(tsplibProblem.getDimension());
+    std::iota(allVertices.begin(), allVertices.end(), 0);
+
+    CandidateEdges result;
+    result.resize(tsplibProblem.getDimension());
+    for (vertex_t v = 0; v < tsplibProblem.getDimension(); ++v) {
+        result[v].resize(k);
+        std::partial_sort_copy(allVertices.begin(), allVertices.end(), result[v].begin(), result[v].end(),
+                               [&tsplibProblem, v](vertex_t w1, vertex_t w2) {
+                                   return tsplibProblem.dist(v, w1) < tsplibProblem.dist(v, w2);
+                               });
+    }
+    return result;
+}
+
+// ============================================= linKernighanHeuristic =================================================
+
 // This is implemented as described in Combinatorial Optimization with p_1 = 5, p_2 = 2 and G = K_n
 
 Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &startTour) {
@@ -50,6 +79,8 @@ Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &start
     const size_t infeasibilityDepth = 2;
 
     const dimension_t dimension = tsplibProblem.getDimension();
+    CandidateEdges candidateEdges = CandidateEdges::nearestNeighbors(tsplibProblem);
+
     Tour currentTour = startTour;
     std::vector<std::vector<vertex_t>> vertexChoices;
     AlternatingWalk currentWalk;
@@ -122,15 +153,14 @@ Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &start
                 signed_distance_t currentGain = tsplibProblem.exchangeGain(currentWalk);
                 vertex_t xiPredecessor = currentTour.predecessor(xi);
                 vertex_t xiSuccessor = currentTour.successor(xi);
-                for (vertex_t x = 0; x < dimension; ++x) {
-                    if (x != xi and x != currentWalk.at(0)
+                for (vertex_t x : candidateEdges[xi]) {
+                    if (x != currentWalk.at(0)
                         and x != xiPredecessor and x != xiSuccessor // equivalent to !currentTour.containsEdge(xi, x)
                         and !currentWalk.containsEdge(xi, x)
                         and currentGain - static_cast<signed_distance_t>(tsplibProblem.dist(xi, x)) > highestGain) {
 
                         vertexChoices.at(i + 1).push_back(x);
                     }
-
                 }
             } else { // i is even
                 // Determine possible out-edges
@@ -161,3 +191,4 @@ Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &start
 
     }
 }
+

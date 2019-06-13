@@ -31,6 +31,22 @@ public:
 std::ostream &operator<<(std::ostream &out, const AlternatingWalk &walk);
 
 
+// ============================================ CandidateEdgeGraph class ===============================================
+
+// This class represents a spanning graph that contains the
+
+class CandidateEdges : public std::vector<std::vector<vertex_t>> {
+public:
+    static CandidateEdges allNeighbors(const TsplibProblem &tsplibProblem);
+
+    static CandidateEdges nearestNeighbors(const TsplibProblem &tsplibProblem, size_t k = 5);
+
+    //static CandidateEdges alphaNearestNeighbors(const TsplibProblem &tsplibProblem, size_t k = 5);
+};
+
+
+// ============================================= linKernighanHeuristic =================================================
+
 Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &startTour);
 
 #endif //LINKERNINGHANALGORITHM_LINKERNIGHANHEURISTIC_H
