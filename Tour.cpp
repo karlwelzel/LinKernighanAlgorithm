@@ -511,13 +511,8 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
 
     // Case 1: The paths a-c and d-b are made up of segments
     if (aParent.firstVertex() == a and cParent.lastVertex() == c) {
-        // Determine which part of parents is shorter and reverse it
-        dimension_t numberOfParentsAC =
-                (cParent.sequenceNumber - aParent.sequenceNumber + parents.size()) % parents.size();
-        dimension_t numberOfParentsDB =
-                (bParent.sequenceNumber - dParent.sequenceNumber + parents.size()) % parents.size();
-
-        if (numberOfParentsAC <= numberOfParentsDB) {
+        // Reverse one of these paths
+        if (cParent.sequenceNumber >= aParent.sequenceNumber) {
             reverseParents(aVertex.parentIterator, cVertex.parentIterator);
         } else {
             reverseParents(dVertex.parentIterator, bVertex.parentIterator);

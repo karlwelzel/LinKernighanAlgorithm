@@ -181,7 +181,7 @@ private:
 
         // Reverses the segment vertices in vertices in the range [first, last] while correctly changing the sequence
         // numbers
-        // Expects that first and last are iterators of vertices
+        // Expects that first and last are iterators of vertices and that first comes before last
         void reverseVertices(std::list<SegmentVertex>::iterator first, std::list<SegmentVertex>::iterator last);
     };
 
@@ -210,7 +210,7 @@ private:
 
     // Reverses the SegmentParent in parents in the range [first, last] while correctly changing the sequence numbers
     // and updating the reversal bits
-    // Expects that first and last are iterators of parents
+    // Expects that first and last are iterators of parents and that first comes before last
     void reverseParents(std::list<SegmentParent>::iterator first, std::list<SegmentParent>::iterator last);
 
     // Merge the half-segment to the right (or left) of vertex v including v with the right (or left) neighbor segment.
