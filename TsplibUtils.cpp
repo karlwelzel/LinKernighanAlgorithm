@@ -251,6 +251,10 @@ distance_t TsplibProblem::dist(const vertex_t i, const vertex_t j) const {
     }
 }
 
+distance_t TsplibProblem::operator()(vertex_t i, vertex_t j) const {
+    return dist(i, j);
+}
+
 distance_t TsplibProblem::length(const BaseTour &tour) const {
     distance_t sum = 0;
     vertex_t currentVertex = 0;

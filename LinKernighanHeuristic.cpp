@@ -8,6 +8,7 @@
 #include <utility>
 #include <numeric>
 #include "LinKernighanHeuristic.h"
+#include "PrimsAlgorithm.h"
 
 // ============================================= AlternatingWalk class =================================================
 
@@ -68,6 +69,28 @@ CandidateEdges CandidateEdges::nearestNeighbors(const TsplibProblem &tsplibProbl
                                });
     }
     return result;
+}
+
+CandidateEdges CandidateEdges::alphaNearestNeighbors(const TsplibProblem &tsplibProblem, size_t k) {
+    std::vector<std::vector<vertex_t>> adjacentVertices;
+    std::vector<vertex_t> topologicalOrder;
+
+    std::tie(adjacentVertices, topologicalOrder) = primsAlgorithm(tsplibProblem.getDimension(), tsplibProblem, 0);
+
+    for (vertex_t v = 0; v < tsplibProblem.getDimension(); ++v) {
+        std::cout << v << " : ";
+        for (vertex_t w : adjacentVertices[v]) {
+            std::cout << w << ", ";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << "==========" << std::endl;
+    for (vertex_t v : topologicalOrder) {
+        std::cout << v << std::endl;
+    }
+
+
+    return allNeighbors(tsplibProblem);
 }
 
 // ============================================= linKernighanHeuristic =================================================

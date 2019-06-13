@@ -71,6 +71,9 @@ public:
     // Expects that i and j are in [0, dimension)
     distance_t dist(vertex_t i, vertex_t j) const;
 
+    // Alias for dist
+    distance_t operator()(vertex_t i, vertex_t j) const;
+
     // Returns the length of tour
     distance_t length(const BaseTour &tour) const;
 

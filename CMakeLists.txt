@@ -6,4 +6,4 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -pedantic-errors
 
 add_executable(LinKerninghanAlgorithm main.cpp Tour.cpp Tour.h TsplibUtils.cpp TsplibUtils.h
         SimpleHeuristic.cpp SimpleHeuristic.h LinKernighanHeuristic.cpp LinKernighanHeuristic.h
-        SignedPermutation.cpp SignedPermutation.h)
+        SignedPermutation.cpp SignedPermutation.h PrimsAlgorithm.cpp PrimsAlgorithm.h)

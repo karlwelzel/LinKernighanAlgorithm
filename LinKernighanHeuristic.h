@@ -41,7 +41,7 @@ public:
 
     static CandidateEdges nearestNeighbors(const TsplibProblem &tsplibProblem, size_t k = 5);
 
-    //static CandidateEdges alphaNearestNeighbors(const TsplibProblem &tsplibProblem, size_t k = 5);
+    static CandidateEdges alphaNearestNeighbors(const TsplibProblem &tsplibProblem, size_t k = 5);
 };
 
 
