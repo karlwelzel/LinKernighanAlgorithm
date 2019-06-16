@@ -76,15 +76,14 @@ CandidateEdges CandidateEdges::alphaNearestNeighbors(const TsplibProblem &proble
     std::vector<vertex_t> allVertices(problem.getDimension());
     std::iota(allVertices.begin(), allVertices.end(), 0);
 
-    std::vector<std::vector<vertex_t>> adjacentVertices;
-    std::vector<vertex_t> topologicalOrder;
     std::vector<vertex_t> parent;
+    std::vector<vertex_t> topologicalOrder;
 
     // Generate a minimum spanning tree for vertices 0, ..., dimension-2
     auto distFunction = [&problem](vertex_t i, vertex_t j) { return problem.dist(i, j); };
-    std::tie(adjacentVertices, topologicalOrder, parent) = primsAlgorithm(dimension - 1, distFunction);
+    std::tie(parent, topologicalOrder) = primsAlgorithm(dimension - 1, distFunction);
 
-    // Add edges to form a 1-tree
+    // Find the edges to be added to form a 1-tree
     vertex_t special = dimension - 1; // The special node "1" in the 1-tree
     std::vector<vertex_t> specialNeighbors(2);
     auto specialDistanceComparator = [&problem, special](vertex_t w1, vertex_t w2) {
@@ -92,11 +91,6 @@ CandidateEdges CandidateEdges::alphaNearestNeighbors(const TsplibProblem &proble
     };
     std::partial_sort_copy(topologicalOrder.begin(), topologicalOrder.end(), specialNeighbors.begin(),
                            specialNeighbors.end(), specialDistanceComparator);
-    adjacentVertices.emplace_back(); // Create empty list of vertices adjacent to special (= dimension-1)
-    for (vertex_t neighbor : specialNeighbors) {
-        adjacentVertices[special].push_back(neighbor);
-        adjacentVertices[neighbor].push_back(special);
-    }
 
     // Initialize the beta array
     std::vector<std::vector<distance_t>> beta(dimension, std::vector<distance_t>(dimension, 0));
@@ -104,13 +98,16 @@ CandidateEdges CandidateEdges::alphaNearestNeighbors(const TsplibProblem &proble
     // Set the beta values for edges (special, v)
     for (vertex_t vertex : topologicalOrder) {
         if (vertex == specialNeighbors[0]) {
+            // alpha(special, vertex) = 0 so beta(special, vertex) = dist(special, vertex)
             beta[special][vertex] = beta[vertex][special] = problem.dist(special, vertex);
         } else {
+            // When (special, vertex) is required to be in the 1-tree then the edge incident with special with highest
+            // distance needs to be removed, namely (special, specialNeighbors[1])
             beta[special][vertex] = beta[vertex][special] = problem.dist(special, specialNeighbors[1]);
         }
     }
 
-    // Compute the beta values for all other edges
+    // Compute the beta values for all other edges as described in the paper by Keld Helsgaun from 2000
     for (size_t i = 0; i < topologicalOrder.size(); ++i) {
         for (size_t j = i + 1; j < topologicalOrder.size(); ++j) {
             // beta[i][i] has the smallest possible value 0, so it will never be chosen here
@@ -139,6 +136,7 @@ CandidateEdges CandidateEdges::alphaNearestNeighbors(const TsplibProblem &proble
     }
 */
 
+    // Store the k alpha-nearest neighbors for each vertex
     CandidateEdges result;
     result.resize(problem.getDimension());
     for (vertex_t v = 0; v < problem.getDimension(); ++v) {
@@ -154,14 +152,10 @@ CandidateEdges CandidateEdges::alphaNearestNeighbors(const TsplibProblem &proble
 
 // ============================================= linKernighanHeuristic =================================================
 
-// This is implemented as described in Combinatorial Optimization with p_1 = 5, p_2 = 2 and G = K_n
-
-Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &startTour) {
-    const size_t backtrackingDepth = 5;
-    const size_t infeasibilityDepth = 2;
+Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &startTour, CandidateEdges &candidateEdges,
+                           size_t backtrackingDepth, size_t infeasibilityDepth) {
 
     const dimension_t dimension = tsplibProblem.getDimension();
-    CandidateEdges candidateEdges = CandidateEdges::alphaNearestNeighbors(tsplibProblem);
 
     Tour currentTour = startTour;
     std::vector<std::vector<vertex_t>> vertexChoices;
@@ -256,8 +250,9 @@ Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &start
                     }
                 } else {
                     for (vertex_t neighbor : currentTour.getNeighbors(xi)) {
-                        // currentWalk.appendAndClose(neighbor) is not a valid alternating walk if {neighbor, x_0}, but
-                        // this is only possible if neighbor is x_1, so we only need to exclude this special case
+                        // currentWalk.appendAndClose(neighbor) is not a valid alternating walk if {neighbor, x_0} is an
+                        // edge in currentWalk, but this is only possible if neighbor is x_1, so we only need to exclude
+                        // this special case
                         if (neighbor != currentWalk.at(0)
                             and !currentWalk.containsEdge(xi, neighbor)
                             and neighbor != currentWalk.at(1)
