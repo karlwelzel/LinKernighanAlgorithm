@@ -141,10 +141,14 @@ CandidateEdges CandidateEdges::alphaNearestNeighbors(const TsplibProblem &proble
     result.resize(problem.getDimension());
     for (vertex_t v = 0; v < problem.getDimension(); ++v) {
         result[v].resize(k);
+        auto alphaCompare = [&problem, &beta, v](vertex_t w1, vertex_t w2) {
+            distance_t w1Distance = problem.dist(v, w1);
+            distance_t w2Distance = problem.dist(v, w2);
+            return std::make_tuple(w1Distance - beta[v][w1], w1Distance) <
+                   std::make_tuple(w2Distance - beta[v][w2], w2Distance);
+        };
         std::partial_sort_copy(allVertices.begin(), allVertices.end(), result[v].begin(), result[v].end(),
-                               [&problem, &beta, v](vertex_t w1, vertex_t w2) {
-                                   return problem.dist(v, w1) - beta[v][w1] < problem.dist(v, w2) - beta[v][w2];
-                               });
+                               alphaCompare);
     }
 
     return result;
