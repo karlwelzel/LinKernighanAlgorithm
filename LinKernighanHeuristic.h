@@ -44,11 +44,11 @@ public:
     static CandidateEdges allNeighbors(const TsplibProblem &problem);
 
     // For each vertex choose the k edges with minimal distance as candidate edges
-    static CandidateEdges nearestNeighbors(const TsplibProblem &problem, size_t k = 5);
+    static CandidateEdges nearestNeighbors(const TsplibProblem &problem, size_t k = 10);
 
     // For each vertex choose the k edges with minimal alpha distance as candidate edges
     // The alpha distance of an edge is defined as the increase in length of a 1-tree when required to contain this edge
-    static CandidateEdges alphaNearestNeighbors(const TsplibProblem &problem, size_t k = 5);
+    static CandidateEdges alphaNearestNeighbors(const TsplibProblem &problem, size_t k = 10);
 };
 
 // ========================================== LinKernighanHeuristic class ==============================================
@@ -85,7 +85,7 @@ public:
     explicit LinKernighanHeuristic(TsplibProblem &tsplibProblem,
                                    CandidateEdges::Type candidateEdgeType = CandidateEdges::ALPHA_NEAREST_NEIGHBORS);
 
-    Tour findBestTour(size_t numberOfTrials = 1);
+    Tour findBestTour(size_t numberOfTrials = 10);
 };
 
 #endif //LINKERNINGHANALGORITHM_LINKERNIGHANHEURISTIC_H

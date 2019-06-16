@@ -221,8 +221,11 @@ private:
 public:
     TwoLevelTreeTour() = default;
 
-    // The copy-constructor: Copy the state of otherTour into this tour
+    // The copy constructor: Copy the state of otherTour into this tour
     TwoLevelTreeTour(const TwoLevelTreeTour &otherTour);
+
+    // The copy assignment operator: Copy the state of otherTour into this tour
+    TwoLevelTreeTour &operator=(const TwoLevelTreeTour &otherTour);
 
     // Initialize the tour with a sequence of vertices
     // This function expects a vector containing the numbers from 0 to tour.size()-1 and overrides all data

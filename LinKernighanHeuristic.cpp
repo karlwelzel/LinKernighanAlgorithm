@@ -354,6 +354,16 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
 }
 
 Tour LinKernighanHeuristic::findBestTour(size_t numberOfTrials) {
-    // TODO: Correctly implement findBestTour
-    return improveTour(generateRandomTour());
+    if (numberOfTrials < 1) {
+        throw std::runtime_error("The number of trials can not be lower than 1.");
+    }
+    Tour currentTour = improveTour(generateRandomTour());
+    currentBestTour = improveTour(generateRandomTour());
+    while (--numberOfTrials > 0) {
+        Tour currentTour = improveTour(generateRandomTour());
+        if (tsplibProblem.length(currentTour) < tsplibProblem.length(currentBestTour)) {
+            currentBestTour = currentTour;
+        }
+    }
+    return currentBestTour;
 }

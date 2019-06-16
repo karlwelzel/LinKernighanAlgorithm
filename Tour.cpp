@@ -292,6 +292,27 @@ TwoLevelTreeTour::TwoLevelTreeTour(const TwoLevelTreeTour &otherTour) : dimensio
     }
 }
 
+TwoLevelTreeTour &TwoLevelTreeTour::operator=(const TwoLevelTreeTour &otherTour) {
+    if (this != &otherTour) {
+        dimension = otherTour.dimension;
+        groupSize = otherTour.groupSize;
+        parents = otherTour.parents;
+        iterators = otherTour.iterators;
+
+        // Update all iterators because they still point to elements in otherTour
+        for (auto parentIterator = parents.begin(); parentIterator != parents.end(); ++parentIterator) {
+            std::list<SegmentVertex> &vertices = parentIterator->vertices;
+            for (auto vertexIterator = vertices.begin(); vertexIterator != vertices.end(); ++vertexIterator) {
+                vertexIterator->parentIterator = parentIterator;
+                iterators[vertexIterator->vertex] = vertexIterator;
+            }
+        }
+    }
+
+    return *this;
+}
+
+
 void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
     dimension = vertexList.size();
     // TODO: Test different values
@@ -610,7 +631,6 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
 
 
 // =============================================== TourWalker class ====================================================
-
 
 std::ostream &operator<<(std::ostream &out, const BaseTour &tour) {
     std::string output;
