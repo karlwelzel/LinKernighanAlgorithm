@@ -7,6 +7,7 @@
 #include <tuple>
 #include <utility>
 #include <numeric>
+#include <random>
 #include "LinKernighanHeuristic.h"
 #include "PrimsAlgorithm.h"
 
@@ -52,6 +53,10 @@ CandidateEdges CandidateEdges::allNeighbors(const TsplibProblem &problem) {
     std::vector<vertex_t> allVertices(problem.getDimension());
     std::iota(allVertices.begin(), allVertices.end(), 0);
     result.assign(problem.getDimension(), allVertices);
+    for (vertex_t v : allVertices) {
+        // Delete v from its neighbors
+        result[v].erase(std::remove(result[v].begin(), result[v].end(), v), result[v].end());
+    }
     return result;
 }
 
@@ -62,8 +67,10 @@ CandidateEdges CandidateEdges::nearestNeighbors(const TsplibProblem &problem, si
     CandidateEdges result;
     result.resize(problem.getDimension());
     for (vertex_t v = 0; v < problem.getDimension(); ++v) {
+        // Sort the k nearest neighbors of v by distance to v and put them in result[v]
         result[v].resize(k);
-        std::partial_sort_copy(allVertices.begin(), allVertices.end(), result[v].begin(), result[v].end(),
+        std::partial_sort_copy(allVertices.begin(), std::remove(allVertices.begin(), allVertices.end(), v),
+                               result[v].begin(), result[v].end(),
                                [&problem, v](vertex_t w1, vertex_t w2) {
                                    return problem.dist(v, w1) < problem.dist(v, w2);
                                });
@@ -82,6 +89,8 @@ CandidateEdges CandidateEdges::alphaNearestNeighbors(const TsplibProblem &proble
     // Generate a minimum spanning tree for vertices 0, ..., dimension-2
     auto distFunction = [&problem](vertex_t i, vertex_t j) { return problem.dist(i, j); };
     std::tie(parent, topologicalOrder) = primsAlgorithm(dimension - 1, distFunction);
+
+    // TODO: Don't fix the special node
 
     // Find the edges to be added to form a 1-tree
     vertex_t special = dimension - 1; // The special node "1" in the 1-tree
@@ -147,8 +156,8 @@ CandidateEdges CandidateEdges::alphaNearestNeighbors(const TsplibProblem &proble
             return std::make_tuple(w1Distance - beta[v][w1], w1Distance) <
                    std::make_tuple(w2Distance - beta[v][w2], w2Distance);
         };
-        std::partial_sort_copy(allVertices.begin(), allVertices.end(), result[v].begin(), result[v].end(),
-                               alphaCompare);
+        std::partial_sort_copy(allVertices.begin(), std::remove(allVertices.begin(), allVertices.end(), v),
+                               result[v].begin(), result[v].end(), alphaCompare);
     }
 
     return result;
@@ -156,9 +165,80 @@ CandidateEdges CandidateEdges::alphaNearestNeighbors(const TsplibProblem &proble
 
 // ============================================= linKernighanHeuristic =================================================
 
-Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &startTour, CandidateEdges &candidateEdges,
-                           size_t backtrackingDepth, size_t infeasibilityDepth) {
+LinKernighanHeuristic::LinKernighanHeuristic(TsplibProblem &tsplibProblem, CandidateEdges::Type candidateEdgeType)
+        : tsplibProblem(tsplibProblem) {
+    switch (candidateEdgeType) {
+        case CandidateEdges::ALL_NEIGHBORS:
+            candidateEdges = CandidateEdges::allNeighbors(tsplibProblem);
+            break;
+        case CandidateEdges::NEAREST_NEIGHBORS:
+            candidateEdges = CandidateEdges::nearestNeighbors(tsplibProblem);
+            break;
+        case CandidateEdges::ALPHA_NEAREST_NEIGHBORS:
+            candidateEdges = CandidateEdges::alphaNearestNeighbors(tsplibProblem);
+            break;
+    }
+}
 
+vertex_t LinKernighanHeuristic::chooseRandomElement(const std::vector<vertex_t> &elements) {
+    std::random_device randomNumberGenerator;
+    std::uniform_int_distribution<size_t> distribution(0, elements.size() - 1);
+    return elements[distribution(randomNumberGenerator)];
+}
+
+Tour LinKernighanHeuristic::generateRandomTour() {
+    // Initialize a array with all vertices as the remaining vertices (that are to be placed on the tour)
+    std::vector<vertex_t> remainingVertices(tsplibProblem.getDimension());
+    std::iota(remainingVertices.begin(), remainingVertices.end(), 0);
+
+    // This variable store the order of the vertices on the tour
+    std::vector<vertex_t> tourOrder;
+
+    // Start with a random vertex
+    vertex_t currentVertex = chooseRandomElement(remainingVertices);
+    remainingVertices.erase(remainingVertices.begin() + currentVertex); // The index of currentVertex is currentVertex
+    tourOrder.push_back(currentVertex);
+
+
+    // In each step, decide for each vertex otherVertex if it is an element in one or more of these categories
+    // (1) otherVertex was not already chosen and {currentVertex, otherVertex} is a candidate edge and on the
+    //     current best tour
+    // (2) otherVertex was not already chosen and {currentVertex, otherVertex} is a candidate edge
+    // (3) otherVertex was not already chosen
+    // Choose the next current vertex randomly from the first non-empty category above
+
+    std::vector<vertex_t> candidatesInBestTour; // Category (1)
+    std::vector<vertex_t> candidates; // Category (2)
+    // Category (3) is remainingVertices
+    while (!remainingVertices.empty()) {
+        candidatesInBestTour.clear();
+        candidates.clear();
+        for (vertex_t otherVertex : candidateEdges[currentVertex]) {
+            if (std::find(remainingVertices.begin(), remainingVertices.end(), otherVertex) != remainingVertices.end()) {
+                // otherVertex is an element of remainingVertices
+                if (currentBestTour.getDimension() != 0 and currentBestTour.containsEdge(currentVertex, otherVertex)) {
+                    candidatesInBestTour.push_back(otherVertex);
+                }
+                candidates.push_back(otherVertex);
+            }
+        }
+
+        if (!candidatesInBestTour.empty()) {
+            currentVertex = chooseRandomElement(candidatesInBestTour);
+        } else if (!candidates.empty()) {
+            currentVertex = chooseRandomElement(candidates);
+        } else {
+            currentVertex = chooseRandomElement(remainingVertices);
+        }
+        remainingVertices.erase(std::remove(remainingVertices.begin(), remainingVertices.end(), currentVertex),
+                                remainingVertices.end());
+        tourOrder.push_back(currentVertex);
+    }
+
+    return Tour(tourOrder);
+}
+
+Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
     const dimension_t dimension = tsplibProblem.getDimension();
 
     Tour currentTour = startTour;
@@ -184,7 +264,7 @@ Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &start
                     std::cout << "Exchange done: " << bestAlternatingWalk << std::endl;
                     currentTour.exchange(bestAlternatingWalk);
                     std::cout << " with gain: " << tsplibProblem.exchangeGain(bestAlternatingWalk) << " (highestGain = "
-                              << highestGain << ")" << std::endl;
+                            << highestGain << ")" << std::endl;
                     std::cout << " new tour: " << currentTour << std::endl;
                     std::cout << " previous length: " << previousLength << std::endl;
                     std::cout << " new length: " << tsplibProblem.length(currentTour) << std::endl;
@@ -273,3 +353,7 @@ Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &start
     }
 }
 
+Tour LinKernighanHeuristic::findBestTour(size_t numberOfTrials) {
+    // TODO: Correctly implement findBestTour
+    return improveTour(generateRandomTour());
+}

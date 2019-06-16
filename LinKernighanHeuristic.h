@@ -36,6 +36,10 @@ std::ostream &operator<<(std::ostream &out, const AlternatingWalk &walk);
 
 class CandidateEdges : public std::vector<std::vector<vertex_t>> {
 public:
+    enum Type {
+        ALL_NEIGHBORS, NEAREST_NEIGHBORS, ALPHA_NEAREST_NEIGHBORS
+    };
+
     // For each vertex choose all edges as candidate edges
     static CandidateEdges allNeighbors(const TsplibProblem &problem);
 
@@ -47,12 +51,41 @@ public:
     static CandidateEdges alphaNearestNeighbors(const TsplibProblem &problem, size_t k = 5);
 };
 
+// ========================================== LinKernighanHeuristic class ==============================================
 
-// ============================================= linKernighanHeuristic =================================================
+// This class represents a single run of the Lin-Kernighan-heuristic. Each run consists of multiple trials and in every
+// trial a random tour is improved until no further improvement is found. The generation of random tours and the search
+// for improvements can depend on previous trials.
 
-// The algorithm is implemented as described in Combinatorial Optimization
+class LinKernighanHeuristic {
+private:
+    const size_t backtrackingDepth = 5;
+    const size_t infeasibilityDepth = 2;
 
-Tour linKernighanHeuristic(const TsplibProblem &tsplibProblem, const Tour &startTour, CandidateEdges &candidateEdges,
-                           size_t backtrackingDepth = 5, size_t infeasibilityDepth = 2);
+    // The TsplibProblem that should be solved
+    TsplibProblem tsplibProblem;
+
+    // The best solution tour found by the algorithm (initially none)
+    Tour currentBestTour;
+
+    // The candidate edges used
+    CandidateEdges candidateEdges;
+
+    static vertex_t chooseRandomElement(const std::vector<vertex_t> &elements);
+
+    // Generates a random good tour based on the current best tour and the candidate edges
+    Tour generateRandomTour();
+
+    // The core part of the algorithm as described in Combinatorial Optimization
+    Tour improveTour(const Tour &startTour);
+
+public:
+    LinKernighanHeuristic() = delete;
+
+    explicit LinKernighanHeuristic(TsplibProblem &tsplibProblem,
+                                   CandidateEdges::Type candidateEdgeType = CandidateEdges::ALPHA_NEAREST_NEIGHBORS);
+
+    Tour findBestTour(size_t numberOfTrials = 1);
+};
 
 #endif //LINKERNINGHANALGORITHM_LINKERNIGHANHEURISTIC_H
