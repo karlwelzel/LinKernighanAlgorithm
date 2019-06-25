@@ -97,6 +97,8 @@ CandidateEdges CandidateEdges::alphaNearestNeighbors(const TsplibProblem &proble
     std::tie(parent, topologicalOrder) = primsAlgorithm(dimension - 1, distFunction);
 
     // TODO: Don't fix the special node
+    // TODO: Move the computation of alpha values to PrimsAlgorithm
+    // TODO: Use subgradient optimization
 
     // Find the edges to be added to form a 1-tree
     vertex_t special = dimension - 1; // The special node "1" in the 1-tree
@@ -247,6 +249,9 @@ Tour LinKernighanHeuristic::generateRandomTour() {
 Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
     const dimension_t dimension = tsplibProblem.getDimension();
 
+    // TODO: Add a hashing technique for tours that can't be improved
+    // TODO: Introduce the "Don't look" bit
+
     Tour currentTour = startTour;
     std::vector<std::vector<vertex_t>> vertexChoices;
     AlternatingWalk currentWalk;
@@ -257,14 +262,14 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
         // Create set X_0 with all vertices
         vertexChoices.clear();
         vertexChoices.emplace_back(dimension);
-        std::iota(vertexChoices.at(0).begin(), vertexChoices.at(0).end(), 0);
+        std::iota(vertexChoices[0].begin(), vertexChoices[0].end(), 0);
 
         currentWalk.clear();
         bestAlternatingWalk.clear();
         highestGain = 0;
         size_t i = 0;
         while (true) {
-            if (vertexChoices.at(i).empty()) {
+            if (vertexChoices[i].empty()) {
                 if (highestGain > 0) {
                     //distance_t previousLength = tsplibProblem.length(currentTour);
                     //std::cout << "Exchange done: " << bestAlternatingWalk << std::endl;
@@ -287,9 +292,10 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
                 }
             }
 
-            currentWalk.push_back(vertexChoices.at(i).back());
-            vertexChoices.at(i).pop_back();
+            currentWalk.push_back(vertexChoices[i].back());
+            vertexChoices[i].pop_back();
 
+            // TODO: Remove these debugging checks
             // DEBUG:
             if (vertexChoices.size() != i + 1) {
                 throw std::runtime_error(
@@ -313,29 +319,38 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
             }
 
             vertexChoices.emplace_back(); // Add set X_{i+1}
-            vertex_t xi = currentWalk.at(i);
+            vertex_t xi = currentWalk[i];
             if (i % 2 == 1) { // i is odd
                 // Determine possible in-edges
                 signed_distance_t currentGain = tsplibProblem.exchangeGain(currentWalk);
                 vertex_t xiPredecessor = currentTour.predecessor(xi);
                 vertex_t xiSuccessor = currentTour.successor(xi);
                 for (vertex_t x : candidateEdges[xi]) {
-                    if (x != currentWalk.at(0)
+                    if (x != currentWalk[0]
                         and x != xiPredecessor and x != xiSuccessor // equivalent to !currentTour.containsEdge(xi, x)
                         and !currentWalk.containsEdge(xi, x)
                         and currentGain - static_cast<signed_distance_t>(tsplibProblem.dist(xi, x)) > highestGain) {
 
-                        vertexChoices.at(i + 1).push_back(x);
+                        vertexChoices[i + 1].push_back(x);
                     }
                 }
             } else { // i is even
                 // Determine possible out-edges
                 // No out-edge should connect back to currentWalk[0], because at this point currentWalk is not a valid
                 // alternating walk (even number of elements) and can never be closed in the future
-                if (i <= infeasibilityDepth) {
+                if (i == 0 and currentBestTour.getDimension() != 0) {
+                    // The first edge to be broken may not be on the currently best solution tour
+                    vertex_t x0Predecessor = currentBestTour.predecessor(currentWalk[0]);
+                    vertex_t x0Successor = currentBestTour.successor(currentWalk[0]);
                     for (vertex_t neighbor : currentTour.getNeighbors(xi)) {
-                        if (neighbor != currentWalk.at(0) and !currentWalk.containsEdge(xi, neighbor)) {
-                            vertexChoices.at(i + 1).push_back(neighbor);
+                        if (neighbor != currentWalk[0] and neighbor != x0Predecessor and neighbor != x0Successor) {
+                            vertexChoices[i + 1].push_back(neighbor);
+                        }
+                    }
+                } else if (i <= infeasibilityDepth) {
+                    for (vertex_t neighbor : currentTour.getNeighbors(xi)) {
+                        if (neighbor != currentWalk[0] and !currentWalk.containsEdge(xi, neighbor)) {
+                            vertexChoices[i + 1].push_back(neighbor);
                         }
                     }
                 } else {
@@ -343,11 +358,11 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
                         // currentWalk.appendAndClose(neighbor) is not a valid alternating walk if {neighbor, x_0} is an
                         // edge in currentWalk, but this is only possible if neighbor is x_1, so we only need to exclude
                         // this special case
-                        if (neighbor != currentWalk.at(0)
+                        if (neighbor != currentWalk[0]
                             and !currentWalk.containsEdge(xi, neighbor)
-                            and neighbor != currentWalk.at(1)
+                            and neighbor != currentWalk[1]
                             and currentTour.isTourAfterExchange(currentWalk.appendAndClose(neighbor))) {
-                            vertexChoices.at(i + 1).push_back(neighbor);
+                            vertexChoices[i + 1].push_back(neighbor);
                         }
                     }
                 }

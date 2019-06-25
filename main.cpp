@@ -5,7 +5,6 @@
 #include <iostream>
 #include <string>
 #include "LinKernighanHeuristic.h"
-#include "SimpleHeuristic.h"
 #include "Tour.h"
 #include "TsplibUtils.h"
 
@@ -61,10 +60,6 @@ int main(int argc, char *argv[]) {
         std::cout << std::endl;
     }
 */
-
-    // Print the length of the tour 1, ..., n
-    distance_t ascendingLength = problem.length(ascendingVerticesHeuristic(problem));
-    std::cout << "The tour 1, 2, ..., n has length " << ascendingLength << "." << std::endl << std::endl;
 
     // Use the heuristic from the introduction assignment to get a tour to start with and optimize it with the
     // Lin-Kernighan-heuristic
