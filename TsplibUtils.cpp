@@ -2,13 +2,15 @@
 // Created by Karl Welzel on 19.04.2019.
 //
 
-#include <utility>
-#include <list>
 #include <cmath>
-#include <string>
-#include <vector>
+#include <cstddef>
 #include <fstream>
+#include <memory>
 #include <sstream>
+#include <stdexcept>
+#include <string>
+#include <utility>
+#include <vector>
 #include "TsplibUtils.h"
 
 // Checks if str has the UPPERCASE_WITH_UNDERSCORES format, that all keywords have

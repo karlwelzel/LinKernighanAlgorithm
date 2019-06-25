@@ -5,6 +5,8 @@
 #ifndef LINKERNINGHANALGORITHM_SIGNEDPERMUTATION_H
 #define LINKERNINGHANALGORITHM_SIGNEDPERMUTATION_H
 
+#include <cstddef>
+#include <utility>
 #include <vector>
 
 using number_t = size_t; // The data type used for numbers in permutations

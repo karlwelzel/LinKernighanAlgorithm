@@ -1,12 +1,13 @@
+//
+// Created by Karl Welzel on 25.03.19.
+//
+
 #include <iostream>
-#include <fstream>
 #include <string>
-#include <numeric>
+#include "LinKernighanHeuristic.h"
+#include "SimpleHeuristic.h"
 #include "Tour.h"
 #include "TsplibUtils.h"
-#include "SimpleHeuristic.h"
-#include "SignedPermutation.h"
-#include "LinKernighanHeuristic.h"
 
 // TSPLIB test instances:
 // berlin52            EUC_2D
@@ -46,7 +47,7 @@ int main(int argc, char *argv[]) {
     std::cout << "Opened the " << problem.getName() << " TSPLIB file" << std::endl << std::endl;
     if (!errorMessage.empty()) {
         std::cerr << "The TSPLIB file has an invalid format: " << errorMessage
-                  << std::endl;
+                << std::endl;
         return 1;
     }
 
@@ -104,7 +105,7 @@ int main(int argc, char *argv[]) {
         // Compare the length of the optimal tour to the tour returned by the heuristic
         distance_t optimalLength = problem.length(optimalTour);
         std::cout << "The best tour found by the heuristic is " << ((length / (double) optimalLength) - 1) * 100
-                  << "% above the optimum of " << optimalLength << "." << std::endl;
+                << "% above the optimum of " << optimalLength << "." << std::endl;
     }
 
 

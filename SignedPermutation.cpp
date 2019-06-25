@@ -2,10 +2,12 @@
 // Created by Karl Welzel on 27.05.19.
 //
 
-#include <utility>
-#include <cmath>
-#include <stdexcept>
 #include <algorithm>
+#include <cstddef>
+#include <memory>
+#include <stdexcept>
+#include <utility>
+#include <vector>
 #include "SignedPermutation.h"
 
 SignedPermutation::SignedPermutation(std::vector<std::pair<number_t, bool>> permutation) : permutation(

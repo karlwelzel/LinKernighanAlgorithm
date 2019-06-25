@@ -4,5 +4,5 @@ My implementation of the Lin-Kernighan-algorithm as described in Combinatorial o
 ## Usage
 
 1. Compile the program to `LinKernighanAlgorithm`
-1. Run `LinKernighanAlgorithm tsplib_problem.tsp [tsplib_problem.opt.tour] | python3 visualize.py`
-1. See how the algorithm gradually improves a tour, until no additional exchanges with positive gain are found
+1. Run `LinKernighanAlgorithm tsplib_problem.tsp [tsplib_problem.opt.tour]`
+1. Get the best tour found in TSPLIB Tour format.

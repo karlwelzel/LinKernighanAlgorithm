@@ -4,15 +4,17 @@
 
 // This library contains the code for the introduction assignment
 
-#include <iostream>
-#include <list>
-#include <limits>
-#include <utility>
-#include <tuple>
-#include <vector>
 #include <algorithm>
+#include <iostream>
+#include <memory>
 #include <numeric>
+#include <stdexcept>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
 #include "Tour.h"
+#include "TsplibUtils.h"
 #include "SimpleHeuristic.h"
 
 

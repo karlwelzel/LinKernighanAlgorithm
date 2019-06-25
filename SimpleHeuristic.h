@@ -7,9 +7,6 @@
 
 #include <utility>
 #include <vector>
-#include <limits>
-#include <list>
-#include <iostream>
 #include "Tour.h"
 #include "TsplibUtils.h"
 

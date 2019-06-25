@@ -2,12 +2,12 @@
 // Created by Karl Welzel on 13.06.19.
 //
 
-#include <tuple>
-#include <vector>
+#include <algorithm>
 #include <functional>
 #include <limits>
 #include <numeric>
-#include <algorithm>
+#include <tuple>
+#include <vector>
 #include "Tour.h"
 #include "PrimsAlgorithm.h"
 

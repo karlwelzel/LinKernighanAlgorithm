@@ -5,9 +5,9 @@
 #ifndef LINKERNINGHANALGORITHM_TSPLIBUTILS_H
 #define LINKERNINGHANALGORITHM_TSPLIBUTILS_H
 
+#include <fstream>
 #include <string>
 #include <vector>
-#include <fstream>
 #include "Tour.h"
 
 

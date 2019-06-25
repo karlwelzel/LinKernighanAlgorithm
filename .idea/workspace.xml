@@ -10,18 +10,32 @@
   </component>
   <component name="CMakeSettings">
     <configurations>
-      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" GENERATION_OPTIONS="-DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE=&quot;/bin/include-what-you-use;-Xiwyu&quot;" BUILD_OPTIONS="-j 6" />
+      <configuration PROFILE_NAME="Release" CONFIG_NAME="Release" GENERATION_OPTIONS="-DCMAKE_BUILD_TYPE=Release" BUILD_OPTIONS="-j 6" />
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ea2faef9-1e3e-415f-ac69-9bebb67db99c" name="Default Changelist" comment="Improved CandidateEdges::alphaNearestNeighbors">
+    <list default="true" id="ea2faef9-1e3e-415f-ac69-9bebb67db99c" name="Default Changelist" comment="Updated imports using IWYU&#10;&#10;Added the optimization flag to the compiler options for ~5 times better&#10;performance.">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LinKernighanHeuristic.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/LinKernighanHeuristic.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/LinKernighanHeuristic.h" beforeDir="false" afterPath="$PROJECT_DIR$/LinKernighanHeuristic.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PrimsAlgorithm.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/PrimsAlgorithm.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/PrimsAlgorithm.h" beforeDir="false" afterPath="$PROJECT_DIR$/PrimsAlgorithm.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SignedPermutation.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SignedPermutation.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SignedPermutation.h" beforeDir="false" afterPath="$PROJECT_DIR$/SignedPermutation.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SimpleHeuristic.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/SimpleHeuristic.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SimpleHeuristic.h" beforeDir="false" afterPath="$PROJECT_DIR$/SimpleHeuristic.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tour.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Tour.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Tour.h" beforeDir="false" afterPath="$PROJECT_DIR$/Tour.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TsplibUtils.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/TsplibUtils.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/TsplibUtils.h" beforeDir="false" afterPath="$PROJECT_DIR$/TsplibUtils.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/CMakeFiles/" />
+    <ignored path="$PROJECT_DIR$/cmake-build-release/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,13 +52,10 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main.cpp">
+        <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
-              <caret line="70" selection-start-line="70" selection-end-line="70" />
-              <folding>
-                <element signature="e#0#19#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="75">
+              <caret line="5" column="72" selection-start-line="5" selection-start-column="72" selection-end-line="5" selection-end-column="72" />
             </state>
           </provider>
         </entry>
@@ -52,8 +63,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="619">
-              <caret line="356" column="45" selection-start-line="356" selection-start-column="45" selection-end-line="356" selection-end-column="45" />
+            <state relative-caret-position="206">
+              <caret line="272" column="22" selection-start-line="272" selection-start-column="22" selection-end-line="272" selection-end-column="22" />
               <folding>
                 <element signature="e#46#66#0" expanded="true" />
               </folding>
@@ -61,13 +72,22 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.h">
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/SignedPermutation.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-26">
-              <caret line="57" column="50" lean-forward="true" selection-start-line="57" selection-start-column="50" selection-end-line="57" selection-end-column="50" />
+            <state relative-caret-position="90">
+              <caret line="6" selection-start-line="6" selection-end-line="6" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Tour.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="60">
+              <caret line="4" column="9" selection-start-line="4" selection-start-column="9" selection-end-line="4" selection-end-column="9" />
               <folding>
-                <element signature="e#157#174#0" expanded="true" />
+                <element signature="e#48#68#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -76,44 +96,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/TsplibUtils.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="236">
-              <caret line="253" selection-start-line="253" selection-end-line="253" />
-              <folding>
-                <element signature="e#48#66#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/PrimsAlgorithm.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="184">
-              <caret line="23" selection-start-line="23" selection-end-line="24" selection-end-column="69" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/PrimsAlgorithm.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="300">
-              <caret line="20" lean-forward="true" selection-start-line="20" selection-end-line="20" />
-              <folding>
-                <element signature="e#143#160#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Tour.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-660">
-              <caret line="31" selection-start-line="31" selection-end-line="31" />
-              <folding>
-                <element signature="e#48#66#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="90">
+              <caret line="6" selection-start-line="6" selection-end-line="6" />
             </state>
           </provider>
         </entry>
@@ -121,11 +105,29 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Tour.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="379">
-              <caret line="235" column="46" lean-forward="true" selection-start-line="235" selection-start-column="46" selection-end-line="235" selection-end-column="46" />
+            <state relative-caret-position="191">
+              <caret line="147" column="11" selection-start-line="147" selection-start-column="11" selection-end-line="147" selection-end-column="11" />
               <folding>
-                <element signature="e#125#143#0" expanded="true" />
+                <element signature="e#125#144#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/SignedPermutation.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="120">
+              <caret line="8" selection-start-line="7" selection-end-line="8" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.h">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="105">
+              <caret line="7" column="17" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
             </state>
           </provider>
         </entry>
@@ -134,14 +136,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>lround</find>
-      <find>ifstream</find>
-      <find>vect</find>
-      <find>ostream</find>
-      <find>std::pair</find>
-      <find>std::ve</find>
-      <find>ifstre</find>
-      <find>std::move</find>
       <find>std::vect</find>
       <find>std::string</find>
       <find>std::list</find>
@@ -164,11 +158,21 @@
       <find>61</find>
       <find>109</find>
       <find>assign</find>
+      <find>std::cout</find>
+      <find>ptrdi</find>
+      <find>size_t</find>
+      <find>std::size_t</find>
+      <find>out</find>
+      <find>list</find>
+      <find>Tsplib</find>
+      <find>copy</find>
     </findStrings>
     <replaceStrings>
       <replace>vertex_t</replace>
       <replace>dimension_t</replace>
       <replace>Parent</replace>
+      <replace>std::size_t</replace>
+      <replace>size_t</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -193,24 +197,25 @@
         <option value="$PROJECT_DIR$/ExampleProblems/si1032.tsp" />
         <option value="$PROJECT_DIR$/LinKerninghanHeuristic.h" />
         <option value="$PROJECT_DIR$/LinKerninghanHeuristic.cpp" />
-        <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/SortingBySignedReversals.h" />
         <option value="$PROJECT_DIR$/SortingBySignedReversals.cpp" />
         <option value="$PROJECT_DIR$/visualize.py" />
-        <option value="$PROJECT_DIR$/SignedPermutation.cpp" />
-        <option value="$PROJECT_DIR$/SignedPermutation.h" />
-        <option value="$PROJECT_DIR$/SimpleHeuristic.cpp" />
-        <option value="$PROJECT_DIR$/SimpleHeuristic.h" />
-        <option value="$PROJECT_DIR$/Tour.cpp" />
-        <option value="$PROJECT_DIR$/Tour.h" />
         <option value="$PROJECT_DIR$/UnionFindStructure.h" />
         <option value="$PROJECT_DIR$/UnionFindStructure.cpp" />
-        <option value="$PROJECT_DIR$/TsplibUtils.cpp" />
-        <option value="$PROJECT_DIR$/TsplibUtils.h" />
+        <option value="$PROJECT_DIR$/SimpleHeuristic.h" />
+        <option value="$PROJECT_DIR$/main.cpp" />
         <option value="$PROJECT_DIR$/PrimsAlgorithm.cpp" />
         <option value="$PROJECT_DIR$/PrimsAlgorithm.h" />
-        <option value="$PROJECT_DIR$/main.cpp" />
+        <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/SimpleHeuristic.cpp" />
+        <option value="$PROJECT_DIR$/TsplibUtils.h" />
+        <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/LinKernighanHeuristic.cpp" />
+        <option value="$PROJECT_DIR$/SignedPermutation.cpp" />
+        <option value="$PROJECT_DIR$/Tour.cpp" />
+        <option value="$PROJECT_DIR$/Tour.h" />
+        <option value="$PROJECT_DIR$/TsplibUtils.cpp" />
+        <option value="$PROJECT_DIR$/SignedPermutation.h" />
         <option value="$PROJECT_DIR$/LinKernighanHeuristic.h" />
       </list>
     </option>
@@ -290,7 +295,7 @@
     <property name="node.js.path.for.package.eslint" value="project" />
     <property name="node.js.selected.package.eslint" value="(autodetect)" />
     <property name="run.code.analysis.last.selected.profile" value="pProject Default" />
-    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="settings.editor.selected.configurable" value="CMakeSettings" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -310,7 +315,7 @@
     </option>
   </component>
   <component name="RunManager" selected="CMake Application.LinKerninghanAlgorithm">
-    <configuration name="LinKerninghanAlgorithm" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="&quot;ExampleProblems/ch130.tsp&quot; &quot;ExampleProblems/ch130.opt.tour&quot;" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="LinKerninghanAlgorithm" TARGET_NAME="LinKerninghanAlgorithm" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="LinKerninghanAlgorithm" RUN_TARGET_NAME="LinKerninghanAlgorithm">
+    <configuration name="LinKerninghanAlgorithm" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="&quot;ExampleProblems/si1032.tsp&quot; &quot;ExampleProblems/si1032.opt.tour&quot;" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="LinKerninghanAlgorithm" TARGET_NAME="LinKerninghanAlgorithm" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="LinKerninghanAlgorithm" RUN_TARGET_NAME="LinKerninghanAlgorithm">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
@@ -379,21 +384,10 @@
       <workItem from="1560370588116" duration="16737000" />
       <workItem from="1560413979230" duration="16572000" />
       <workItem from="1560434078529" duration="28138000" />
-      <workItem from="1560678418132" duration="16578000" />
-    </task>
-    <task id="LOCAL-00017" summary="Added linKerninghanHeuristic, unfinished">
-      <created>1557867509395</created>
-      <option name="number" value="00017" />
-      <option name="presentableId" value="LOCAL-00017" />
-      <option name="project" value="LOCAL" />
-      <updated>1557867509395</updated>
-    </task>
-    <task id="LOCAL-00018" summary="Improved linKerninghanHeuristic and added TODOs">
-      <created>1558036265067</created>
-      <option name="number" value="00018" />
-      <option name="presentableId" value="LOCAL-00018" />
-      <option name="project" value="LOCAL" />
-      <updated>1558036265067</updated>
+      <workItem from="1560678418132" duration="27357000" />
+      <workItem from="1561399548365" duration="3222000" />
+      <workItem from="1561489707042" duration="5924000" />
+      <workItem from="1561496263090" duration="1479000" />
     </task>
     <task id="LOCAL-00019" summary="Refactored neighbors to be of type std::vector&lt;std::vector&lt;vertex_t&gt;&gt;">
       <created>1558105452535</created>
@@ -724,11 +718,25 @@
       <option name="project" value="LOCAL" />
       <updated>1560686748608</updated>
     </task>
-    <option name="localTasksCounter" value="66" />
+    <task id="LOCAL-00066" summary="Added the LinKernighanHeuristic class to implement multiple trials">
+      <created>1560704203892</created>
+      <option name="number" value="00066" />
+      <option name="presentableId" value="LOCAL-00066" />
+      <option name="project" value="LOCAL" />
+      <updated>1560704203892</updated>
+    </task>
+    <task id="LOCAL-00067" summary="Implemented LinKernighanHeuristic::findBestTour">
+      <created>1560715409749</created>
+      <option name="number" value="00067" />
+      <option name="presentableId" value="LOCAL-00067" />
+      <option name="project" value="LOCAL" />
+      <updated>1560715409749</updated>
+    </task>
+    <option name="localTasksCounter" value="68" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="285155000" />
+    <option name="totallyTimeSpent" value="306559000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -743,19 +751,19 @@
     <frame x="1598" y="120" width="1924" height="1054" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.498" visible="true" weight="0.24866596" />
-      <window_info id="Structure" order="1" sideWeight="0.502" side_tool="true" weight="0.2501681" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4965278" visible="true" weight="0.255603" />
+      <window_info id="Structure" order="1" sideWeight="0.5034722" side_tool="true" weight="0.24866596" />
       <window_info id="Favorites" order="2" sideWeight="0.502" side_tool="true" weight="0.2501681" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3275862" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.498713" visible="true" weight="0.32543105" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49893278" weight="0.39655173" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.498713" weight="0.32543105" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49893278" weight="0.50431037" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3275862" />
       <window_info anchor="bottom" id="Database Changes" order="7" />
       <window_info anchor="bottom" id="Inspection Results" order="8" weight="0.3297587" />
-      <window_info anchor="bottom" id="Messages" order="9" sideWeight="0.49966374" weight="0.32543105" />
+      <window_info active="true" anchor="bottom" id="Messages" order="9" sideWeight="0.49966374" visible="true" weight="0.32543105" />
       <window_info anchor="bottom" id="Terminal" order="10" weight="0.3297414" />
       <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.5010672" side_tool="true" weight="0.39655173" />
       <window_info anchor="bottom" id="Version Control" order="12" weight="0.3286638" />
@@ -768,23 +776,23 @@
       <window_info anchor="right" id="Database" order="3" />
     </layout>
     <layout-to-restore>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.498" visible="true" weight="0.2379936" />
-      <window_info id="Structure" order="1" sideWeight="0.502" side_tool="true" weight="0.2501681" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.4965278" visible="true" weight="0.2561366" />
+      <window_info id="Structure" order="1" sideWeight="0.5034722" side_tool="true" weight="0.24866596" />
       <window_info id="Favorites" order="2" sideWeight="0.502" side_tool="true" weight="0.2501681" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.3275862" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.498713" weight="0.32543105" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.39655173" />
+      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49893278" weight="0.50431037" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3275862" />
       <window_info anchor="bottom" id="Database Changes" order="7" />
       <window_info anchor="bottom" id="Inspection Results" order="8" weight="0.3297587" />
-      <window_info active="true" anchor="bottom" id="Messages" order="9" sideWeight="0.49966374" visible="true" weight="0.32543105" />
+      <window_info anchor="bottom" id="Messages" order="9" sideWeight="0.49966374" weight="0.32543105" />
       <window_info anchor="bottom" id="Terminal" order="10" weight="0.3297414" />
-      <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.501287" side_tool="true" weight="0.3265086" />
+      <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.5010672" side_tool="true" weight="0.39655173" />
       <window_info anchor="bottom" id="Version Control" order="12" weight="0.3286638" />
-      <window_info anchor="bottom" id="CMake" order="13" />
+      <window_info anchor="bottom" id="CMake" order="13" weight="0.3297414" />
       <window_info anchor="bottom" id="TypeScript" order="14" weight="0.3297587" />
       <window_info anchor="bottom" id="Profiler" order="15" sideWeight="0.49899125" weight="0.37931034" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -848,10 +856,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
-    <MESSAGE value="Changed TwoLevelTreeTour::SegmentParent::vertices from vector to list" />
-    <MESSAGE value="Implemented TwoLevelTreeTour::flip&#10;&#10;but there is a problem with references to SegmentParent inside of &#10;SegmentVertex" />
-    <MESSAGE value="Change TwoLevelTreeTour::parents' type to std::list&#10;&#10;None of the functions in TwoLevelTreeTour was tested!" />
-    <MESSAGE value="Fixed a bug in TsplibProblem" />
     <MESSAGE value="Fixed a bug in TsplibProblem::trueDistance&#10;&#10;and optimized the Lin-Kerninghan-Algorithm to not always recalculate the&#10;current gain." />
     <MESSAGE value="Fixed a bug in TsplibProblem::trueDistance&#10;&#10;and optimized the Lin-Kernighan-Algorithm to not always recalculate the&#10;current gain." />
     <MESSAGE value="Fixed bug in TwoLevelTreeTour::setVertices" />
@@ -873,7 +877,11 @@
     <MESSAGE value="Updated date formats" />
     <MESSAGE value="Improved Prim's algorithm and added comments" />
     <MESSAGE value="Improved CandidateEdges::alphaNearestNeighbors" />
-    <option name="LAST_COMMIT_MESSAGE" value="Improved CandidateEdges::alphaNearestNeighbors" />
+    <MESSAGE value="Added the LinKernighanHeuristic class to implement multiple trials" />
+    <MESSAGE value="Implemented findBestTour" />
+    <MESSAGE value="Implemented LinKernighanHeuristic::findBestTour" />
+    <MESSAGE value="Updated imports using IWYU&#10;&#10;Added the optimization flag to the compiler options for ~5 times better&#10;performance." />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated imports using IWYU&#10;&#10;Added the optimization flag to the compiler options for ~5 times better&#10;performance." />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
@@ -883,14 +891,60 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/LinKernighanHeuristic.cpp</url>
-          <line>189</line>
-          <option name="timeStamp" value="61" />
+          <line>362</line>
+          <option name="timeStamp" value="64" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/LinKernighanHeuristic.cpp</url>
+          <line>196</line>
+          <option name="timeStamp" value="65" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="CMakeRunConfiguration">
+        <watch expression="parents.size()" language="ObjectiveC" />
+        <watch expression="parent.vertices.size()" language="ObjectiveC" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="watch">
+      <expression>
+        <expression-string>iterators[113]</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>iterators[9]</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>iterators[0]</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>iterator+1</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>std::prev(iterator)</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>parent.vertices.size()</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>parents.size()</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>dParent.lastVertex()</expression-string>
         <language-id>ObjectiveC</language-id>
@@ -906,43 +960,13 @@
         <language-id>ObjectiveC</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
-      <expression>
-        <expression-string>parents.begin()-&gt;lastVertex()</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>parents.begin()-&gt;firstVertex()</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>parents.begin()-&gt;sequenceNumber</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>dParent.vertices.back().vertex</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>dParent.vertices.front().vertex</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>dParent.vertices.back().sequenceNumber</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>dParent.vertices.front().sequenceNumber</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
     </expressions>
     <expressions id="evaluateExpression">
+      <expression>
+        <expression-string>currentBestTour</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>candidateEdges[1]</expression-string>
         <language-id>ObjectiveC</language-id>
@@ -991,27 +1015,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/ExampleProblems/sample_UPPER_DIAG_ROW.tsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="17" selection-start-line="11" selection-start-column="17" selection-end-line="11" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ExampleProblems/sample_UPPER_ROW.tsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="18" selection-start-line="10" selection-start-column="18" selection-end-line="10" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ExampleProblems/brg180.opt.tour">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="19" selection-start-column="19" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/include/c++/8.3.0/bits/stl_bvector.h" />
     <entry file="file://$PROJECT_DIR$/ExampleProblems/sample_CEIL_2D.tsp">
       <provider selected="true" editor-type-id="text-editor">
@@ -1119,13 +1122,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file:///usr/include/c++/8.3.0/bits/stl_list.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="222">
-          <caret line="1929" selection-start-line="1929" selection-end-line="1929" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/visualize.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="390">
@@ -1133,46 +1129,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SignedPermutation.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" column="35" selection-start-line="1" selection-start-column="35" selection-end-line="1" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SignedPermutation.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="1" column="35" selection-start-line="1" selection-start-column="35" selection-end-line="1" selection-end-column="35" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/UnionFindStructure.h" />
     <entry file="file://$PROJECT_DIR$/UnionFindStructure.cpp" />
-    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="8" selection-start-line="8" selection-start-column="8" selection-end-line="8" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ExampleProblems/sample_EUC_2D.tsp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="165">
           <caret line="11" column="3" lean-forward="true" selection-start-line="11" selection-start-column="3" selection-end-line="11" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/TsplibUtils.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1095">
-          <caret line="73" column="4" selection-start-line="73" selection-start-column="4" selection-end-line="73" selection-end-column="4" />
-          <folding>
-            <element signature="e#139#156#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1183,77 +1145,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SimpleHeuristic.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1511">
-          <caret line="1" column="35" selection-start-line="1" selection-start-column="35" selection-end-line="1" selection-end-column="35" />
-          <folding>
-            <element signature="e#147#165#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/TsplibUtils.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="236">
-          <caret line="253" selection-start-line="253" selection-end-line="253" />
-          <folding>
-            <element signature="e#48#66#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SimpleHeuristic.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="469">
-          <caret line="219" selection-start-line="216" selection-end-line="219" />
-          <folding>
-            <element signature="e#115#134#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/PrimsAlgorithm.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="20" lean-forward="true" selection-start-line="20" selection-end-line="20" />
-          <folding>
-            <element signature="e#143#160#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/include/c++/8.3.0/bits/uniform_int_dist.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="199">
           <caret line="104" column="6" selection-start-line="104" selection-start-column="6" selection-end-line="104" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/PrimsAlgorithm.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="184">
-          <caret line="23" selection-start-line="23" selection-end-line="24" selection-end-column="69" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Tour.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-660">
-          <caret line="31" selection-start-line="31" selection-end-line="31" />
-          <folding>
-            <element signature="e#48#66#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Tour.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="379">
-          <caret line="235" column="46" lean-forward="true" selection-start-line="235" selection-start-column="46" selection-end-line="235" selection-end-column="46" />
-          <folding>
-            <element signature="e#125#143#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1264,33 +1159,131 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.cpp">
+    <entry file="file:///usr/include/c++/8.3.0/bits/stl_list.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="177">
+          <caret line="411" selection-start-line="411" selection-end-line="411" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CMakeCache.txt" />
+    <entry file="file://$PROJECT_DIR$/cmake_install.cmake" />
+    <entry file="file://$PROJECT_DIR$/Makefile" />
+    <entry file="file://$PROJECT_DIR$/PrimsAlgorithm.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" selection-start-line="9" selection-end-line="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="105">
+            <caret line="7" selection-start-line="7" selection-end-line="7" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+      <provider editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SimpleHeuristic.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
-          <caret line="70" selection-start-line="70" selection-end-line="70" />
-          <folding>
-            <element signature="e#0#19#0" expanded="true" />
-          </folding>
+          <caret line="16" selection-start-line="16" selection-end-line="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SimpleHeuristic.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" selection-start-line="9" selection-end-line="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/main.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" selection-start-line="7" selection-end-line="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PrimsAlgorithm.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" selection-start-line="11" selection-end-line="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TsplibUtils.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" selection-start-line="10" selection-end-line="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="75">
+          <caret line="5" column="72" selection-start-line="5" selection-start-column="72" selection-end-line="5" selection-end-column="72" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="619">
-          <caret line="356" column="45" selection-start-line="356" selection-start-column="45" selection-end-line="356" selection-end-column="45" />
+        <state relative-caret-position="206">
+          <caret line="272" column="22" selection-start-line="272" selection-start-column="22" selection-end-line="272" selection-end-column="22" />
           <folding>
             <element signature="e#46#66#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/SignedPermutation.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" selection-start-line="6" selection-end-line="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Tour.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="9" selection-start-line="4" selection-start-column="9" selection-end-line="4" selection-end-column="9" />
+          <folding>
+            <element signature="e#48#68#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TsplibUtils.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" selection-start-line="6" selection-end-line="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Tour.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="191">
+          <caret line="147" column="11" selection-start-line="147" selection-start-column="11" selection-end-line="147" selection-end-column="11" />
+          <folding>
+            <element signature="e#125#144#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SignedPermutation.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" selection-start-line="7" selection-end-line="8" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-26">
-          <caret line="57" column="50" lean-forward="true" selection-start-line="57" selection-start-column="50" selection-end-line="57" selection-end-column="50" />
-          <folding>
-            <element signature="e#157#174#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="105">
+          <caret line="7" column="17" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
         </state>
       </provider>
     </entry>

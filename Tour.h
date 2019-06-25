@@ -5,12 +5,10 @@
 #ifndef LINKERNINGHANALGORITHM_TOUR_H
 #define LINKERNINGHANALGORITHM_TOUR_H
 
-#include <utility>
-#include <limits>
+#include <cstddef>
+#include <iostream>
 #include <list>
 #include <vector>
-#include <list>
-#include <iostream>
 
 using vertex_t = size_t; // The type used for vertices
 using dimension_t = vertex_t; // The type used for counting vertices

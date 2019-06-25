@@ -5,9 +5,10 @@
 #ifndef LINKERNINGHANALGORITHM_PRIMSALGORITHM_H
 #define LINKERNINGHANALGORITHM_PRIMSALGORITHM_H
 
-#include <vector>
-#include <tuple>
 #include <functional>
+#include <tuple>
+#include <vector>
+#include "Tour.h"
 
 // Prim's algorithm for complete graphs
 

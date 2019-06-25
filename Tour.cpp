@@ -2,14 +2,17 @@
 // Created by Karl Welzel on 19.04.2019.
 //
 
-#include <utility>
-#include <limits>
-#include <list>
-#include <vector>
 #include <algorithm>
+#include <cstddef>
 #include <iostream>
+#include <iterator>
+#include <list>
+#include <memory>
+#include <stdexcept>
+#include <string>
 #include <unordered_map>
-#include <cmath>
+#include <utility>
+#include <vector>
 #include "Tour.h"
 #include "SignedPermutation.h"
 
@@ -184,7 +187,7 @@ dimension_t ArrayTour::getDimension() const {
 
 dimension_t ArrayTour::distance(vertex_t vertex1, vertex_t vertex2) const {
     // Avoid problems with negative values and modulo
-    ptrdiff_t diff = indices[vertex2] - indices[vertex1];
+    std::ptrdiff_t diff = indices[vertex2] - indices[vertex1];
     return (diff + getDimension()) % getDimension();
 }
 
@@ -213,20 +216,20 @@ bool ArrayTour::isBetween(vertex_t before, vertex_t vertex, vertex_t after) cons
 
 void ArrayTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
     // Calculate the length of the two segments to decide which of them will be reversed
-    dimension_t distanceAC = distance(a, c);
-    dimension_t distanceDB = distance(d, b);
+    dimension_t acDistance = distance(a, c);
+    dimension_t dbDistance = distance(d, b);
     dimension_t segmentStartIndex, segmentEndIndex;
     dimension_t segmentLength;
-    if (distanceAC <= distanceDB) {
+    if (acDistance <= dbDistance) {
         // The segment a-c will be reversed
         segmentStartIndex = indices[a];
         segmentEndIndex = indices[c];
-        segmentLength = distanceAC;
+        segmentLength = acDistance;
     } else {
         // The segment d-b will be reversed
         segmentStartIndex = indices[d];
         segmentEndIndex = indices[b];
-        segmentLength = distanceDB;
+        segmentLength = dbDistance;
     }
     for (dimension_t i = 0; i < (segmentLength + 1) / 2; ++i) {
         vertex_t &vertex1 = sequence[(segmentStartIndex + i) % getDimension()];

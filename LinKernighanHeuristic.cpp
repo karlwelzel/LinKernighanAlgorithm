@@ -3,13 +3,19 @@
 //
 
 #include <algorithm>
-#include <vector>
-#include <tuple>
-#include <utility>
+#include <cstddef>
+#include <iostream>
+#include <memory>
 #include <numeric>
 #include <random>
-#include "LinKernighanHeuristic.h"
+#include <stdexcept>
+#include <string>
+#include <tuple>
+#include <vector>
 #include "PrimsAlgorithm.h"
+#include "Tour.h"
+#include "TsplibUtils.h"
+#include "LinKernighanHeuristic.h"
 
 // ============================================= AlternatingWalk class =================================================
 
@@ -260,13 +266,13 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
         while (true) {
             if (vertexChoices.at(i).empty()) {
                 if (highestGain > 0) {
-                    distance_t previousLength = tsplibProblem.length(currentTour);
-                    std::cout << "Exchange done: " << bestAlternatingWalk << std::endl;
+                    //distance_t previousLength = tsplibProblem.length(currentTour);
+                    //std::cout << "Exchange done: " << bestAlternatingWalk << std::endl;
                     currentTour.exchange(bestAlternatingWalk);
-                    std::cout << " with gain: " << tsplibProblem.exchangeGain(bestAlternatingWalk) << " (highestGain = "
-                            << highestGain << ")" << std::endl;
-                    std::cout << " new tour: " << currentTour << std::endl;
-                    std::cout << " previous length: " << previousLength << std::endl;
+                    //std::cout << " with gain: " << tsplibProblem.exchangeGain(bestAlternatingWalk)
+                    //          << " (highestGain = " << highestGain << ")" << std::endl;
+                    //std::cout << " new tour: " << currentTour << std::endl;
+                    //std::cout << " previous length: " << previousLength << std::endl;
                     std::cout << " new length: " << tsplibProblem.length(currentTour) << std::endl;
                     break;
                 } else { // highestGain == 0
@@ -300,7 +306,7 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
                 AlternatingWalk closedWalk = currentWalk.close(); // closedWalk = (x_0, x_1, ..., x_i, x_0)
                 signed_distance_t gain = tsplibProblem.exchangeGain(closedWalk);
                 if (gain > highestGain and currentTour.isTourAfterExchange(closedWalk)) {
-                    std::cout << "New highest gain: " << gain << ", value before: " << highestGain << std::endl;
+                    //std::cout << "New highest gain: " << gain << ", value before: " << highestGain << std::endl;
                     bestAlternatingWalk = closedWalk;
                     highestGain = gain;
                 }
