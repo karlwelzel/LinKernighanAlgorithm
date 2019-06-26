@@ -14,7 +14,7 @@ using vertex_t = size_t; // The type used for vertices
 using dimension_t = vertex_t; // The type used for counting vertices
 using distance_t = unsigned long; // The type used for distances and lengths
 using signed_distance_t = long long; // The type used for distances and lengths that can be negative
-// using Tour = ArrayTour; // The current implementation of a tour, that should be used
+// using Tour = TwoLevelTreeTour; // The current implementation of a tour, that should be used
 
 
 // ================================================= BaseTour class ====================================================

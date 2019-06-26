@@ -249,7 +249,6 @@ Tour LinKernighanHeuristic::generateRandomTour() {
 Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
     const dimension_t dimension = tsplibProblem.getDimension();
 
-    // TODO: Add a hashing technique for tours that can't be improved
     // TODO: Introduce the "Don't look" bit
 
     Tour currentTour = startTour;
@@ -278,7 +277,7 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
                     //          << " (highestGain = " << highestGain << ")" << std::endl;
                     //std::cout << " new tour: " << currentTour << std::endl;
                     //std::cout << " previous length: " << previousLength << std::endl;
-                    std::cout << " new length: " << tsplibProblem.length(currentTour) << std::endl;
+                    //std::cout << " new length: " << tsplibProblem.length(currentTour) << std::endl;
                     break;
                 } else { // highestGain == 0
                     if (i == 0) {
@@ -381,7 +380,9 @@ Tour LinKernighanHeuristic::findBestTour(size_t numberOfTrials) {
     Tour currentTour = improveTour(generateRandomTour());
     currentBestTour = improveTour(generateRandomTour());
     while (--numberOfTrials > 0) {
-        Tour currentTour = improveTour(generateRandomTour());
+        currentTour = improveTour(generateRandomTour());
+        std::cout << "Trial result: " << tsplibProblem.length(currentTour) << ", best: "
+                  << tsplibProblem.length(currentBestTour) << std::endl;
         if (tsplibProblem.length(currentTour) < tsplibProblem.length(currentBestTour)) {
             currentBestTour = currentTour;
         }
