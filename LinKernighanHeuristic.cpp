@@ -12,10 +12,10 @@
 #include <string>
 #include <tuple>
 #include <vector>
-#include "PrimsAlgorithm.h"
 #include "Tour.h"
 #include "TsplibUtils.h"
 #include "LinKernighanHeuristic.h"
+#include "AlphaDistances.h"
 
 // ============================================= AlternatingWalk class =================================================
 
@@ -86,83 +86,21 @@ CandidateEdges CandidateEdges::nearestNeighbors(const TsplibProblem &problem, si
 
 CandidateEdges CandidateEdges::alphaNearestNeighbors(const TsplibProblem &problem, size_t k) {
     dimension_t dimension = problem.getDimension();
-    std::vector<vertex_t> allVertices(problem.getDimension());
+    auto dist = [&problem](vertex_t i, vertex_t j) { return problem.dist(i, j); };
+
+    // Compute the alpha distances
+    std::vector<std::vector<distance_t>> alpha = alphaDistances(dimension, dist);
+
+    std::vector<vertex_t> allVertices(dimension);
     std::iota(allVertices.begin(), allVertices.end(), 0);
-
-    std::vector<vertex_t> parent;
-    std::vector<vertex_t> topologicalOrder;
-
-    // Generate a minimum spanning tree for vertices 0, ..., dimension-2
-    auto distFunction = [&problem](vertex_t i, vertex_t j) { return problem.dist(i, j); };
-    std::tie(parent, topologicalOrder) = primsAlgorithm(dimension - 1, distFunction);
-
-    // TODO: Don't fix the special node
-    // TODO: Move the computation of alpha values to PrimsAlgorithm
-    // TODO: Use subgradient optimization
-
-    // Find the edges to be added to form a 1-tree
-    vertex_t special = dimension - 1; // The special node "1" in the 1-tree
-    std::vector<vertex_t> specialNeighbors(2);
-    auto specialDistanceComparator = [&problem, special](vertex_t w1, vertex_t w2) {
-        return problem.dist(special, w1) < problem.dist(special, w2);
-    };
-    std::partial_sort_copy(topologicalOrder.begin(), topologicalOrder.end(), specialNeighbors.begin(),
-                           specialNeighbors.end(), specialDistanceComparator);
-
-    // Initialize the beta array
-    std::vector<std::vector<distance_t>> beta(dimension, std::vector<distance_t>(dimension, 0));
-
-    // Set the beta values for edges (special, v)
-    for (vertex_t vertex : topologicalOrder) {
-        if (vertex == specialNeighbors[0]) {
-            // alpha(special, vertex) = 0 so beta(special, vertex) = dist(special, vertex)
-            beta[special][vertex] = beta[vertex][special] = problem.dist(special, vertex);
-        } else {
-            // When (special, vertex) is required to be in the 1-tree then the edge incident with special with highest
-            // distance needs to be removed, namely (special, specialNeighbors[1])
-            beta[special][vertex] = beta[vertex][special] = problem.dist(special, specialNeighbors[1]);
-        }
-    }
-
-    // Compute the beta values for all other edges as described in the paper by Keld Helsgaun from 2000
-    for (size_t i = 0; i < topologicalOrder.size(); ++i) {
-        for (size_t j = i + 1; j < topologicalOrder.size(); ++j) {
-            // beta[i][i] has the smallest possible value 0, so it will never be chosen here
-            beta[i][j] = beta[j][i] = std::max(beta[i][parent[j]], problem.dist(j, parent[j]));
-        }
-    }
-
-/*
-    for (vertex_t v = 0; v < dimension; ++v) {
-        std::cout << v << " : ";
-        for (vertex_t w : adjacentVertices[v]) {
-            std::cout << w << ", ";
-        }
-        std::cout << std::endl;
-    }
-    std::cout << "==========" << std::endl;
-    for (vertex_t v : topologicalOrder) {
-        std::cout << v << ", parent: " << parent[v] << std::endl;
-    }
-    std::cout << "==========" << std::endl;
-    for (vertex_t v = 0; v < dimension; ++v) {
-        for (vertex_t w = 0; w < dimension; ++w) {
-            std::cout << tsplibProblem.dist(v, w) - beta[v][w] << ", ";
-        }
-        std::cout << std::endl;
-    }
-*/
 
     // Store the k alpha-nearest neighbors for each vertex
     CandidateEdges result;
     result.resize(problem.getDimension());
     for (vertex_t v = 0; v < problem.getDimension(); ++v) {
         result[v].resize(k);
-        auto alphaCompare = [&problem, &beta, v](vertex_t w1, vertex_t w2) {
-            distance_t w1Distance = problem.dist(v, w1);
-            distance_t w2Distance = problem.dist(v, w2);
-            return std::make_tuple(w1Distance - beta[v][w1], w1Distance) <
-                   std::make_tuple(w2Distance - beta[v][w2], w2Distance);
+        auto alphaCompare = [&dist, &alpha, v](vertex_t w1, vertex_t w2) {
+            return std::make_tuple(alpha[v][w1], dist(v, w1)) < std::make_tuple(alpha[v][w2], dist(v, w2));
         };
         std::partial_sort_copy(allVertices.begin(), std::remove(allVertices.begin(), allVertices.end(), v),
                                result[v].begin(), result[v].end(), alphaCompare);
