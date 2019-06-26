@@ -64,6 +64,7 @@ int main(int argc, char *argv[]) {
     // Use the heuristic from the introduction assignment to get a tour to start with and optimize it with the
     // Lin-Kernighan-heuristic
     const Tour tour = LinKernighanHeuristic(problem).findBestTour();
+    //const Tour tour = LinKernighanHeuristic(problem).findBestTour(problem.getDimension());
 
     // Output the best tour found by the algorithm and compare it to the optimal tour if given
     distance_t length = problem.length(tour);
