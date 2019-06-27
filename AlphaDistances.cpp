@@ -3,6 +3,7 @@
 //
 
 #include <algorithm>
+#include <cmath>
 #include <cstddef>
 #include <functional>
 #include <memory>
@@ -12,6 +13,36 @@
 #include <unordered_set>
 #include "AlphaDistances.h"
 #include "PrimsAlgorithm.h"
+
+signed_distance_t OneTree::length(const std::function<distance_t(vertex_t, vertex_t)> &dist) {
+    signed_distance_t result = 0;
+
+    for (vertex_t v = 0; v < parent.size(); v++) {
+        // All edges (v, parent[v])
+        result += dist(v, parent[v]);
+    }
+
+    // The edge (special, specialNeighbor)
+    result += dist(special, specialNeighbor);
+
+    return result;
+}
+
+std::vector<signed_distance_t> OneTree::degrees() {
+    std::vector<signed_distance_t> result(parent.size(), 0);
+
+    for (vertex_t v = 0; v < parent.size(); v++) {
+        // All edges (v, parent[v])
+        result[v]++;
+        result[parent[v]]++;
+    }
+
+    // The edge (special, specialNeighbor)
+    result[special]++;
+    result[specialNeighbor]++;
+
+    return result;
+}
 
 OneTree minimumOneTree(dimension_t dimension, const std::function<distance_t(vertex_t, vertex_t)> &dist) {
     std::vector<vertex_t> allVertices(dimension);
@@ -53,7 +84,7 @@ OneTree minimumOneTree(dimension_t dimension, const std::function<distance_t(ver
     return OneTree{parent, topologicalOrder, special, specialNeighbor};
 }
 
-
+// TODO: Incorporate beta in alpha
 std::vector<std::vector<distance_t>>
 betaValues(OneTree tree, dimension_t dimension, const std::function<distance_t(vertex_t, vertex_t)> &dist) {
     // Initialize the beta array
@@ -99,3 +130,102 @@ alphaDistances(dimension_t dimension, const std::function<distance_t(vertex_t, v
 
     return alpha;
 }
+
+
+std::vector<std::vector<distance_t>>
+optimizedAlphaDistances(dimension_t dimension, const std::function<distance_t(vertex_t, vertex_t)> &dist) {
+    // The penalties of each vector
+    std::vector<signed_distance_t> penalties(dimension, 0);
+
+    // The modified distance function
+    auto modifiedDist = [&dist, &penalties](vertex_t v, vertex_t w) {
+        return dist(v, w) + penalties[v] + penalties[w];
+    };
+
+    // The minimum 1-tree
+    OneTree tree = minimumOneTree(dimension, modifiedDist);
+
+    // The lower bound on the size of an optimal tour. This is the objective function we want to maximize
+    auto objectiveFunction = [&tree, &modifiedDist, &penalties]() {
+        signed_distance_t penaltiesSum = 0;
+        for (signed_distance_t p : penalties) {
+            penaltiesSum += p;
+        }
+        return tree.length(modifiedDist) - 2 * penaltiesSum;
+    };
+
+    size_t stepSize = 1;
+    size_t periodLength = dimension / 2;
+    size_t iteration = 0; // A counter for the iterations in the current period
+    signed_distance_t previousObjective = objectiveFunction(); // The previous value of the objective function
+    signed_distance_t currentObjective; // The current value of the objective function
+    // Used to double the step size in the first period until the objective function does not increase
+    bool doubleStepSize = true;
+
+    // The subgradient vector is the degree of each vertex minus 2
+    std::vector<signed_distance_t> currentSubgradient = tree.degrees();
+    std::transform(currentSubgradient.begin(), currentSubgradient.end(), currentSubgradient.begin(),
+                   [](signed_distance_t d) { return d - 2; });
+    std::vector<signed_distance_t> previousSubgradient = currentSubgradient;
+
+
+
+    // Stop the subgradient optimization if the step size the length of the period or the gradient vector is zero
+    while (stepSize == 0 or periodLength == 0 or std::all_of(currentSubgradient.begin(), currentSubgradient.end(),
+                                                             [](signed_distance_t d) { return d == 0; })) {
+        // Start of the period
+        while (++iteration < periodLength) {
+            // Update the penalties
+            for (size_t i = 0; i < penalties.size(); ++i) {
+                penalties[i] += lround(stepSize * (0.7 * currentSubgradient[i] + 0.3 * previousSubgradient[i]));
+            }
+
+            // Update the tree and the subgradient vector
+            tree = minimumOneTree(dimension, modifiedDist);
+            previousSubgradient = currentSubgradient;
+            currentSubgradient = tree.degrees();
+            std::transform(currentSubgradient.begin(), currentSubgradient.end(), currentSubgradient.begin(),
+                           [](signed_distance_t d) { return d - 2; });
+            currentObjective = objectiveFunction();
+
+            // In the first period the step size is doubled until the objective function does not increase
+            if (doubleStepSize) {
+                if (currentObjective > previousObjective) {
+                    stepSize *= 2;
+                } else {
+                    doubleStepSize = false;
+                }
+            }
+
+            // If the last iteration in the period leads to an increase of the objective function the period length is
+            // doubled
+            if (iteration + 1 == periodLength and currentObjective > previousObjective) {
+                periodLength *= 2;
+            }
+
+            previousObjective = currentObjective;
+
+        }
+
+        // End of the period
+        stepSize /= 2;
+        periodLength /= 2;
+        iteration = 0;
+    }
+
+    // Compute the beta values
+    std::vector<std::vector<distance_t>> beta = betaValues(tree, dimension, modifiedDist);
+
+    // Initialize the alpha array
+    std::vector<std::vector<distance_t>> alpha(dimension, std::vector<distance_t>(dimension, 0));
+
+    // Compute the alpha values
+    for (size_t i = 0; i < dimension; ++i) {
+        for (size_t j = 0; j < dimension; ++j) {
+            alpha[i][j] = dist(i, j) - beta[i][j];
+        }
+    }
+
+    return alpha;
+}
+
