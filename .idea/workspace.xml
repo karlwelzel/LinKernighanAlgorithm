@@ -15,11 +15,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="ea2faef9-1e3e-415f-ac69-9bebb67db99c" name="Default Changelist" comment="Added OneTree and minimumOneTree">
-      <change beforePath="$PROJECT_DIR$/.idea/dictionaries/karl.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dictionaries/karl.xml" afterDir="false" />
+    <list default="true" id="ea2faef9-1e3e-415f-ac69-9bebb67db99c" name="Default Changelist" comment="Added CandidateEdges::optimizedAlphaNearestNeighbors&#10;&#10;Added CandidateEdges::rawNearestNeighbors &#10;Fixed bug in optimizedAlphaDistances (line 180/183)&#10;Fixed bug in OneTree::degrees (line 36)&#10;Refactored allVertices from std::vector to std::unordered_set&#10;&#10;There is still a bug in optimizedAlphaDistances because the objective&#10;function should never exceed the length of the optimum tour">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AlphaDistances.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/AlphaDistances.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AlphaDistances.h" beforeDir="false" afterPath="$PROJECT_DIR$/AlphaDistances.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LinKernighanHeuristic.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/LinKernighanHeuristic.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/LinKernighanHeuristic.h" beforeDir="false" afterPath="$PROJECT_DIR$/LinKernighanHeuristic.h" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/cmake-build-debug/" />
     <ignored path="$PROJECT_DIR$/CMakeFiles/" />
@@ -42,41 +43,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="90">
-              <caret line="6" selection-start-line="6" selection-end-line="6" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/main.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="182">
-              <caret line="65" column="5" selection-start-line="65" selection-start-column="5" selection-end-line="65" selection-end-column="5" />
-              <folding>
-                <element signature="e#46#65#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/TsplibUtils.cpp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2194">
-              <caret line="369" selection-start-line="369" selection-end-line="369" />
-              <folding>
-                <element signature="e#48#64#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Tour.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
-              <caret line="16" column="32" selection-start-line="16" selection-start-column="32" selection-end-line="16" selection-end-column="32" />
+            <state relative-caret-position="60">
+              <caret line="4" column="39" selection-start-line="4" selection-start-column="39" selection-end-line="4" selection-end-column="39" />
             </state>
           </provider>
         </entry>
@@ -84,8 +52,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="364">
-              <caret line="321" column="48" selection-start-line="321" selection-start-column="48" selection-end-line="321" selection-end-column="48" />
+            <state relative-caret-position="361">
+              <caret line="240" selection-start-line="240" selection-end-line="240" />
               <folding>
                 <element signature="e#46#66#0" expanded="true" />
               </folding>
@@ -94,10 +62,25 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/TsplibUtils.cpp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="144">
+              <caret line="227" selection-start-line="227" selection-end-line="227" />
+              <folding>
+                <element signature="e#48#64#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="424">
-              <caret line="89" column="48" selection-start-line="89" selection-start-column="48" selection-end-line="89" selection-end-column="48" />
+            <state relative-caret-position="-89">
+              <caret line="40" selection-start-line="40" selection-end-line="40" />
+              <folding>
+                <element signature="e#157#175#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -105,8 +88,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/AlphaDistances.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="586">
-              <caret line="212" column="17" selection-start-line="212" selection-start-column="8" selection-end-line="212" selection-end-column="17" />
+            <state relative-caret-position="183">
+              <caret line="196" column="34" selection-start-line="196" selection-start-column="34" selection-end-line="196" selection-end-column="34" />
               <folding>
                 <element signature="e#46#66#0" expanded="true" />
               </folding>
@@ -117,8 +100,11 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/AlphaDistances.h">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="257">
-              <caret line="27" column="86" lean-forward="true" selection-start-line="27" selection-start-column="86" selection-end-line="27" selection-end-column="86" />
+            <state relative-caret-position="171">
+              <caret line="19" column="35" lean-forward="true" selection-start-line="19" selection-start-column="35" selection-end-line="19" selection-end-column="35" />
+              <folding>
+                <element signature="e#144#165#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -126,22 +112,10 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/PrimsAlgorithm.cpp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="409">
-              <caret line="50" column="9" lean-forward="true" selection-start-line="50" selection-start-column="9" selection-end-line="50" selection-end-column="9" />
+            <state relative-caret-position="465">
+              <caret line="46" selection-start-line="46" selection-end-line="46" />
               <folding>
                 <element signature="e#46#66#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/PrimsAlgorithm.h">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="270">
-              <caret line="18" column="95" selection-start-line="18" selection-start-column="15" selection-end-line="18" selection-end-column="95" />
-              <folding>
-                <element signature="e#143#164#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -151,7 +125,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>std::list</find>
       <find>UPPER_DIAG</find>
       <find>std::advance</find>
       <find>delimiter</find>
@@ -181,6 +154,7 @@
       <find>copy</find>
       <find>bound</find>
       <find>Bound</find>
+      <find>step</find>
     </findStrings>
     <replaceStrings>
       <replace>vertex_t</replace>
@@ -228,11 +202,11 @@
         <option value="$PROJECT_DIR$/TsplibUtils.cpp" />
         <option value="$PROJECT_DIR$/SignedPermutation.h" />
         <option value="$PROJECT_DIR$/Tour.h" />
-        <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/main.cpp" />
-        <option value="$PROJECT_DIR$/LinKernighanHeuristic.h" />
-        <option value="$PROJECT_DIR$/LinKernighanHeuristic.cpp" />
         <option value="$PROJECT_DIR$/AlphaDistances.h" />
+        <option value="$PROJECT_DIR$/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/LinKernighanHeuristic.cpp" />
+        <option value="$PROJECT_DIR$/LinKernighanHeuristic.h" />
         <option value="$PROJECT_DIR$/AlphaDistances.cpp" />
       </list>
     </option>
@@ -271,6 +245,11 @@
             <path>
               <item name="LinKerninghanAlgorithm" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
               <item name="~/CLionProjects/LinKernighanAlgorithm" type="442cc68d:ScopeViewTreeModel$RootNode" />
+            </path>
+            <path>
+              <item name="LinKerninghanAlgorithm" type="3d21c010:ScopeViewTreeModel$ProjectNode" />
+              <item name="~/CLionProjects/LinKernighanAlgorithm" type="442cc68d:ScopeViewTreeModel$RootNode" />
+              <item name="ExampleProblems" type="9f88c78c:ScopeViewTreeModel$FileNode" />
             </path>
           </expand>
           <select />
@@ -389,13 +368,6 @@
       <workItem from="1561399548365" duration="3222000" />
       <workItem from="1561489707042" duration="5924000" />
       <workItem from="1561496263090" duration="1479000" />
-    </task>
-    <task id="LOCAL-00022" summary="Added signed_distance_t to fix problem with negative gains">
-      <created>1558169563300</created>
-      <option name="number" value="00022" />
-      <option name="presentableId" value="LOCAL-00022" />
-      <option name="project" value="LOCAL" />
-      <updated>1558169563301</updated>
     </task>
     <task id="LOCAL-00023" summary="Improved visualize.py and optimized Tour::isHamiltonianTour">
       <created>1558200440753</created>
@@ -733,11 +705,18 @@
       <option name="project" value="LOCAL" />
       <updated>1561660934728</updated>
     </task>
-    <option name="localTasksCounter" value="71" />
+    <task id="LOCAL-00071" summary="Implemented subgradient optimization (untested)">
+      <created>1561667375147</created>
+      <option name="number" value="00071" />
+      <option name="presentableId" value="LOCAL-00071" />
+      <option name="project" value="LOCAL" />
+      <updated>1561667375147</updated>
+    </task>
+    <option name="localTasksCounter" value="72" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="318610000" />
+    <option name="totallyTimeSpent" value="329808000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -750,13 +729,12 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="1598" y="120" width="1924" height="1054" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4965278" visible="true" weight="0.26093918" />
       <window_info id="Structure" order="1" sideWeight="0.5034722" side_tool="true" weight="0.24866596" />
       <window_info id="Favorites" order="2" sideWeight="0.502" side_tool="true" weight="0.2501681" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info active="true" anchor="bottom" id="Find" order="1" visible="true" weight="0.3275862" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3275862" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.498713" weight="0.32543105" />
       <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49893278" weight="0.50431037" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
@@ -764,7 +742,7 @@
       <window_info anchor="bottom" id="TODO" order="6" weight="0.3275862" />
       <window_info anchor="bottom" id="Database Changes" order="7" />
       <window_info anchor="bottom" id="Inspection Results" order="8" weight="0.3297587" />
-      <window_info anchor="bottom" id="Messages" order="9" sideWeight="0.49966374" weight="0.32543105" />
+      <window_info active="true" anchor="bottom" id="Messages" order="9" sideWeight="0.49966374" visible="true" weight="0.32543105" />
       <window_info anchor="bottom" id="Terminal" order="10" weight="0.3297414" />
       <window_info anchor="bottom" id="Event Log" order="11" sideWeight="0.5010672" side_tool="true" weight="0.39655173" />
       <window_info anchor="bottom" id="Version Control" order="12" weight="0.3286638" />
@@ -857,8 +835,6 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
-    <MESSAGE value="Fixed bug with the implicit copy-constructor of TwoLevelTreeTour" />
-    <MESSAGE value="Fixed bug in TwoLevelTreeTour::reverse" />
     <MESSAGE value="Fixed bug in TwoLevelTreeTour::isBetween&#10;&#10;The case analysis was not complete. Also added groupSize = 30 for &#10;testing purposes (for n &lt;= 1000) and an error if flip is called with&#10;illegal arguments." />
     <MESSAGE value="Fixed a bug in TwoLevelTreeTour::flip&#10;&#10;The comparison of sequence numbers needs to respect the reversal bit." />
     <MESSAGE value="Refactored TwoLevelTreeTour::reverse&#10;&#10;TwoLevelTreeTour::reverse has become TwoLevelTreeTour::SegmentParent::&#10;reverseVertices and TwoLevelTreeTour::reverseParents. Also reordered&#10;some of the functions of TwoLevelTreeTour and added comments." />
@@ -882,7 +858,9 @@
     <MESSAGE value="Updated the output" />
     <MESSAGE value="Refactored secondNearestNeighbor" />
     <MESSAGE value="Added OneTree and minimumOneTree" />
-    <option name="LAST_COMMIT_MESSAGE" value="Added OneTree and minimumOneTree" />
+    <MESSAGE value="Implemented subgradient optimization (untested)" />
+    <MESSAGE value="Added CandidateEdges::optimizedAlphaNearestNeighbors&#10;&#10;Added CandidateEdges::rawNearestNeighbors &#10;Fixed bug in optimizedAlphaDistances (line 180/183)&#10;Fixed bug in OneTree::degrees (line 36)&#10;Refactored allVertices from std::vector to std::unordered_set&#10;&#10;There is still a bug in optimizedAlphaDistances because the objective&#10;function should never exceed the length of the optimum tour" />
+    <option name="LAST_COMMIT_MESSAGE" value="Added CandidateEdges::optimizedAlphaNearestNeighbors&#10;&#10;Added CandidateEdges::rawNearestNeighbors &#10;Fixed bug in optimizedAlphaDistances (line 180/183)&#10;Fixed bug in OneTree::degrees (line 36)&#10;Refactored allVertices from std::vector to std::unordered_set&#10;&#10;There is still a bug in optimizedAlphaDistances because the objective&#10;function should never exceed the length of the optimum tour" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
@@ -891,21 +869,55 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/LinKernighanHeuristic.cpp</url>
-          <line>299</line>
-          <option name="timeStamp" value="64" />
+          <url>file://$PROJECT_DIR$/AlphaDistances.cpp</url>
+          <line>211</line>
+          <option name="timeStamp" value="77" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/AlphaDistances.cpp</url>
+          <line>217</line>
+          <option name="timeStamp" value="78" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
       <configuration name="CMakeRunConfiguration">
-        <watch expression="parents.size()" language="ObjectiveC" />
-        <watch expression="parent.vertices.size()" language="ObjectiveC" />
+        <watch expression="tsplibProblem.length(currentTour)" language="ObjectiveC" />
       </configuration>
     </watches-manager>
   </component>
   <component name="debuggerHistoryManager">
     <expressions id="watch">
+      <expression>
+        <expression-string>tsplibProblem.length(currentTour)</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>problem.dist</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>problem.dist(5, 1)</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>problem.dist(5, 0)</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>dist(5, 0)</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
+      <expression>
+        <expression-string>dist(1, 0)</expression-string>
+        <language-id>ObjectiveC</language-id>
+        <evaluation-mode>EXPRESSION</evaluation-mode>
+      </expression>
       <expression>
         <expression-string>iterators[113]</expression-string>
         <language-id>ObjectiveC</language-id>
@@ -923,36 +935,6 @@
       </expression>
       <expression>
         <expression-string>iterator+1</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>std::prev(iterator)</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>parent.vertices.size()</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>parents.size()</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>dParent.lastVertex()</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>dParent.firstVertex()</expression-string>
-        <language-id>ObjectiveC</language-id>
-        <evaluation-mode>EXPRESSION</evaluation-mode>
-      </expression>
-      <expression>
-        <expression-string>dParent.sequenceNumber</expression-string>
         <language-id>ObjectiveC</language-id>
         <evaluation-mode>EXPRESSION</evaluation-mode>
       </expression>
@@ -1011,22 +993,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file:///usr/include/c++/8.3.0/iosfwd" />
-    <entry file="file:///usr/lib/python3.7/turtle.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-42234" />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/venv/lib64/python3.7/site-packages/pip-19.0.3-py3.7.egg/pip/_vendor/chardet/hebrewprober.py" />
-    <entry file="file://$PROJECT_DIR$/LinKerninghanHeuristic.h" />
-    <entry file="file://$PROJECT_DIR$/LinKerninghanHeuristic.cpp" />
-    <entry file="file://$PROJECT_DIR$/cmake-build-debug/CMakeCache.txt">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cmake-build-debug/cmake_install.cmake">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/SortingBySignedReversals.cpp" />
     <entry file="file://$PROJECT_DIR$/SortingBySignedReversals.h" />
     <entry file="file://$PROJECT_DIR$/ExampleProblems/berlin52.opt.tour">
       <provider selected="true" editor-type-id="text-editor" />
@@ -1112,20 +1078,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/UnionFindStructure.h" />
     <entry file="file://$PROJECT_DIR$/UnionFindStructure.cpp" />
-    <entry file="file://$PROJECT_DIR$/ExampleProblems/sample_EUC_2D.tsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="3" lean-forward="true" selection-start-line="11" selection-start-column="3" selection-end-line="11" selection-end-column="3" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/include/c++/8.3.0/bits/stl_vector.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="414" column="6" selection-start-line="414" selection-start-column="6" selection-end-line="414" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/include/c++/8.3.0/bits/uniform_int_dist.h">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="199">
@@ -1217,56 +1169,12 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" selection-start-line="6" selection-end-line="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/TsplibUtils.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2194">
-          <caret line="369" selection-start-line="369" selection-end-line="369" />
-          <folding>
-            <element signature="e#48#64#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="182">
           <caret line="65" column="5" selection-start-line="65" selection-start-column="5" selection-end-line="65" selection-end-column="5" />
           <folding>
             <element signature="e#46#65#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="424">
-          <caret line="89" column="48" selection-start-line="89" selection-start-column="48" selection-end-line="89" selection-end-column="48" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="364">
-          <caret line="321" column="48" selection-start-line="321" selection-start-column="48" selection-end-line="321" selection-end-column="48" />
-          <folding>
-            <element signature="e#46#66#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/PrimsAlgorithm.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="409">
-          <caret line="50" column="9" lean-forward="true" selection-start-line="50" selection-start-column="9" selection-end-line="50" selection-end-column="9" />
-          <folding>
-            <element signature="e#46#66#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -1281,17 +1189,133 @@
         </state>
       </provider>
     </entry>
+    <entry file="file:///usr/include/c++/8.3.0/new">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="168" selection-start-line="168" selection-end-line="168" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/8.3.0/bits/stl_vector.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="929" selection-start-line="929" selection-end-line="929" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="60">
+          <caret line="4" column="39" selection-start-line="4" selection-start-column="39" selection-end-line="4" selection-end-column="39" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/8.3.0/bits/unordered_set.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="333" selection-start-line="333" selection-end-line="333" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/8.3.0/bits/predefined_ops.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="282" selection-start-line="282" selection-end-line="282" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/8.3.0/bits/stl_algo.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="940" selection-start-line="940" selection-end-line="940" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/8.3.0/bits/algorithmfwd.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="259">
+          <caret line="515" column="10" lean-forward="true" selection-start-line="515" selection-start-column="10" selection-end-line="515" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/PrimsAlgorithm.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="465">
+          <caret line="46" selection-start-line="46" selection-end-line="46" />
+          <folding>
+            <element signature="e#46#66#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ExampleProblems/sample_EUC_2D.tsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" column="3" lean-forward="true" selection-start-line="11" selection-start-column="3" selection-end-line="11" selection-end-column="3" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/AlphaDistances.h">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="257">
-          <caret line="27" column="86" lean-forward="true" selection-start-line="27" selection-start-column="86" selection-end-line="27" selection-end-column="86" />
+        <state relative-caret-position="171">
+          <caret line="19" column="35" lean-forward="true" selection-start-line="19" selection-start-column="35" selection-end-line="19" selection-end-column="35" />
+          <folding>
+            <element signature="e#144#165#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/ExampleProblems/fri26.opt.tour">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file:///usr/include/c++/8.3.0/bits/std_function.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="667" selection-start-line="667" selection-end-line="667" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/TsplibUtils.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="144">
+          <caret line="227" selection-start-line="227" selection-end-line="227" />
+          <folding>
+            <element signature="e#48#64#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/c++/8.3.0/bits/stl_iterator.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="126">
+          <caret line="836" selection-start-line="836" selection-end-line="836" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="361">
+          <caret line="240" selection-start-line="240" selection-end-line="240" />
+          <folding>
+            <element signature="e#46#66#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/LinKernighanHeuristic.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-89">
+          <caret line="40" selection-start-line="40" selection-end-line="40" />
+          <folding>
+            <element signature="e#157#175#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/AlphaDistances.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="586">
-          <caret line="212" column="17" selection-start-line="212" selection-start-column="8" selection-end-line="212" selection-end-column="17" />
+        <state relative-caret-position="183">
+          <caret line="196" column="34" selection-start-line="196" selection-start-column="34" selection-end-line="196" selection-end-column="34" />
           <folding>
             <element signature="e#46#66#0" expanded="true" />
           </folding>

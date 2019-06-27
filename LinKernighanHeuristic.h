@@ -6,6 +6,7 @@
 #define LINKERNINGHANALGORITHM_LINKERNIGHANHEURISTIC_H
 
 #include <cstddef>
+#include <functional>
 #include <iostream>
 #include <vector>
 #include "Tour.h"
@@ -36,10 +37,18 @@ std::ostream &operator<<(std::ostream &out, const AlternatingWalk &walk);
 
 // This class provides candidate edges for each vertex in a graph and functions for generating them
 
+// TODO: Refactor this class so that it does not inherit from std::vector
 class CandidateEdges : public std::vector<std::vector<vertex_t>> {
+private:
+    // Find the k nearest neighbors in the set of vertices 0, ..., dimension by using the distCompare function that
+    // decides for three vertices v, w1 and w2 if the distance between v and w1 is smaller than the distance between v
+    // and w2
+    static CandidateEdges rawNearestNeighbors(dimension_t dimension, size_t k,
+                                              const std::function<bool(vertex_t, vertex_t, vertex_t)> &distCompare);
+
 public:
     enum Type {
-        ALL_NEIGHBORS, NEAREST_NEIGHBORS, ALPHA_NEAREST_NEIGHBORS
+        ALL_NEIGHBORS, NEAREST_NEIGHBORS, ALPHA_NEAREST_NEIGHBORS, OPTIMIZED_ALPHA_NEAREST_NEIGHBORS
     };
 
     // For each vertex choose all edges as candidate edges
@@ -51,6 +60,10 @@ public:
     // For each vertex choose the k edges with minimal alpha distance as candidate edges
     // The alpha distance of an edge is defined as the increase in length of a 1-tree when required to contain this edge
     static CandidateEdges alphaNearestNeighbors(const TsplibProblem &problem, size_t k = 5);
+
+    // For each vertex choose the k edges with minimal alpha distance as candidate edges
+    // The alpha distances are optimized with subgradient optimization, see AlphaDistance
+    static CandidateEdges optimizedAlphaNearestNeighbors(const TsplibProblem &problem, size_t k = 5);
 };
 
 // ========================================== LinKernighanHeuristic class ==============================================
@@ -84,8 +97,9 @@ private:
 public:
     LinKernighanHeuristic() = delete;
 
-    explicit LinKernighanHeuristic(TsplibProblem &tsplibProblem,
-                                   CandidateEdges::Type candidateEdgeType = CandidateEdges::ALPHA_NEAREST_NEIGHBORS);
+    explicit LinKernighanHeuristic(
+            TsplibProblem &tsplibProblem,
+            CandidateEdges::Type candidateEdgeType = CandidateEdges::OPTIMIZED_ALPHA_NEAREST_NEIGHBORS);
 
     Tour findBestTour(size_t numberOfTrials = 50);
 };

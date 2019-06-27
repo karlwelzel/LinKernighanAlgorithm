@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.13)
 project(LinKerninghanAlgorithm)
 
 set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wextra -pedantic -pedantic-errors")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -pedantic-errors")
 #set(CMAKE_CXX_INCLUDE_WHAT_YOU_USE "/bin/include-what-you-use;-Xiwyu;any")
 
 

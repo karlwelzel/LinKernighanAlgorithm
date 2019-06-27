@@ -33,8 +33,10 @@ std::vector<signed_distance_t> OneTree::degrees() {
 
     for (vertex_t v = 0; v < parent.size(); v++) {
         // All edges (v, parent[v])
-        result[v]++;
-        result[parent[v]]++;
+        if (v != topologicalOrder.front()) {
+            result[v]++;
+            result[parent[v]]++;
+        }
     }
 
     // The edge (special, specialNeighbor)
@@ -45,8 +47,10 @@ std::vector<signed_distance_t> OneTree::degrees() {
 }
 
 OneTree minimumOneTree(dimension_t dimension, const std::function<distance_t(vertex_t, vertex_t)> &dist) {
-    std::vector<vertex_t> allVertices(dimension);
-    std::iota(allVertices.begin(), allVertices.end(), 0);
+    std::unordered_set<vertex_t> allVertices{};
+    for (vertex_t v = 0; v < dimension; ++v) {
+        allVertices.insert(v);
+    }
 
     std::vector<vertex_t> parent;
     std::vector<vertex_t> topologicalOrder;
@@ -59,24 +63,22 @@ OneTree minimumOneTree(dimension_t dimension, const std::function<distance_t(ver
     for (vertex_t v : allVertices) {
         leafs.erase(parent[v]);
     }
-    auto secondNearestNeighbor = [&allVertices, &dist](vertex_t v) {
-        std::vector<vertex_t> twoNearestNeighbors(2);
-        std::partial_sort_copy(allVertices.begin(), std::remove(allVertices.begin(), allVertices.end(), v),
-                               twoNearestNeighbors.begin(), twoNearestNeighbors.end(),
-                               [v, &dist](vertex_t w1, vertex_t w2) {
-                                   return dist(v, w1) < dist(v, w2);
-                               });
-        return twoNearestNeighbors[1];
+    auto secondNearestNeighbor = [&allVertices, &dist, &parent](vertex_t v) {
+        // The parent of v is the nearest neighbor for any leaf, so by excluding v and parent[v] the nearest neighbor
+        // that is left is automatically the second nearest
+        allVertices.erase(v);
+        allVertices.erase(parent[v]);
+        vertex_t result = *std::min_element(allVertices.begin(), allVertices.end(),
+                                            [v, &dist](vertex_t w1, vertex_t w2) { return dist(v, w1) < dist(v, w2); });
+        allVertices.insert(v);
+        allVertices.insert(parent[v]);
+        return result;
     };
     vertex_t special = *std::max_element(leafs.begin(), leafs.end(),
                                          [&dist, &secondNearestNeighbor](vertex_t v, vertex_t w) {
                                              return dist(v, secondNearestNeighbor(v)) <
                                                     dist(w, secondNearestNeighbor(w));
                                          });
-
-    // remove special from topologicalOrder
-    topologicalOrder.erase(std::remove(topologicalOrder.begin(), topologicalOrder.end(), special),
-                           topologicalOrder.end());
 
     // Determine the second nearest neighbor of special
     vertex_t specialNeighbor = secondNearestNeighbor(special);
@@ -92,7 +94,9 @@ betaValues(OneTree tree, dimension_t dimension, const std::function<distance_t(v
 
     // Set the beta values for edges (special, v)
     for (vertex_t vertex : tree.topologicalOrder) {
-        if (vertex == tree.parent[tree.special]) {
+        if (vertex == tree.special) {
+            continue;
+        } else if (vertex == tree.parent[tree.special]) {
             // alpha(special, vertex) = 0 so beta(special, vertex) = dist(special, vertex)
             beta[tree.special][vertex] = beta[vertex][tree.special] = dist(tree.special, vertex);
         } else {
@@ -104,8 +108,10 @@ betaValues(OneTree tree, dimension_t dimension, const std::function<distance_t(v
 
     // Compute the beta values for all other edges as described in the paper by Keld Helsgaun from 2000
     for (auto i = tree.topologicalOrder.begin(); i != tree.topologicalOrder.end(); ++i) {
+        if (*i == tree.special) continue;
         for (auto j = i + 1; j != tree.topologicalOrder.end(); ++j) {
-            // beta[x][x] has the smallest possible value 0, so it will never be chosen here
+            if (*j == tree.special) continue;
+            // beta[x][x] has the smallest possible value 0, so it will never be chosen as the maximum
             beta[*i][*j] = beta[*j][*i] = std::max(beta[*i][tree.parent[*j]], dist(*j, tree.parent[*j]));
         }
     }
@@ -169,12 +175,12 @@ optimizedAlphaDistances(dimension_t dimension, const std::function<distance_t(ve
     std::vector<signed_distance_t> previousSubgradient = currentSubgradient;
 
 
-
     // Stop the subgradient optimization if the step size the length of the period or the gradient vector is zero
-    while (stepSize == 0 or periodLength == 0 or std::all_of(currentSubgradient.begin(), currentSubgradient.end(),
-                                                             [](signed_distance_t d) { return d == 0; })) {
+    while (stepSize != 0 and periodLength != 0 and !std::all_of(currentSubgradient.begin(), currentSubgradient.end(),
+                                                                [](signed_distance_t d) { return d == 0; })) {
         // Start of the period
-        while (++iteration < periodLength) {
+        while (iteration++ < periodLength and !std::all_of(currentSubgradient.begin(), currentSubgradient.end(),
+                                                           [](signed_distance_t d) { return d == 0; })) {
             // Update the penalties
             for (size_t i = 0; i < penalties.size(); ++i) {
                 penalties[i] += lround(stepSize * (0.7 * currentSubgradient[i] + 0.3 * previousSubgradient[i]));
@@ -187,6 +193,8 @@ optimizedAlphaDistances(dimension_t dimension, const std::function<distance_t(ve
             std::transform(currentSubgradient.begin(), currentSubgradient.end(), currentSubgradient.begin(),
                            [](signed_distance_t d) { return d - 2; });
             currentObjective = objectiveFunction();
+            std::cout << "currentObjective: " << currentObjective << ", stepSize: " << stepSize << ", iteration: "
+                      << iteration << ", periodLength: " << periodLength << std::endl;
 
             // In the first period the step size is doubled until the objective function does not increase
             if (doubleStepSize) {

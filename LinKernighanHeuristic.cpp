@@ -11,6 +11,7 @@
 #include <stdexcept>
 #include <string>
 #include <tuple>
+#include <unordered_set>
 #include <vector>
 #include "Tour.h"
 #include "TsplibUtils.h"
@@ -58,6 +59,7 @@ CandidateEdges CandidateEdges::allNeighbors(const TsplibProblem &problem) {
     CandidateEdges result;
     std::vector<vertex_t> allVertices(problem.getDimension());
     std::iota(allVertices.begin(), allVertices.end(), 0);
+
     result.assign(problem.getDimension(), allVertices);
     for (vertex_t v : allVertices) {
         // Delete v from its neighbors
@@ -66,47 +68,59 @@ CandidateEdges CandidateEdges::allNeighbors(const TsplibProblem &problem) {
     return result;
 }
 
-CandidateEdges CandidateEdges::nearestNeighbors(const TsplibProblem &problem, size_t k) {
-    std::vector<vertex_t> allVertices(problem.getDimension());
-    std::iota(allVertices.begin(), allVertices.end(), 0);
+CandidateEdges CandidateEdges::rawNearestNeighbors(dimension_t dimension, size_t k,
+                                                   const std::function<bool(vertex_t, vertex_t,
+                                                                            vertex_t)> &distCompare) {
+    std::unordered_set<vertex_t> allVertices{};
+    for (vertex_t v = 0; v < dimension; ++v) {
+        allVertices.insert(v);
+    }
 
     CandidateEdges result;
-    result.resize(problem.getDimension());
-    for (vertex_t v = 0; v < problem.getDimension(); ++v) {
+    result.resize(dimension);
+    for (vertex_t v = 0; v < dimension; ++v) {
         // Sort the k nearest neighbors of v by distance to v and put them in result[v]
         result[v].resize(k);
-        std::partial_sort_copy(allVertices.begin(), std::remove(allVertices.begin(), allVertices.end(), v),
-                               result[v].begin(), result[v].end(),
-                               [&problem, v](vertex_t w1, vertex_t w2) {
-                                   return problem.dist(v, w1) < problem.dist(v, w2);
-                               });
+        allVertices.erase(v); // Don't include v in the search
+        std::partial_sort_copy(allVertices.begin(), allVertices.end(), result[v].begin(), result[v].end(),
+                               std::bind(distCompare, v, std::placeholders::_1, std::placeholders::_2));
+        allVertices.insert(v);
     }
     return result;
 }
 
+CandidateEdges CandidateEdges::nearestNeighbors(const TsplibProblem &problem, size_t k) {
+    auto distCompare = [&problem](vertex_t v, vertex_t w1, vertex_t w2) {
+        return problem.dist(v, w1) < problem.dist(v, w2);
+    };
+
+    return rawNearestNeighbors(problem.getDimension(), k, distCompare);
+}
+
 CandidateEdges CandidateEdges::alphaNearestNeighbors(const TsplibProblem &problem, size_t k) {
-    dimension_t dimension = problem.getDimension();
     auto dist = [&problem](vertex_t i, vertex_t j) { return problem.dist(i, j); };
 
     // Compute the alpha distances
-    std::vector<std::vector<distance_t>> alpha = alphaDistances(dimension, dist);
+    std::vector<std::vector<distance_t>> alpha = alphaDistances(problem.getDimension(), dist);
 
-    std::vector<vertex_t> allVertices(dimension);
-    std::iota(allVertices.begin(), allVertices.end(), 0);
+    auto distCompare = [&problem, &alpha](vertex_t v, vertex_t w1, vertex_t w2) {
+        return std::make_tuple(alpha[v][w1], problem.dist(v, w1)) <
+               std::make_tuple(alpha[v][w2], problem.dist(v, w2));
+    };
+    return rawNearestNeighbors(problem.getDimension(), k, distCompare);
+}
 
-    // Store the k alpha-nearest neighbors for each vertex
-    CandidateEdges result;
-    result.resize(problem.getDimension());
-    for (vertex_t v = 0; v < problem.getDimension(); ++v) {
-        result[v].resize(k);
-        auto alphaCompare = [&dist, &alpha, v](vertex_t w1, vertex_t w2) {
-            return std::make_tuple(alpha[v][w1], dist(v, w1)) < std::make_tuple(alpha[v][w2], dist(v, w2));
-        };
-        std::partial_sort_copy(allVertices.begin(), std::remove(allVertices.begin(), allVertices.end(), v),
-                               result[v].begin(), result[v].end(), alphaCompare);
-    }
+CandidateEdges CandidateEdges::optimizedAlphaNearestNeighbors(const TsplibProblem &problem, size_t k) {
+    auto dist = [&problem](vertex_t i, vertex_t j) { return problem.dist(i, j); };
 
-    return result;
+    // Compute the optimized alpha distances
+    std::vector<std::vector<distance_t>> alpha = optimizedAlphaDistances(problem.getDimension(), dist);
+
+    auto distCompare = [&problem, &alpha](vertex_t v, vertex_t w1, vertex_t w2) {
+        return std::make_tuple(alpha[v][w1], problem.dist(v, w1)) <
+               std::make_tuple(alpha[v][w2], problem.dist(v, w2));
+    };
+    return rawNearestNeighbors(problem.getDimension(), k, distCompare);
 }
 
 // ============================================= linKernighanHeuristic =================================================
@@ -122,6 +136,9 @@ LinKernighanHeuristic::LinKernighanHeuristic(TsplibProblem &tsplibProblem, Candi
             break;
         case CandidateEdges::ALPHA_NEAREST_NEIGHBORS:
             candidateEdges = CandidateEdges::alphaNearestNeighbors(tsplibProblem);
+            break;
+        case CandidateEdges::OPTIMIZED_ALPHA_NEAREST_NEIGHBORS:
+            candidateEdges = CandidateEdges::optimizedAlphaNearestNeighbors(tsplibProblem);
             break;
     }
 }
