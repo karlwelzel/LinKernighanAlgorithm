@@ -319,7 +319,7 @@ Tour LinKernighanHeuristic::findBestTour(size_t numberOfTrials) {
     currentBestTour = improveTour(generateRandomTour());
     while (--numberOfTrials > 0) {
         currentTour = improveTour(generateRandomTour());
-        std::cout << "Trial result: " << tsplibProblem.length(currentTour) << ", best: "
+        std::cout << "Trial " << numberOfTrials << ", result: " << tsplibProblem.length(currentTour) << ", best: "
                   << tsplibProblem.length(currentBestTour) << std::endl;
         if (tsplibProblem.length(currentTour) < tsplibProblem.length(currentBestTour)) {
             currentBestTour = currentTour;

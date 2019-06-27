@@ -87,7 +87,7 @@ public:
     explicit LinKernighanHeuristic(TsplibProblem &tsplibProblem,
                                    CandidateEdges::Type candidateEdgeType = CandidateEdges::ALPHA_NEAREST_NEIGHBORS);
 
-    Tour findBestTour(size_t numberOfTrials = 5);
+    Tour findBestTour(size_t numberOfTrials = 50);
 };
 
 #endif //LINKERNINGHANALGORITHM_LINKERNIGHANHEURISTIC_H

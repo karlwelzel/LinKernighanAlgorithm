@@ -13,16 +13,6 @@
 #include "AlphaDistances.h"
 #include "PrimsAlgorithm.h"
 
-vertex_t secondNearestNeighbor(vertex_t v, std::vector<vertex_t> &vertices,
-                               const std::function<distance_t(vertex_t, vertex_t)> &dist) {
-    std::vector<vertex_t> twoNearestNeighbors(2);
-    std::partial_sort_copy(vertices.begin(), std::remove(vertices.begin(), vertices.end(), v),
-                           twoNearestNeighbors.begin(), twoNearestNeighbors.end(),
-                           [v, &dist](vertex_t w1, vertex_t w2) {
-                               return dist(v, w1) < dist(v, w2);
-                           });
-    return twoNearestNeighbors[1];
-}
 
 std::vector<std::vector<distance_t>>
 betaValues(dimension_t dimension, const std::function<distance_t(vertex_t, vertex_t)> &dist) {
@@ -35,7 +25,6 @@ betaValues(dimension_t dimension, const std::function<distance_t(vertex_t, verte
     // Generate a minimum spanning tree in the complete graph
     std::tie(parent, topologicalOrder) = primsAlgorithm(dimension, dist);
 
-    // TODO: Don't fix the special node
     // TODO: Use subgradient optimization
 
     // Determine the special vertex "1" by selecting the leaf with longest second nearest neighbor distance
@@ -43,12 +32,21 @@ betaValues(dimension_t dimension, const std::function<distance_t(vertex_t, verte
     for (vertex_t v : allVertices) {
         leafs.erase(parent[v]);
     }
+    auto secondNearestNeighbor = [&allVertices, &dist](vertex_t v) {
+        std::vector<vertex_t> twoNearestNeighbors(2);
+        std::partial_sort_copy(allVertices.begin(), std::remove(allVertices.begin(), allVertices.end(), v),
+                               twoNearestNeighbors.begin(), twoNearestNeighbors.end(),
+                               [v, &dist](vertex_t w1, vertex_t w2) {
+                                   return dist(v, w1) < dist(v, w2);
+                               });
+        return twoNearestNeighbors[1];
+    };
     vertex_t special = *std::max_element(leafs.begin(), leafs.end(),
-                                         [&allVertices, &dist](vertex_t v, vertex_t w) {
-                                             return dist(v, secondNearestNeighbor(v, allVertices, dist)) <
-                                                    dist(w, secondNearestNeighbor(w, allVertices, dist));
+                                         [&dist, &secondNearestNeighbor](vertex_t v, vertex_t w) {
+                                             return dist(v, secondNearestNeighbor(v)) <
+                                                    dist(w, secondNearestNeighbor(w));
                                          });
-    vertex_t specialNeighbor = secondNearestNeighbor(special, allVertices, dist);
+    vertex_t specialNeighbor = secondNearestNeighbor(special);
     topologicalOrder.erase(std::remove(topologicalOrder.begin(), topologicalOrder.end(), special),
                            topologicalOrder.end());
 
@@ -73,7 +71,7 @@ betaValues(dimension_t dimension, const std::function<distance_t(vertex_t, verte
 
     // Compute the beta values for all other edges as described in the paper by Keld Helsgaun from 2000
     for (auto i = topologicalOrder.begin(); i != topologicalOrder.end(); ++i) {
-        for (auto j = i + 1; j < topologicalOrder.end(); ++j) {
+        for (auto j = i + 1; j != topologicalOrder.end(); ++j) {
             // beta[x][x] has the smallest possible value 0, so it will never be chosen here
             beta[*i][*j] = beta[*j][*i] = std::max(beta[*i][parent[*j]], dist(*j, parent[*j]));
         }
