@@ -12,6 +12,7 @@
 #include <string>
 #include <tuple>
 #include <unordered_set>
+#include <utility>
 #include <vector>
 #include "Tour.h"
 #include "TsplibUtils.h"
@@ -126,24 +127,25 @@ CandidateEdges CandidateEdges::optimizedAlphaNearestNeighbors(const TsplibProble
     return rawNearestNeighbors(problem.getDimension(), k, distCompare);
 }
 
+CandidateEdges CandidateEdges::create(const TsplibProblem &problem, CandidateEdges::Type candidateEdgeType,
+                                      size_t k) {
+    switch (candidateEdgeType) {
+        case Type::ALL_NEIGHBORS:
+            return CandidateEdges::allNeighbors(problem);
+        case Type::NEAREST_NEIGHBORS:
+            return CandidateEdges::nearestNeighbors(problem, k);
+        case Type::ALPHA_NEAREST_NEIGHBORS:
+            return CandidateEdges::alphaNearestNeighbors(problem, k);
+        default:
+        case Type::OPTIMIZED_ALPHA_NEAREST_NEIGHBORS:
+            return CandidateEdges::optimizedAlphaNearestNeighbors(problem, k);
+    }
+}
+
 // ============================================= linKernighanHeuristic =================================================
 
-LinKernighanHeuristic::LinKernighanHeuristic(TsplibProblem &tsplibProblem, CandidateEdges::Type candidateEdgeType)
-        : tsplibProblem(tsplibProblem) {
-    switch (candidateEdgeType) {
-        case CandidateEdges::ALL_NEIGHBORS:
-            candidateEdges = CandidateEdges::allNeighbors(tsplibProblem);
-            break;
-        case CandidateEdges::NEAREST_NEIGHBORS:
-            candidateEdges = CandidateEdges::nearestNeighbors(tsplibProblem);
-            break;
-        case CandidateEdges::ALPHA_NEAREST_NEIGHBORS:
-            candidateEdges = CandidateEdges::alphaNearestNeighbors(tsplibProblem);
-            break;
-        case CandidateEdges::OPTIMIZED_ALPHA_NEAREST_NEIGHBORS:
-            candidateEdges = CandidateEdges::optimizedAlphaNearestNeighbors(tsplibProblem);
-            break;
-    }
+LinKernighanHeuristic::LinKernighanHeuristic(TsplibProblem &tsplibProblem, CandidateEdges candidateEdges)
+        : tsplibProblem(tsplibProblem), candidateEdges(std::move(candidateEdges)) {
 }
 
 vertex_t LinKernighanHeuristic::chooseRandomElement(const std::vector<vertex_t> &elements) {
@@ -319,7 +321,7 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
     }
 }
 
-Tour LinKernighanHeuristic::findBestTour(size_t numberOfTrials) {
+Tour LinKernighanHeuristic::findBestTour(size_t numberOfTrials, distance_t optimumTourLength, double acceptableError) {
     if (numberOfTrials < 1) {
         throw std::runtime_error("The number of trials can not be lower than 1.");
     }
@@ -327,10 +329,16 @@ Tour LinKernighanHeuristic::findBestTour(size_t numberOfTrials) {
     Tour currentTour;
     while (--numberOfTrials > 0) {
         currentTour = improveTour(generateRandomTour());
-        std::cout << "Trial " << numberOfTrials << ", result: " << tsplibProblem.length(currentTour) << ", best: "
-                  << tsplibProblem.length(currentBestTour) << std::endl;
         if (tsplibProblem.length(currentTour) < tsplibProblem.length(currentBestTour)) {
             currentBestTour = currentTour;
+        }
+        std::cout << "Trial " << numberOfTrials << ", result: " << tsplibProblem.length(currentTour) << ", best: "
+                  << tsplibProblem.length(currentBestTour) << std::endl;
+
+        // Stop if the increase in length of the current best tour relative to the optimal length is below the
+        // threshold set by acceptableError
+        if (tsplibProblem.length(currentBestTour) < (1 + acceptableError) * optimumTourLength) {
+            break;
         }
     }
     return currentBestTour;

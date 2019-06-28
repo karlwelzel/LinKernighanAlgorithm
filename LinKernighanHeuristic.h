@@ -56,15 +56,19 @@ public:
     static CandidateEdges allNeighbors(const TsplibProblem &problem);
 
     // For each vertex choose the k edges with minimal distance as candidate edges
-    static CandidateEdges nearestNeighbors(const TsplibProblem &problem, size_t k = 5);
+    static CandidateEdges nearestNeighbors(const TsplibProblem &problem, size_t k);
 
     // For each vertex choose the k edges with minimal alpha distance as candidate edges
     // The alpha distance of an edge is defined as the increase in length of a 1-tree when required to contain this edge
-    static CandidateEdges alphaNearestNeighbors(const TsplibProblem &problem, size_t k = 5);
+    static CandidateEdges alphaNearestNeighbors(const TsplibProblem &problem, size_t k);
 
     // For each vertex choose the k edges with minimal alpha distance as candidate edges
     // The alpha distances are optimized with subgradient optimization, see AlphaDistance
-    static CandidateEdges optimizedAlphaNearestNeighbors(const TsplibProblem &problem, size_t k = 5);
+    static CandidateEdges optimizedAlphaNearestNeighbors(const TsplibProblem &problem, size_t k);
+
+    // Create candidate edges of type candidateEdgeType with k candidate edges for each vertex
+    // numberOfCandidateEdges is ignored for Type::ALL_NEIGHBORS
+    static CandidateEdges create(const TsplibProblem &problem, Type candidateEdgeType, size_t k);
 
 public:
     CandidateEdges() = default;
@@ -107,11 +111,9 @@ private:
 public:
     LinKernighanHeuristic() = delete;
 
-    explicit LinKernighanHeuristic(
-            TsplibProblem &tsplibProblem,
-            CandidateEdges::Type candidateEdgeType = CandidateEdges::OPTIMIZED_ALPHA_NEAREST_NEIGHBORS);
+    explicit LinKernighanHeuristic(TsplibProblem &tsplibProblem, CandidateEdges candidateEdges);
 
-    Tour findBestTour(size_t numberOfTrials = 50);
+    Tour findBestTour(size_t numberOfTrials, distance_t optimumTourLength = 0, double acceptableError = 0);
 };
 
 #endif //LINKERNINGHANALGORITHM_LINKERNIGHANHEURISTIC_H
