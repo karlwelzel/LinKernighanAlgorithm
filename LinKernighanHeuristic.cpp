@@ -207,8 +207,6 @@ Tour LinKernighanHeuristic::generateRandomTour() {
 Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
     const dimension_t dimension = tsplibProblem.getDimension();
 
-    // TODO: Introduce the "Don't look" bit
-
     // TODO: Remove the output "length of startTour"
     std::cout << "length of startTour: " << tsplibProblem.length(startTour) << std::endl;
 

@@ -8,19 +8,6 @@
 #include "Tour.h"
 #include "TsplibUtils.h"
 
-// TSPLIB test instances:
-// berlin52            EUC_2D
-// ch130               EUC_2D (with decimal places)
-// d198                EUC_2D (coordinates in scientific notation)
-// usa13509            EUC_2D (too big)
-// pla7397             CEIL_2D
-// brg180              UPPER_ROW
-// si175               UPPER_DIAG_ROW
-// si1032              UPPER_DIAG_ROW
-// fri26               LOWER_DIAG_ROW
-// swiss42             FULL_MATRIX
-
-
 int main(int argc, char *argv[]) {
     std::ifstream problemFile;
     if (argc < 2) {
@@ -49,17 +36,6 @@ int main(int argc, char *argv[]) {
                 << std::endl;
         return 1;
     }
-
-/*
-    // DEBUG: Print out all distances in matrix form
-    for (vertex_t i = 0; i < problem.getDimension(); ++i) {
-        for (vertex_t j = 0; j < problem.getDimension(); ++j) {
-            std::cout.width(10);
-            std::cout << problem.dist(i, j);
-        }
-        std::cout << std::endl;
-    }
-*/
 
     // Use the heuristic from the introduction assignment to get a tour to start with and optimize it with the
     // Lin-Kernighan-heuristic
