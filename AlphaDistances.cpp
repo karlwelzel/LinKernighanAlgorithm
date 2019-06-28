@@ -7,7 +7,6 @@
 #include <cstddef>
 #include <functional>
 #include <memory>
-#include <numeric>
 #include <tuple>
 #include <vector>
 #include <unordered_set>
@@ -164,9 +163,6 @@ optimizedAlphaDistances(dimension_t dimension, const std::function<signed_distan
                    [](signed_distance_t d) { return d - 2; });
     std::vector<signed_distance_t> previousSubgradient = currentSubgradient;
 
-    std::cout << "currentObjective: " << currentObjective << ", stepSize: " << stepSize << ", iteration: "
-              << iteration << ", periodLength: " << periodLength << std::endl;
-
     // Stop the subgradient optimization if the step size the length of the period or the gradient vector is zero
     while (stepSize != 0 and periodLength != 0 and !std::all_of(currentSubgradient.begin(), currentSubgradient.end(),
                                                                 [](signed_distance_t d) { return d == 0; })) {
@@ -185,8 +181,6 @@ optimizedAlphaDistances(dimension_t dimension, const std::function<signed_distan
             std::transform(currentSubgradient.begin(), currentSubgradient.end(), currentSubgradient.begin(),
                            [](signed_distance_t d) { return d - 2; });
             currentObjective = objectiveFunction();
-            std::cout << "currentObjective: " << currentObjective << ", stepSize: " << stepSize << ", iteration: "
-                      << iteration << ", periodLength: " << periodLength << std::endl;
 
             // In the first period the step size is doubled until the objective function does not increase
             if (doubleStepSize) {
@@ -204,7 +198,6 @@ optimizedAlphaDistances(dimension_t dimension, const std::function<signed_distan
             }
 
             previousObjective = currentObjective;
-
         }
 
         // End of the period

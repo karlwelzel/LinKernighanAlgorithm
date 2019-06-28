@@ -5,7 +5,6 @@
 // This library contains the code for the introduction assignment
 
 #include <algorithm>
-#include <iostream>
 #include <memory>
 #include <numeric>
 #include <stdexcept>

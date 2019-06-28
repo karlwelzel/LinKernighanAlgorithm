@@ -113,7 +113,8 @@ public:
 
     explicit LinKernighanHeuristic(TsplibProblem &tsplibProblem, CandidateEdges candidateEdges);
 
-    Tour findBestTour(size_t numberOfTrials, distance_t optimumTourLength = 0, double acceptableError = 0);
+    Tour findBestTour(size_t numberOfTrials, distance_t optimumTourLength = 0, double acceptableError = 0,
+                      bool verboseOutput = true);
 };
 
 #endif //LINKERNINGHANALGORITHM_LINKERNIGHANHEURISTIC_H

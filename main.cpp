@@ -10,6 +10,8 @@
 #include "Tour.h"
 #include "TsplibUtils.h"
 
+// TODO: Replace all size_t by std::size_t because the latter is the C++ way
+
 int main(int argc, char *argv[]) {
     const std::string helpString = R""(
 Usage:
@@ -48,16 +50,9 @@ Restrictions:
     if (argc < 2) {
         std::cerr << "No TSPLIB file was supplied." << std::endl;
         std::cout << helpString;
+        return 1;
     } else if (strcmp(argv[1], "--help") == 0) {
         std::cout << helpString;
-    }
-
-    std::ifstream problemFile(argv[1]);
-
-    // Check whether the problem file could be opened
-    if (!problemFile.is_open() or !problemFile.good()) {
-        std::cerr << "Could not open the TSPLIB file '" << argv[1] << "'" << std::endl;
-        return 1;
     }
 
     size_t numberOfTrials = 50;
@@ -117,6 +112,14 @@ Restrictions:
         stringStream.clear();
     }
 
+    std::ifstream problemFile(argv[1]);
+
+    // Check whether the problem file could be opened
+    if (!problemFile.is_open() or !problemFile.good()) {
+        std::cerr << "Could not open the TSPLIB file '" << argv[1] << "'" << std::endl;
+        return 1;
+    }
+
     // Interpret the problem file and report any syntax errors, logical errors or unsupported keywords
     TsplibProblem problem;
     std::string errorMessage = problem.readFile(problemFile);
@@ -127,17 +130,28 @@ Restrictions:
         return 1;
     }
 
-    if (verboseOutput) {
-        std::cout << "Opened the " << problem.getName() << " TSPLIB file" << std::endl << std::endl;
+    if (verboseOutput) std::cout << "Opened the " << problem.getName() << " TSPLIB file" << std::endl;
+
+    CandidateEdges candidateEdges = CandidateEdges::create(problem, candidateEdgeType, numberOfCandidateEdges);
+
+    if (verboseOutput) std::cout << "Computed candidate edges" << std::endl;
+
+    LinKernighanHeuristic heuristic(problem, candidateEdges);
+    const Tour tour = heuristic.findBestTour(numberOfTrials, optimumTourLength, acceptableError / 100, verboseOutput);
+
+    // Output the best tour found by the algorithm
+    std::string tourName = problem.getName() + ".lk.tour";
+    if (outputToFile) {
+        std::ofstream outputFile(tourName);
+        outputFile << TsplibTour(tourName, tour).toTsplibTourFile() << std::endl;
+        outputFile.close();
+
+        if (verboseOutput) std::cout << "Successfully written the tour to '" << tourName << "'" << std::endl;
+    } else {
+        std::cout << std::endl << TsplibTour(tourName, tour).toTsplibTourFile() << std::endl;
     }
 
-    LinKernighanHeuristic heuristic(
-            problem, CandidateEdges::create(problem, candidateEdgeType, numberOfCandidateEdges));
-    const Tour tour = heuristic.findBestTour(numberOfTrials, optimumTourLength, acceptableError / 100);
-
-    // Output the best tour found by the algorithm and compare it to the length of the optimal tour if given
-    std::cout << std::endl << TsplibTour(problem.getName() + ".tour", tour).toTsplibTourFile() << std::endl;
-
+    // Compare the tour length to the length of the optimal tour if given
     distance_t length = problem.length(tour);
     if (optimumTourLength == 0) {
         std::cout << "The shortest tour found is " << length << " units long." << std::endl;

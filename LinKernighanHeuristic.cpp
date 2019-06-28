@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <iostream>
+#include <limits>
 #include <memory>
 #include <numeric>
 #include <random>
@@ -209,9 +210,6 @@ Tour LinKernighanHeuristic::generateRandomTour() {
 Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
     const dimension_t dimension = tsplibProblem.getDimension();
 
-    // TODO: Remove the output "length of startTour"
-    std::cout << "length of startTour: " << tsplibProblem.length(startTour) << std::endl;
-
     Tour currentTour = startTour;
     std::vector<std::vector<vertex_t>> vertexChoices;
     AlternatingWalk currentWalk;
@@ -231,14 +229,7 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
         while (true) {
             if (vertexChoices[i].empty()) {
                 if (highestGain > 0) {
-                    //distance_t previousLength = tsplibProblem.length(currentTour);
-                    //std::cout << "Exchange done: " << bestAlternatingWalk << std::endl;
                     currentTour.exchange(bestAlternatingWalk);
-                    //std::cout << " with gain: " << tsplibProblem.exchangeGain(bestAlternatingWalk)
-                    //          << " (highestGain = " << highestGain << ")" << std::endl;
-                    //std::cout << " new tour: " << currentTour << std::endl;
-                    //std::cout << " previous length: " << previousLength << std::endl;
-                    //std::cout << " new length: " << tsplibProblem.length(currentTour) << std::endl;
                     break;
                 } else { // highestGain == 0
                     if (i == 0) {
@@ -321,19 +312,31 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
     }
 }
 
-Tour LinKernighanHeuristic::findBestTour(size_t numberOfTrials, distance_t optimumTourLength, double acceptableError) {
+Tour LinKernighanHeuristic::findBestTour(size_t numberOfTrials, distance_t optimumTourLength, double acceptableError,
+                                         bool verboseOutput) {
     if (numberOfTrials < 1) {
         throw std::runtime_error("The number of trials can not be lower than 1.");
     }
-    currentBestTour = improveTour(generateRandomTour());
+
+    Tour startTour;
     Tour currentTour;
-    while (--numberOfTrials > 0) {
-        currentTour = improveTour(generateRandomTour());
-        if (tsplibProblem.length(currentTour) < tsplibProblem.length(currentBestTour)) {
+    distance_t currentBestLength = std::numeric_limits<distance_t>::max();
+    size_t trialCount = 0;
+
+    while (trialCount++ < numberOfTrials) {
+        if (verboseOutput) std::cout << "Trial " << trialCount << " | ";
+
+        startTour = generateRandomTour();
+        if (verboseOutput) std::cout << "Length of startTour: " << tsplibProblem.length(startTour) << " | ";
+
+        currentTour = improveTour(startTour);
+        if (verboseOutput) std::cout << "Length of currentTour: " << tsplibProblem.length(currentTour) << " | ";
+
+        if (tsplibProblem.length(currentTour) < currentBestLength) {
             currentBestTour = currentTour;
+            currentBestLength = tsplibProblem.length(currentBestTour);
         }
-        std::cout << "Trial " << numberOfTrials << ", result: " << tsplibProblem.length(currentTour) << ", best: "
-                  << tsplibProblem.length(currentBestTour) << std::endl;
+        if (verboseOutput) std::cout << "Length of currentBestTour: " << currentBestLength << std::endl;
 
         // Stop if the increase in length of the current best tour relative to the optimal length is below the
         // threshold set by acceptableError
@@ -341,5 +344,6 @@ Tour LinKernighanHeuristic::findBestTour(size_t numberOfTrials, distance_t optim
             break;
         }
     }
+
     return currentBestTour;
 }
