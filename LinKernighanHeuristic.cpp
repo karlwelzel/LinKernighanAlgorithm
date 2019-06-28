@@ -55,12 +55,18 @@ std::ostream &operator<<(std::ostream &out, const AlternatingWalk &walk) {
 
 // ============================================= CandidateEdges class =================================================
 
+CandidateEdges::CandidateEdges(dimension_t dimension, const std::vector<vertex_t> &fillValue) : edges(dimension,
+                                                                                                      fillValue) {}
+
+std::vector<vertex_t> &CandidateEdges::operator[](size_t index) {
+    return edges[index];
+}
+
 CandidateEdges CandidateEdges::allNeighbors(const TsplibProblem &problem) {
-    CandidateEdges result;
     std::vector<vertex_t> allVertices(problem.getDimension());
     std::iota(allVertices.begin(), allVertices.end(), 0);
 
-    result.assign(problem.getDimension(), allVertices);
+    CandidateEdges result(problem.getDimension(), allVertices);
     for (vertex_t v : allVertices) {
         // Delete v from its neighbors
         result[v].erase(std::remove(result[v].begin(), result[v].end(), v), result[v].end());
@@ -68,19 +74,16 @@ CandidateEdges CandidateEdges::allNeighbors(const TsplibProblem &problem) {
     return result;
 }
 
-CandidateEdges CandidateEdges::rawNearestNeighbors(dimension_t dimension, size_t k,
-                                                   const std::function<bool(vertex_t, vertex_t,
-                                                                            vertex_t)> &distCompare) {
+CandidateEdges CandidateEdges::rawNearestNeighbors(
+        dimension_t dimension, size_t k, const std::function<bool(vertex_t, vertex_t, vertex_t)> &distCompare) {
     std::unordered_set<vertex_t> allVertices{};
     for (vertex_t v = 0; v < dimension; ++v) {
         allVertices.insert(v);
     }
 
-    CandidateEdges result;
-    result.resize(dimension);
+    CandidateEdges result(dimension, std::vector<vertex_t>(k));
     for (vertex_t v = 0; v < dimension; ++v) {
         // Sort the k nearest neighbors of v by distance to v and put them in result[v]
-        result[v].resize(k);
         allVertices.erase(v); // Don't include v in the search
         std::partial_sort_copy(allVertices.begin(), allVertices.end(), result[v].begin(), result[v].end(),
                                std::bind(distCompare, v, std::placeholders::_1, std::placeholders::_2));
@@ -170,9 +173,6 @@ Tour LinKernighanHeuristic::generateRandomTour() {
     // (3) otherVertex was not already chosen
     // Choose the next current vertex randomly from the first non-empty category above
 
-    // TODO: Remove the category counter
-    std::vector<size_t> categoryCounter(3);
-
     std::vector<vertex_t> candidatesInBestTour; // Category (1)
     std::vector<vertex_t> candidates; // Category (2)
     // Category (3) is remainingVertices
@@ -191,20 +191,15 @@ Tour LinKernighanHeuristic::generateRandomTour() {
 
         if (!candidatesInBestTour.empty()) {
             currentVertex = chooseRandomElement(candidatesInBestTour);
-            categoryCounter[0]++;
         } else if (!candidates.empty()) {
             currentVertex = chooseRandomElement(candidates);
-            categoryCounter[1]++;
         } else {
             currentVertex = chooseRandomElement(remainingVertices);
-            categoryCounter[2]++;
         }
         remainingVertices.erase(std::remove(remainingVertices.begin(), remainingVertices.end(), currentVertex),
                                 remainingVertices.end());
         tourOrder.push_back(currentVertex);
     }
-    std::cout << "Random tour: (1): " << categoryCounter[0] << ", (2): " << categoryCounter[1] << ", (3): "
-              << categoryCounter[2] << std::endl;
 
     return Tour(tourOrder);
 }
@@ -259,19 +254,6 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
 
             currentWalk.push_back(vertexChoices[i].back());
             vertexChoices[i].pop_back();
-
-            // TODO: Remove these debugging checks
-            // DEBUG:
-            if (vertexChoices.size() != i + 1) {
-                throw std::runtime_error(
-                        "vertexChoices.size() (=" + std::to_string(vertexChoices.size()) + ") is not i+1 (=" +
-                        std::to_string(i + 1) + ")");
-            }
-            if (currentWalk.size() != i + 1) {
-                throw std::runtime_error(
-                        "currentWalk.size() (=" + std::to_string(currentWalk.size()) + ") is not i+1 (=" +
-                        std::to_string(i + 1) + ")");
-            }
 
             if (i % 2 == 1 and i >= 3) {
                 AlternatingWalk closedWalk = currentWalk.close(); // closedWalk = (x_0, x_1, ..., x_i, x_0)

@@ -11,6 +11,8 @@
 #include "Tour.h"
 #include "PrimsAlgorithm.h"
 
+// TODO: priority queue
+
 std::tuple<std::vector<vertex_t>, std::vector<vertex_t>>
 primsAlgorithm(dimension_t dimension, const std::function<signed_distance_t(vertex_t, vertex_t)> &dist) {
     signed_distance_t infiniteDistance = std::numeric_limits<signed_distance_t>::max();

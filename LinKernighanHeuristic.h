@@ -37,9 +37,10 @@ std::ostream &operator<<(std::ostream &out, const AlternatingWalk &walk);
 
 // This class provides candidate edges for each vertex in a graph and functions for generating them
 
-// TODO: Refactor this class so that it does not inherit from std::vector
-class CandidateEdges : public std::vector<std::vector<vertex_t>> {
+class CandidateEdges {
 private:
+    std::vector<std::vector<vertex_t>> edges;
+
     // Find the k nearest neighbors in the set of vertices 0, ..., dimension by using the distCompare function that
     // decides for three vertices v, w1 and w2 if the distance between v and w1 is smaller than the distance between v
     // and w2
@@ -64,6 +65,15 @@ public:
     // For each vertex choose the k edges with minimal alpha distance as candidate edges
     // The alpha distances are optimized with subgradient optimization, see AlphaDistance
     static CandidateEdges optimizedAlphaNearestNeighbors(const TsplibProblem &problem, size_t k = 5);
+
+public:
+    CandidateEdges() = default;
+
+    // Fill edges with dimension copies of fillValue (just as the constructor of std::vector)
+    CandidateEdges(dimension_t dimension, const std::vector<vertex_t> &fillValue);
+
+    // Forwards the [] operator of edges
+    std::vector<vertex_t> &operator[](size_t index);
 };
 
 // ========================================== LinKernighanHeuristic class ==============================================
