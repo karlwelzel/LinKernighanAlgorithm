@@ -84,9 +84,10 @@ OneTree minimumOneTree(dimension_t dimension, const std::function<signed_distanc
     return OneTree{parent, topologicalOrder, special, specialNeighbor};
 }
 
-// TODO: Incorporate beta in alpha
-std::vector<std::vector<signed_distance_t>>
-betaValues(OneTree tree, dimension_t dimension, const std::function<signed_distance_t(vertex_t, vertex_t)> &dist) {
+std::vector<std::vector<distance_t>>
+alphaDistances(dimension_t dimension, const std::function<signed_distance_t(vertex_t, vertex_t)> &dist) {
+    OneTree tree = minimumOneTree(dimension, dist);
+
     // Initialize the beta array
     std::vector<std::vector<signed_distance_t>> beta(dimension, std::vector<signed_distance_t>(dimension, 0));
 
@@ -114,14 +115,6 @@ betaValues(OneTree tree, dimension_t dimension, const std::function<signed_dista
         }
     }
 
-    return beta;
-}
-
-std::vector<std::vector<distance_t>>
-alphaDistances(dimension_t dimension, const std::function<signed_distance_t(vertex_t, vertex_t)> &dist) {
-    // Compute the beta values
-    std::vector<std::vector<signed_distance_t>> beta = betaValues(minimumOneTree(dimension, dist), dimension, dist);
-
     // Initialize the alpha array
     std::vector<std::vector<distance_t>> alpha(dimension, std::vector<distance_t>(dimension, 0));
 
@@ -134,7 +127,6 @@ alphaDistances(dimension_t dimension, const std::function<signed_distance_t(vert
 
     return alpha;
 }
-
 
 std::vector<std::vector<distance_t>>
 optimizedAlphaDistances(dimension_t dimension, const std::function<signed_distance_t(vertex_t, vertex_t)> &dist) {
@@ -219,19 +211,6 @@ optimizedAlphaDistances(dimension_t dimension, const std::function<signed_distan
         iteration = 0;
     }
 
-    // Compute the beta values
-    std::vector<std::vector<signed_distance_t>> beta = betaValues(tree, dimension, modifiedDist);
-
-    // Initialize the alpha array
-    std::vector<std::vector<distance_t>> alpha(dimension, std::vector<distance_t>(dimension, 0));
-
-    // Compute the alpha values
-    for (size_t i = 0; i < dimension; ++i) {
-        for (size_t j = 0; j < dimension; ++j) {
-            alpha[i][j] = dist(i, j) - beta[i][j];
-        }
-    }
-
-    return alpha;
+    return alphaDistances(dimension, modifiedDist);
 }
 

@@ -10,6 +10,10 @@
 #include <vector>
 #include "Tour.h"
 
+// The alpha distance alpha[i][j] between two vertices in a complete graph is defined as the increase in in length of a
+// minimum 1-tree when it is required to contain the edge (i, j). This is a measure for the likelihood that the edge
+// (i, j) is contained in an optimum tour (smaller = more likely)
+
 // This struct represents a 1-tree
 struct OneTree {
     // parent maps each vertex to its parent in the ordinary minimum spanning tree
@@ -31,23 +35,21 @@ struct OneTree {
     std::vector<signed_distance_t> degrees();
 };
 
-// Computes a minimum 1-tree by computing a minimum spanning tree in the complete graph, choosing the leaf with the
-// longest second nearest neighbor distance as the special vertex and adding the edge to special's second nearest
-// neighbor to the tree. special is incident to the edges (special, parent[special]) and (special, specialNeighbor)
+// Computes a minimum 1-tree in the complete graph with dimension vertices and edge weights given by dist. This is done
+// by computing a minimum spanning tree in the complete graph, choosing the leaf with the longest second nearest
+// neighbor distance as the special vertex and adding the edge to special's second nearest neighbor to the tree. special
+// is incident to the edges (special, parent[special]) and (special, specialNeighbor)
 // It is guaranteed that dist(special, parent[special]) <= dist(special, specialNeighbor)
 OneTree minimumOneTree(dimension_t dimension, const std::function<signed_distance_t(vertex_t, vertex_t)> &dist);
 
-// Computes the beta values in the complete graph
-// beta[i][j] is the length of the edge that needs to be removed from the 1-tree when the edge (i, j) is added
-std::vector<std::vector<signed_distance_t>>
-betaValues(OneTree tree, dimension_t dimension, const std::function<signed_distance_t(vertex_t, vertex_t)> &dist);
-
-// Computes the alpha distances in the complete graph
-// alpha[i][j] is the increase in length of a minimum 1-tree when it is required to contain the edge (i, j)
-// This is a measure for the likelihood that the edge (i, j) is contained in an optimum tour (smaller = more likely)
+// Computes the alpha distances in the complete graph with dimension vertices and edge weights given by dist
 std::vector<std::vector<distance_t>>
 alphaDistances(dimension_t dimension, const std::function<signed_distance_t(vertex_t, vertex_t)> &dist);
 
+// Computes the alpha distances in the complete graph with dimension vertices and modified edge weights
+// The edge weights are modified by determining a penalty for each vector. The penalty increases or decreases the length
+// of all edges incident to this vertex. The penalties are chosen in such a way that the minimum 1-tree with these
+// modified distances gives a maximum lower bound on the length of an optimum tour.
 std::vector<std::vector<distance_t>>
 optimizedAlphaDistances(dimension_t dimension, const std::function<signed_distance_t(vertex_t, vertex_t)> &dist);
 
