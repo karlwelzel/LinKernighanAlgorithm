@@ -14,12 +14,12 @@
 #include "AlphaDistances.h"
 #include "PrimsAlgorithm.h"
 
-signed_distance_t OneTree::length(const std::function<distance_t(vertex_t, vertex_t)> &dist) {
+signed_distance_t OneTree::length(const std::function<signed_distance_t(vertex_t, vertex_t)> &dist) {
     signed_distance_t result = 0;
 
-    for (vertex_t v = 0; v < parent.size(); v++) {
+    for (auto v = topologicalOrder.begin() + 1; v != topologicalOrder.end(); ++v) {
         // All edges (v, parent[v])
-        result += dist(v, parent[v]);
+        result += dist(*v, parent[*v]);
     }
 
     // The edge (special, specialNeighbor)
@@ -31,12 +31,10 @@ signed_distance_t OneTree::length(const std::function<distance_t(vertex_t, verte
 std::vector<signed_distance_t> OneTree::degrees() {
     std::vector<signed_distance_t> result(parent.size(), 0);
 
-    for (vertex_t v = 0; v < parent.size(); v++) {
+    for (auto v = topologicalOrder.begin() + 1; v != topologicalOrder.end(); ++v) {
         // All edges (v, parent[v])
-        if (v != topologicalOrder.front()) {
-            result[v]++;
-            result[parent[v]]++;
-        }
+        result[*v]++;
+        result[parent[*v]]++;
     }
 
     // The edge (special, specialNeighbor)
@@ -46,7 +44,7 @@ std::vector<signed_distance_t> OneTree::degrees() {
     return result;
 }
 
-OneTree minimumOneTree(dimension_t dimension, const std::function<distance_t(vertex_t, vertex_t)> &dist) {
+OneTree minimumOneTree(dimension_t dimension, const std::function<signed_distance_t(vertex_t, vertex_t)> &dist) {
     std::unordered_set<vertex_t> allVertices{};
     for (vertex_t v = 0; v < dimension; ++v) {
         allVertices.insert(v);
@@ -59,13 +57,13 @@ OneTree minimumOneTree(dimension_t dimension, const std::function<distance_t(ver
     std::tie(parent, topologicalOrder) = primsAlgorithm(dimension, dist);
 
     // Determine the special vertex "1" by selecting the leaf with longest second nearest neighbor distance
-    std::unordered_set<vertex_t> leafs(allVertices.begin(), allVertices.end());
+    std::unordered_set<vertex_t> leafs(allVertices);
     for (vertex_t v : allVertices) {
         leafs.erase(parent[v]);
     }
     auto secondNearestNeighbor = [&allVertices, &dist, &parent](vertex_t v) {
-        // The parent of v is the nearest neighbor for any leaf, so by excluding v and parent[v] the nearest neighbor
-        // that is left is automatically the second nearest
+        // For every leaf v the parent of v is the nearest neighbor of v, so by excluding v and parent[v] the nearest
+        // neighbor that is left is automatically the second nearest
         allVertices.erase(v);
         allVertices.erase(parent[v]);
         vertex_t result = *std::min_element(allVertices.begin(), allVertices.end(),
@@ -87,10 +85,10 @@ OneTree minimumOneTree(dimension_t dimension, const std::function<distance_t(ver
 }
 
 // TODO: Incorporate beta in alpha
-std::vector<std::vector<distance_t>>
-betaValues(OneTree tree, dimension_t dimension, const std::function<distance_t(vertex_t, vertex_t)> &dist) {
+std::vector<std::vector<signed_distance_t>>
+betaValues(OneTree tree, dimension_t dimension, const std::function<signed_distance_t(vertex_t, vertex_t)> &dist) {
     // Initialize the beta array
-    std::vector<std::vector<distance_t>> beta(dimension, std::vector<distance_t>(dimension, 0));
+    std::vector<std::vector<signed_distance_t>> beta(dimension, std::vector<signed_distance_t>(dimension, 0));
 
     // Set the beta values for edges (special, v)
     for (vertex_t vertex : tree.topologicalOrder) {
@@ -120,9 +118,9 @@ betaValues(OneTree tree, dimension_t dimension, const std::function<distance_t(v
 }
 
 std::vector<std::vector<distance_t>>
-alphaDistances(dimension_t dimension, const std::function<distance_t(vertex_t, vertex_t)> &dist) {
+alphaDistances(dimension_t dimension, const std::function<signed_distance_t(vertex_t, vertex_t)> &dist) {
     // Compute the beta values
-    std::vector<std::vector<distance_t>> beta = betaValues(minimumOneTree(dimension, dist), dimension, dist);
+    std::vector<std::vector<signed_distance_t>> beta = betaValues(minimumOneTree(dimension, dist), dimension, dist);
 
     // Initialize the alpha array
     std::vector<std::vector<distance_t>> alpha(dimension, std::vector<distance_t>(dimension, 0));
@@ -139,7 +137,7 @@ alphaDistances(dimension_t dimension, const std::function<distance_t(vertex_t, v
 
 
 std::vector<std::vector<distance_t>>
-optimizedAlphaDistances(dimension_t dimension, const std::function<distance_t(vertex_t, vertex_t)> &dist) {
+optimizedAlphaDistances(dimension_t dimension, const std::function<signed_distance_t(vertex_t, vertex_t)> &dist) {
     // The penalties of each vector
     std::vector<signed_distance_t> penalties(dimension, 0);
 
@@ -222,7 +220,7 @@ optimizedAlphaDistances(dimension_t dimension, const std::function<distance_t(ve
     }
 
     // Compute the beta values
-    std::vector<std::vector<distance_t>> beta = betaValues(tree, dimension, modifiedDist);
+    std::vector<std::vector<signed_distance_t>> beta = betaValues(tree, dimension, modifiedDist);
 
     // Initialize the alpha array
     std::vector<std::vector<distance_t>> alpha(dimension, std::vector<distance_t>(dimension, 0));

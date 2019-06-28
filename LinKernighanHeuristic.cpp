@@ -170,6 +170,9 @@ Tour LinKernighanHeuristic::generateRandomTour() {
     // (3) otherVertex was not already chosen
     // Choose the next current vertex randomly from the first non-empty category above
 
+    // TODO: Remove the category counter
+    std::vector<size_t> categoryCounter(3);
+
     std::vector<vertex_t> candidatesInBestTour; // Category (1)
     std::vector<vertex_t> candidates; // Category (2)
     // Category (3) is remainingVertices
@@ -188,15 +191,20 @@ Tour LinKernighanHeuristic::generateRandomTour() {
 
         if (!candidatesInBestTour.empty()) {
             currentVertex = chooseRandomElement(candidatesInBestTour);
+            categoryCounter[0]++;
         } else if (!candidates.empty()) {
             currentVertex = chooseRandomElement(candidates);
+            categoryCounter[1]++;
         } else {
             currentVertex = chooseRandomElement(remainingVertices);
+            categoryCounter[2]++;
         }
         remainingVertices.erase(std::remove(remainingVertices.begin(), remainingVertices.end(), currentVertex),
                                 remainingVertices.end());
         tourOrder.push_back(currentVertex);
     }
+    std::cout << "Random tour: (1): " << categoryCounter[0] << ", (2): " << categoryCounter[1] << ", (3): "
+              << categoryCounter[2] << std::endl;
 
     return Tour(tourOrder);
 }
@@ -205,6 +213,9 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
     const dimension_t dimension = tsplibProblem.getDimension();
 
     // TODO: Introduce the "Don't look" bit
+
+    // TODO: Remove the output "length of startTour"
+    std::cout << "length of startTour: " << tsplibProblem.length(startTour) << std::endl;
 
     Tour currentTour = startTour;
     std::vector<std::vector<vertex_t>> vertexChoices;
@@ -332,8 +343,8 @@ Tour LinKernighanHeuristic::findBestTour(size_t numberOfTrials) {
     if (numberOfTrials < 1) {
         throw std::runtime_error("The number of trials can not be lower than 1.");
     }
-    Tour currentTour = improveTour(generateRandomTour());
     currentBestTour = improveTour(generateRandomTour());
+    Tour currentTour;
     while (--numberOfTrials > 0) {
         currentTour = improveTour(generateRandomTour());
         std::cout << "Trial " << numberOfTrials << ", result: " << tsplibProblem.length(currentTour) << ", best: "
