@@ -17,6 +17,47 @@ using signed_distance_t = long long; // The type used for distances and lengths 
 // using Tour = TwoLevelTreeTour; // The current implementation of a tour, that should be used
 
 
+// ============================================= AlternatingWalk class =================================================
+
+// This class represents an alternating walk.
+// An alternating walk is a walk where every second edge belongs to the tour and the other edges don't. An alternating
+// walk always starts with an edge on the tour
+
+class AlternatingWalk {
+private:
+    std::vector<vertex_t> vertices;
+
+public: // Forward the required functionality of vertices to AlternatingWalk
+    AlternatingWalk() = default;
+
+    std::size_t size() const noexcept;
+
+    vertex_t operator[](std::size_t index) const;
+
+    std::vector<vertex_t>::const_iterator begin() const noexcept;
+
+    std::vector<vertex_t>::const_iterator end() const noexcept;
+
+    void clear() noexcept;
+
+    std::vector<vertex_t>::const_iterator erase(std::vector<vertex_t>::const_iterator first,
+                                                std::vector<vertex_t>::const_iterator last);
+
+    void push_back(vertex_t vertex);
+
+public: // Additional functionality custom to an alternating Walk
+    // Adds the first vertex to the end, to get a closed alternating walk, and returns the result.
+    // Expects that the walk contains at least two elements
+    AlternatingWalk close() const;
+
+    // Appends vertex at the end, closes the walk (see close) and returns the result.
+    // Expects that the walk contains at least one element
+    AlternatingWalk appendAndClose(vertex_t vertex) const;
+
+    // Checks if the edge (v, w) is on the alternating walk
+    bool containsEdge(vertex_t v, vertex_t w) const;
+};
+
 // ================================================= BaseTour class ====================================================
 
 // This class represents a Tour. It is an abstract base class for different implementations of a tour.
@@ -62,17 +103,17 @@ public: // functions that all Tour classes have in common and that only depend o
     // the elements in alternatingWalk appear on the tour in the order
     //   alternatingWalk[permutation[0]], alternatingWalk[permutation[1]], ..., alternatingWalk[permutation[n-1]]
     // Expects a closed alternating walk that starts with an edge on the tour
-    std::vector<dimension_t> cyclicPermutation(const std::vector<vertex_t> &alternatingWalk) const;
+    std::vector<dimension_t> cyclicPermutation(const AlternatingWalk &alternatingWalk) const;
 
     // Checks if the tour after exchanging all edges of alternatingWalk on the tour by edges not on the tour is still
     // a hamiltonian tour, does not change the tour itself
     // Expects a closed alternating walk that starts with an edge on the tour
-    bool isTourAfterExchange(const std::vector<vertex_t> &alternatingWalk) const;
+    bool isTourAfterExchange(const AlternatingWalk &alternatingWalk) const;
 
     // Exchanges all edges of alternatingWalk on the tour by edges not on the tour
     // Expects a closed alternating walk that starts with an edge on the tour
     // Expects that the exchange will lead to a hamiltonian tour, check with isTourAfterExchange beforehand
-    void exchange(const std::vector<vertex_t> &alternatingWalk);
+    void exchange(const AlternatingWalk &alternatingWalk);
 };
 
 // Output the tour to the stream out, typically used with std::cout

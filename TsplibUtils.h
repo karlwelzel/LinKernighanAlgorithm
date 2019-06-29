@@ -74,9 +74,9 @@ public:
     // Returns the length of tour
     distance_t length(const BaseTour &tour) const;
 
-    // Returns the gain of an alternating walk
-    // Expects a closed alternating walk that starts with an edge on the tour
-    signed_distance_t exchangeGain(std::vector<vertex_t> &alternatingWalk) const;
+    // Returns the gain of an alternating walk, i.e. the decrease in length of the tour if all the edges of the walk
+    // on the tour are replaced by edges of the walk not on the tour
+    signed_distance_t exchangeGain(const AlternatingWalk &alternatingWalk) const;
 };
 
 

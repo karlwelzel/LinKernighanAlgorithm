@@ -266,7 +266,7 @@ distance_t TsplibProblem::length(const BaseTour &tour) const {
     return sum;
 }
 
-signed_distance_t TsplibProblem::exchangeGain(std::vector<vertex_t> &alternatingWalk) const {
+signed_distance_t TsplibProblem::exchangeGain(const AlternatingWalk &alternatingWalk) const {
     signed_distance_t value = 0;
     for (std::size_t i = 0; i < alternatingWalk.size() - 1; ++i) {
         if (i % 2 == 0) {

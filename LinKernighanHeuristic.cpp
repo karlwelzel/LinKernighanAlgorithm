@@ -20,41 +20,6 @@
 #include "LinKernighanHeuristic.h"
 #include "AlphaDistances.h"
 
-// ============================================= AlternatingWalk class =================================================
-
-AlternatingWalk AlternatingWalk::close() const {
-    AlternatingWalk result(*this);
-    result.push_back(at(0));
-    return result;
-}
-
-AlternatingWalk AlternatingWalk::appendAndClose(vertex_t vertex) const {
-    AlternatingWalk result(*this);
-    result.push_back(vertex);
-    result.push_back(at(0));
-    return result;
-}
-
-bool AlternatingWalk::containsEdge(vertex_t vertex1, vertex_t vertex2) const {
-    for (dimension_t i = 0; i < size() - 1; ++i) {
-        if ((operator[](i) == vertex1 and operator[](i + 1) == vertex2) or
-            (operator[](i) == vertex2 and operator[](i + 1) == vertex1)) {
-            return true;
-        }
-    }
-    return false;
-}
-
-std::ostream &operator<<(std::ostream &out, const AlternatingWalk &walk) {
-    std::string output;
-    for (vertex_t vertex : walk) {
-        output += std::to_string(vertex) + ", ";
-    }
-    out << output.substr(0, output.length() - 2);
-    return out;
-}
-
-
 // ============================================= CandidateEdges class =================================================
 
 CandidateEdges::CandidateEdges(dimension_t dimension, const std::vector<vertex_t> &fillValue) : edges(dimension,

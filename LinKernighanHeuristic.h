@@ -12,27 +12,6 @@
 #include "Tour.h"
 #include "TsplibUtils.h"
 
-// ============================================= AlternatingWalk class =================================================
-
-// This class represents an alternating walk and adds some utility functions to the vector class
-
-class AlternatingWalk : public std::vector<vertex_t> {
-public:
-    // Adds the first vertex to the end, to get a closed alternating walk, and returns the result.
-    // Does not change the walk it is called upon
-    AlternatingWalk close() const;
-
-    // Appends vertex at the end, closes the walk (see close) and returns the result
-    // Does not change the walk it is called upon
-    AlternatingWalk appendAndClose(vertex_t vertex) const;
-
-    bool containsEdge(vertex_t vertex1, vertex_t vertex2) const;
-};
-
-// Output the walk to the stream out, typically used with std::cout
-std::ostream &operator<<(std::ostream &out, const AlternatingWalk &walk);
-
-
 // ============================================ CandidateEdgeGraph class ===============================================
 
 // This class provides candidate edges for each vertex in a graph and functions for generating them
@@ -52,6 +31,11 @@ public:
         ALL_NEIGHBORS, NEAREST_NEIGHBORS, ALPHA_NEAREST_NEIGHBORS, OPTIMIZED_ALPHA_NEAREST_NEIGHBORS
     };
 
+    CandidateEdges() = default;
+
+    // Fill edges with dimension copies of fillValue (just as the constructor of std::vector)
+    CandidateEdges(dimension_t dimension, const std::vector<vertex_t> &fillValue);
+
     // For each vertex choose all edges as candidate edges
     static CandidateEdges allNeighbors(const TsplibProblem &problem);
 
@@ -69,12 +53,6 @@ public:
     // Create candidate edges of type candidateEdgeType with k candidate edges for each vertex
     // numberOfCandidateEdges is ignored for Type::ALL_NEIGHBORS
     static CandidateEdges create(const TsplibProblem &problem, Type candidateEdgeType, std::size_t k);
-
-public:
-    CandidateEdges() = default;
-
-    // Fill edges with dimension copies of fillValue (just as the constructor of std::vector)
-    CandidateEdges(dimension_t dimension, const std::vector<vertex_t> &fillValue);
 
     // Forwards the [] operator of edges
     std::vector<vertex_t> &operator[](std::size_t index);

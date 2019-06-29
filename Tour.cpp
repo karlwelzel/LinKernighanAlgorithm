@@ -17,7 +17,62 @@
 #include "SignedPermutation.h"
 
 
-// =================================================== Tour class ======================================================
+// ============================================= AlternatingWalk class =================================================
+
+std::size_t AlternatingWalk::size() const noexcept {
+    return vertices.size();
+}
+
+vertex_t AlternatingWalk::operator[](std::size_t index) const {
+    return vertices[index];
+}
+
+std::vector<vertex_t>::const_iterator AlternatingWalk::begin() const noexcept {
+    return vertices.begin();
+}
+
+std::vector<vertex_t>::const_iterator AlternatingWalk::end() const noexcept {
+    return vertices.end();
+}
+
+void AlternatingWalk::clear() noexcept {
+    vertices.clear();
+}
+
+std::vector<vertex_t>::const_iterator AlternatingWalk::erase(std::vector<vertex_t>::const_iterator first,
+                                                             std::vector<vertex_t>::const_iterator last) {
+    return vertices.erase(first, last);
+}
+
+void AlternatingWalk::push_back(vertex_t vertex) {
+    vertices.push_back(vertex);
+}
+
+AlternatingWalk AlternatingWalk::close() const {
+    AlternatingWalk result(*this);
+    result.push_back(vertices[0]);
+    return result;
+}
+
+AlternatingWalk AlternatingWalk::appendAndClose(vertex_t vertex) const {
+    AlternatingWalk result(*this);
+    result.push_back(vertex);
+    result.push_back(vertices[0]);
+    return result;
+}
+
+bool AlternatingWalk::containsEdge(vertex_t v, vertex_t w) const {
+    for (dimension_t i = 0; i < vertices.size() - 1; ++i) {
+        if ((vertices[i] == v and vertices[i + 1] == w) or
+            (vertices[i] == w and vertices[i + 1] == v)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+
+// ================================================= BaseTour class ====================================================
 
 std::vector<dimension_t> BaseTour::inversePermutation(const std::vector<dimension_t> &permutation) {
     std::vector<dimension_t> result(permutation.size());
@@ -35,7 +90,7 @@ bool BaseTour::containsEdge(vertex_t vertex1, vertex_t vertex2) const {
     return predecessor(vertex1) == vertex2 or successor(vertex1) == vertex2;
 }
 
-std::vector<dimension_t> BaseTour::cyclicPermutation(const std::vector<vertex_t> &alternatingWalk) const {
+std::vector<dimension_t> BaseTour::cyclicPermutation(const AlternatingWalk &alternatingWalk) const {
     // For every out-edge in the alternating walk choose the vertex that is encountered first on the tour
     // This cuts the number of vertices that need to be sorted in half
     std::vector<dimension_t> outEdges; // contains all indices of the chosen vertices
@@ -68,7 +123,7 @@ std::vector<dimension_t> BaseTour::cyclicPermutation(const std::vector<vertex_t>
     return permutation;
 }
 
-bool BaseTour::isTourAfterExchange(const std::vector<vertex_t> &alternatingWalk) const {
+bool BaseTour::isTourAfterExchange(const AlternatingWalk &alternatingWalk) const {
     std::vector<dimension_t> permutation = cyclicPermutation(alternatingWalk);
     std::vector<dimension_t> indices = inversePermutation(permutation);
     // {alternatingWalk[permutation[2i]], alternatingWalk[permutation[2i+1]]} are the out-edges in alternatingWalk
@@ -96,7 +151,7 @@ bool BaseTour::isTourAfterExchange(const std::vector<vertex_t> &alternatingWalk)
     return 2 * count == size;
 }
 
-void BaseTour::exchange(const std::vector<vertex_t> &alternatingWalk) {
+void BaseTour::exchange(const AlternatingWalk &alternatingWalk) {
     std::vector<dimension_t> permutation = cyclicPermutation(alternatingWalk);
     std::vector<dimension_t> indices = inversePermutation(permutation);
     // {alternatingWalk[permutation[2i]], alternatingWalk[permutation[2i+1]]} are the out-edges in alternatingWalk
