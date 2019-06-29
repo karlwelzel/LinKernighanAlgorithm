@@ -21,12 +21,7 @@ std::string trim(const std::string &str, const std::string &whitespace = " \t");
 class TsplibProblem {
 private:
     // The delimiter between a keyword and its value, used in the TSPLIB format
-    const char DELIMITER = ':';
-
-    // When the EDGE_WEIGHT_TYPE is not EXPLICIT, this parameter specifies whether all distances should be computed
-    // and stored in a matrix or only the coordinates should be saved and the distances will be computed on every call
-    // to TsplibProblem::dist. This is a trade-off between running time and memory usage
-    const bool ALWALYS_STORE_IN_MATRIX = true;
+    static const char DELIMITER = ':';
 
     std::string name;
     std::string type;
@@ -42,6 +37,11 @@ private:
     // if EDGE_WEIGHT_TYPE is *_2D
     std::vector<std::vector<double>> coordinates; // Every entry is a 2d coordinate
 
+    // When the EDGE_WEIGHT_TYPE is not EXPLICIT, this parameter specifies whether all distances should be computed
+    // and stored in a matrix or only the coordinates should be saved and the distances will be computed on every call
+    // to TsplibProblem::dist. This is a trade-off between running time and memory usage
+    bool storeAllDistances = true;
+
     // Interpret a single keyword value pair from the specification part of a TSPLIB file
     // Expects keyword and value to not have any superfluous whitespaces or line breaks
     // Returns an error message if an error occurred and an empty string otherwise
@@ -52,7 +52,7 @@ private:
     distance_t trueDistance(vertex_t i, vertex_t j) const;
 
 public:
-    TsplibProblem();
+    explicit TsplibProblem(bool storeAllDistances = true);
 
     // Interpret the file "inputFile" as a TSPLIB file and store the information given there
     // Returns an error message if an error occurred and an empty string otherwise

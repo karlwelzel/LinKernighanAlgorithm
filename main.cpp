@@ -28,12 +28,15 @@ Options:
             ALPHA_NEAREST: shortest k incident edges by alpha distance
             OPT_ALPHA_NEAREST: shortest k incident edges by alpha distance after subgradient optimization
     --number-of-candidate-edges=integer
-        Set the number of candidate edges k for each vertex. Ignored for candidate-edges=ALL. (default: 5)
+        Set the number of candidate edges k for each vertex. Ignored for --candidate-edges=ALL. (default: 5)
+    --dont-store-distances
+        The distances between all vertices are not computed once and then stored in a matrix, but are computed when
+        needed. This leads to fewer memory usage but also to a considerable decrease in performance.
     --optimum-tour-length=integer
         Set the optimum tour length for the problem. The output will include the percentage error of the solution.
     --acceptable-error=double
         Set the acceptable error compared to the optimum length in percent. The program will stop when a found tour
-        is within the acceptable length range. Ignored if --optimum-value is not given. (default: 1)
+        is within the acceptable length range. Ignored if --optimum-value is not given. (default: 0)
     --output-to-file
         Output the best tour found to "tsplib_problem.lk.tour"
     --verbose
@@ -58,8 +61,9 @@ Restrictions:
     size_t numberOfTrials = 50;
     CandidateEdges::Type candidateEdgeType = CandidateEdges::OPTIMIZED_ALPHA_NEAREST_NEIGHBORS;
     size_t numberOfCandidateEdges = 5;
+    bool storeAllDistances = true;
     distance_t optimumTourLength = 0;
-    double acceptableError = 1;
+    double acceptableError = 0;
     bool outputToFile = false;
     bool verboseOutput = false;
 
@@ -75,7 +79,7 @@ Restrictions:
             stringStream >> numberOfTrials;
         } else if (option == "--candidate-edges") {
             std::string type;
-            std::getline(stringStream, option);
+            std::getline(stringStream, type);
             if (type == "ALL") {
                 candidateEdgeType = CandidateEdges::ALL_NEIGHBORS;
             } else if (type == "NEAREST") {
@@ -91,6 +95,8 @@ Restrictions:
             }
         } else if (option == "--number-of-candidate-edges") {
             stringStream >> numberOfCandidateEdges;
+        } else if (option == "--dont-store-distances") {
+            storeAllDistances = false;
         } else if (option == "--optimum-tour-length") {
             stringStream >> optimumTourLength;
         } else if (option == "--acceptable-error") {
@@ -121,7 +127,7 @@ Restrictions:
     }
 
     // Interpret the problem file and report any syntax errors, logical errors or unsupported keywords
-    TsplibProblem problem;
+    TsplibProblem problem(storeAllDistances);
     std::string errorMessage = problem.readFile(problemFile);
     problemFile.close();
     if (!errorMessage.empty()) {

@@ -32,7 +32,8 @@ std::string trim(const std::string &str, const std::string &whitespace) {
 
 // ============================================ TsplibProblem class ====================================================
 
-TsplibProblem::TsplibProblem() = default;
+TsplibProblem::TsplibProblem(bool storeAllDistances) : storeAllDistances(storeAllDistances) {
+}
 
 std::string TsplibProblem::interpretKeyword(const std::string &keyword, const std::string &value) {
     if (keyword == "NAME") {
@@ -204,7 +205,7 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
         } catch (std::out_of_range &error) {
             return "Too few numbers were specified under EDGE_WEIGHT_SECTION";
         }
-    } else if (ALWALYS_STORE_IN_MATRIX) {
+    } else if (storeAllDistances) {
         matrix.assign(dimension, std::vector<distance_t>(dimension, 0));
         for (vertex_t i = 0; i < dimension; ++i) {
             for (vertex_t j = 0; j < dimension; ++j) {
@@ -246,7 +247,7 @@ distance_t TsplibProblem::trueDistance(vertex_t i, vertex_t j) const {
 }
 
 distance_t TsplibProblem::dist(const vertex_t i, const vertex_t j) const {
-    if (ALWALYS_STORE_IN_MATRIX) {
+    if (storeAllDistances) {
         return matrix[i][j];
     } else {
         return trueDistance(i, j);
