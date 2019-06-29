@@ -22,11 +22,11 @@
 
 // ============================================= CandidateEdges class =================================================
 
-CandidateEdges::CandidateEdges(dimension_t dimension, const std::vector<vertex_t> &fillValue) : edges(dimension,
-                                                                                                      fillValue) {}
+CandidateEdges::CandidateEdges(dimension_t dimension, const std::vector<vertex_t> &fillValue) : neighbors(dimension,
+                                                                                                          fillValue) {}
 
 std::vector<vertex_t> &CandidateEdges::operator[](std::size_t index) {
-    return edges[index];
+    return neighbors[index];
 }
 
 CandidateEdges CandidateEdges::allNeighbors(const TsplibProblem &problem) {
@@ -52,6 +52,8 @@ CandidateEdges CandidateEdges::rawNearestNeighbors(
     for (vertex_t v = 0; v < dimension; ++v) {
         // Sort the k nearest neighbors of v by distance to v and put them in result[v]
         allVertices.erase(v); // Don't include v in the search
+        // std::bind(distCompare, v, std::placeholders::_1, std::placeholders::_2) is a function that takes two vertices
+        // and compares them by their distance to v
         std::partial_sort_copy(allVertices.begin(), allVertices.end(), result[v].begin(), result[v].end(),
                                std::bind(distCompare, v, std::placeholders::_1, std::placeholders::_2));
         allVertices.insert(v);
@@ -108,7 +110,8 @@ CandidateEdges CandidateEdges::create(const TsplibProblem &problem, CandidateEdg
     }
 }
 
-// ============================================= linKernighanHeuristic =================================================
+
+// ========================================== LinKernighanHeuristic class ==============================================
 
 LinKernighanHeuristic::LinKernighanHeuristic(TsplibProblem &tsplibProblem, CandidateEdges candidateEdges)
         : tsplibProblem(tsplibProblem), candidateEdges(std::move(candidateEdges)) {
@@ -125,14 +128,13 @@ Tour LinKernighanHeuristic::generateRandomTour() {
     std::vector<vertex_t> remainingVertices(tsplibProblem.getDimension());
     std::iota(remainingVertices.begin(), remainingVertices.end(), 0);
 
-    // This variable store the order of the vertices on the tour
+    // This variable stores the order of the vertices on the tour
     std::vector<vertex_t> tourOrder;
 
     // Start with a random vertex
     vertex_t currentVertex = chooseRandomElement(remainingVertices);
     remainingVertices.erase(remainingVertices.begin() + currentVertex); // The index of currentVertex is currentVertex
     tourOrder.push_back(currentVertex);
-
 
     // In each step, decide for each vertex otherVertex if it is an element in one or more of these categories
     // (1) otherVertex was not already chosen and {currentVertex, otherVertex} is a candidate edge and on the
@@ -176,30 +178,36 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
     const dimension_t dimension = tsplibProblem.getDimension();
 
     Tour currentTour = startTour;
+    // vertexChoices[i] stores all possible choices for vertex x_i. This is used for backtracking
     std::vector<std::vector<vertex_t>> vertexChoices;
-    AlternatingWalk currentWalk;
+    AlternatingWalk currentWalk; // The i-th element of currentWalk is also reffered to as x_i
     AlternatingWalk bestAlternatingWalk;
     signed_distance_t highestGain = 0;
 
     while (true) {
-        // Create set X_0 with all vertices
+        // Reset everything
         vertexChoices.clear();
-        vertexChoices.emplace_back(dimension);
-        std::iota(vertexChoices[0].begin(), vertexChoices[0].end(), 0);
-
         currentWalk.clear();
         bestAlternatingWalk.clear();
         highestGain = 0;
         std::size_t i = 0;
+
+        // Fill vertexChoices[0] with all vertices
+        vertexChoices.emplace_back(dimension);
+        std::iota(vertexChoices[0].begin(), vertexChoices[0].end(), 0);
+
         while (true) {
             if (vertexChoices[i].empty()) {
+                // The current alternating walk cannot be expanded further
                 if (highestGain > 0) {
                     currentTour.exchange(bestAlternatingWalk);
                     break;
                 } else { // highestGain == 0
                     if (i == 0) {
+                        // No improvement for currentTour was found
                         return currentTour;
                     } else {
+                        // Reset the search to level min(i-1, backtrackingDepth)
                         i = std::min(i - 1, backtrackingDepth);
                         vertexChoices.erase(vertexChoices.begin() + i + 1, vertexChoices.end());
                         currentWalk.erase(currentWalk.begin() + i, currentWalk.end());
@@ -208,23 +216,26 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
                 }
             }
 
-            currentWalk.push_back(vertexChoices[i].back());
+            // Choose x_i from vertexChoices[i] and remove it from there
+            vertex_t xi = vertexChoices[i].back();
             vertexChoices[i].pop_back();
+            currentWalk.push_back(xi);
 
             if (i % 2 == 1 and i >= 3) {
+                // Check if the exchange of the current walk after closing it leads to a tour and update
+                // bestAlternatingWalk if necessary
                 AlternatingWalk closedWalk = currentWalk.close(); // closedWalk = (x_0, x_1, ..., x_i, x_0)
                 signed_distance_t gain = tsplibProblem.exchangeGain(closedWalk);
                 if (gain > highestGain and currentTour.isTourAfterExchange(closedWalk)) {
-                    //std::cout << "New highest gain: " << gain << ", value before: " << highestGain << std::endl;
                     bestAlternatingWalk = closedWalk;
                     highestGain = gain;
                 }
             }
 
-            vertexChoices.emplace_back(); // Add set X_{i+1}
-            vertex_t xi = currentWalk[i];
+            // Add vertexChoices[i+1] and fill it afterwards
+            vertexChoices.emplace_back();
             if (i % 2 == 1) { // i is odd
-                // Determine possible in-edges
+                // Determine possible in-edges (xi, x)
                 signed_distance_t currentGain = tsplibProblem.exchangeGain(currentWalk);
                 vertex_t xiPredecessor = currentTour.predecessor(xi);
                 vertex_t xiSuccessor = currentTour.successor(xi);
@@ -238,33 +249,40 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
                     }
                 }
             } else { // i is even
-                // Determine possible out-edges
-                // No out-edge should connect back to currentWalk[0], because at this point currentWalk is not a valid
-                // alternating walk (even number of elements) and can never be closed in the future
+                // Determine possible out-edges (xi, neighbor)
+
+                // For i > infeasibilityDepth the out-edges must be chosen in way that the exchange of the current walk
+                // after appending the edge and closing the walk (currentWalk.appendAndClose(neighbor)) leads to tour
+
+                // Special caution is needed because:
+                // (1) No out-edge should connect back to x_0, because at this point currentWalk is not a valid
+                //     alternating walk (even number of elements) and can never be closed in the future
+                // (2) currentWalk.appendAndClose(neighbor) is not a valid alternating walk if {neighbor, x_0} is an
+                //     edge in currentWalk, but this is only possible if neighbor = x_1, so we only need to exclude this
+                //     special case
                 if (i == 0 and currentBestTour.getDimension() != 0) {
                     // The first edge to be broken may not be on the currently best solution tour
-                    vertex_t x0Predecessor = currentBestTour.predecessor(currentWalk[0]);
-                    vertex_t x0Successor = currentBestTour.successor(currentWalk[0]);
+                    // (1) can not happen because x_0 is not a neighbor of x_0
                     for (vertex_t neighbor : currentTour.getNeighbors(xi)) {
-                        if (neighbor != currentWalk[0] and neighbor != x0Predecessor and neighbor != x0Successor) {
+                        if (!currentBestTour.containsEdge(xi, neighbor)) {
                             vertexChoices[i + 1].push_back(neighbor);
                         }
                     }
                 } else if (i <= infeasibilityDepth) {
                     for (vertex_t neighbor : currentTour.getNeighbors(xi)) {
-                        if (neighbor != currentWalk[0] and !currentWalk.containsEdge(xi, neighbor)) {
+                        if (neighbor != currentWalk[0] // (1)
+                            and !currentWalk.containsEdge(xi, neighbor)) {
+
                             vertexChoices[i + 1].push_back(neighbor);
                         }
                     }
                 } else {
                     for (vertex_t neighbor : currentTour.getNeighbors(xi)) {
-                        // currentWalk.appendAndClose(neighbor) is not a valid alternating walk if {neighbor, x_0} is an
-                        // edge in currentWalk, but this is only possible if neighbor is x_1, so we only need to exclude
-                        // this special case
-                        if (neighbor != currentWalk[0]
+                        if (neighbor != currentWalk[0] // (1)
                             and !currentWalk.containsEdge(xi, neighbor)
-                            and neighbor != currentWalk[1]
+                            and neighbor != currentWalk[1] // (2)
                             and currentTour.isTourAfterExchange(currentWalk.appendAndClose(neighbor))) {
+
                             vertexChoices[i + 1].push_back(neighbor);
                         }
                     }
@@ -300,6 +318,7 @@ LinKernighanHeuristic::findBestTour(std::size_t numberOfTrials, distance_t optim
         if (verboseOutput)
             std::cout << "Length of currentTour: " << tsplibProblem.length(currentTour) << " | " << std::flush;
 
+        // Update currentBestTour if necessary
         if (tsplibProblem.length(currentTour) < currentBestLength) {
             currentBestTour = currentTour;
             currentBestLength = tsplibProblem.length(currentBestTour);
@@ -308,7 +327,7 @@ LinKernighanHeuristic::findBestTour(std::size_t numberOfTrials, distance_t optim
 
         // Stop if the increase in length of the current best tour relative to the optimal length is below the
         // threshold set by acceptableError
-        if (tsplibProblem.length(currentBestTour) < (1 + acceptableError) * optimumTourLength) {
+        if (currentBestLength < (1 + acceptableError) * optimumTourLength) {
             break;
         }
     }

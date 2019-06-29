@@ -18,7 +18,7 @@
 
 class CandidateEdges {
 private:
-    std::vector<std::vector<vertex_t>> edges;
+    std::vector<std::vector<vertex_t>> neighbors;
 
     // Find the k nearest neighbors in the set of vertices 0, ..., dimension by using the distCompare function that
     // decides for three vertices v, w1 and w2 if the distance between v and w1 is smaller than the distance between v
@@ -51,10 +51,10 @@ public:
     static CandidateEdges optimizedAlphaNearestNeighbors(const TsplibProblem &problem, std::size_t k);
 
     // Create candidate edges of type candidateEdgeType with k candidate edges for each vertex
-    // numberOfCandidateEdges is ignored for Type::ALL_NEIGHBORS
+    // k is ignored for Type::ALL_NEIGHBORS
     static CandidateEdges create(const TsplibProblem &problem, Type candidateEdgeType, std::size_t k);
 
-    // Forwards the [] operator of edges
+    // Forwards the [] operator of neighbors
     std::vector<vertex_t> &operator[](std::size_t index);
 };
 
@@ -78,6 +78,7 @@ private:
     // The candidate edges used
     CandidateEdges candidateEdges;
 
+    // Chooses a random element from the vector elements
     static vertex_t chooseRandomElement(const std::vector<vertex_t> &elements);
 
     // Generates a random good tour based on the current best tour and the candidate edges
@@ -91,6 +92,9 @@ public:
 
     explicit LinKernighanHeuristic(TsplibProblem &tsplibProblem, CandidateEdges candidateEdges);
 
+    // Return the best tour found after numberOfTrials trials. If the relative increase of the length of the best tour
+    // compared to optimumTourLength is below acceptableError the algorithm will stop and return it immediately.
+    // verboseOutput turns debug output on or off
     Tour findBestTour(std::size_t numberOfTrials, distance_t optimumTourLength = 0, double acceptableError = 0,
                       bool verboseOutput = true);
 };
