@@ -149,7 +149,7 @@ void BaseTour::exchange(const std::vector<vertex_t> &alternatingWalk) {
     std::pair<vertex_t, vertex_t> preStartSegment, startSegment, endSegment, postEndSegment;
     vertex_t preStartVertex, startVertex, endVertex, postEndVertex;
     while (!signedPermutation.isIdentityPermutation()) {
-        std::pair<size_t, size_t> reversal = signedPermutation.nextReversal();
+        std::pair<std::size_t, std::size_t> reversal = signedPermutation.nextReversal();
         preStartElement = signedPermutation.getElementAt((reversal.first + segmentsSize - 1) % segmentsSize);
         startElement = signedPermutation.getElementAt(reversal.first);
         endElement = signedPermutation.getElementAt(reversal.second);
@@ -337,8 +337,8 @@ void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
     iterators.resize(vertexList.size());
 
     dimension_t segmentLength = groupSize;
-    size_t parentIndex = 0;
-    size_t vertexIndex = 0;
+    std::size_t parentIndex = 0;
+    std::size_t vertexIndex = 0;
     while (vertexIndex < dimension) {
         // The last segment should have a length between groupSize and 2*groupSize
         if (vertexList.size() - vertexIndex < 2 * groupSize) {
@@ -350,7 +350,7 @@ void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
         SegmentParent &parent = *parentIterator;
         parent.reversed = false;
         parent.sequenceNumber = parentIndex;
-        for (size_t i = vertexIndex; i < vertexIndex + segmentLength; ++i) {
+        for (std::size_t i = vertexIndex; i < vertexIndex + segmentLength; ++i) {
             // Create a new SegmentVertex and append it to parent.vertices
             parent.vertices.push_back(SegmentVertex{vertexList[i], parentIterator, static_cast<long>(i)});
             iterators[vertexList[i]] = std::prev(parent.vertices.end());

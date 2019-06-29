@@ -44,7 +44,7 @@ private:
     // Find the k nearest neighbors in the set of vertices 0, ..., dimension by using the distCompare function that
     // decides for three vertices v, w1 and w2 if the distance between v and w1 is smaller than the distance between v
     // and w2
-    static CandidateEdges rawNearestNeighbors(dimension_t dimension, size_t k,
+    static CandidateEdges rawNearestNeighbors(dimension_t dimension, std::size_t k,
                                               const std::function<bool(vertex_t, vertex_t, vertex_t)> &distCompare);
 
 public:
@@ -56,19 +56,19 @@ public:
     static CandidateEdges allNeighbors(const TsplibProblem &problem);
 
     // For each vertex choose the k edges with minimal distance as candidate edges
-    static CandidateEdges nearestNeighbors(const TsplibProblem &problem, size_t k);
+    static CandidateEdges nearestNeighbors(const TsplibProblem &problem, std::size_t k);
 
     // For each vertex choose the k edges with minimal alpha distance as candidate edges
     // The alpha distance of an edge is defined as the increase in length of a 1-tree when required to contain this edge
-    static CandidateEdges alphaNearestNeighbors(const TsplibProblem &problem, size_t k);
+    static CandidateEdges alphaNearestNeighbors(const TsplibProblem &problem, std::size_t k);
 
     // For each vertex choose the k edges with minimal alpha distance as candidate edges
     // The alpha distances are optimized with subgradient optimization, see AlphaDistance
-    static CandidateEdges optimizedAlphaNearestNeighbors(const TsplibProblem &problem, size_t k);
+    static CandidateEdges optimizedAlphaNearestNeighbors(const TsplibProblem &problem, std::size_t k);
 
     // Create candidate edges of type candidateEdgeType with k candidate edges for each vertex
     // numberOfCandidateEdges is ignored for Type::ALL_NEIGHBORS
-    static CandidateEdges create(const TsplibProblem &problem, Type candidateEdgeType, size_t k);
+    static CandidateEdges create(const TsplibProblem &problem, Type candidateEdgeType, std::size_t k);
 
 public:
     CandidateEdges() = default;
@@ -77,7 +77,7 @@ public:
     CandidateEdges(dimension_t dimension, const std::vector<vertex_t> &fillValue);
 
     // Forwards the [] operator of edges
-    std::vector<vertex_t> &operator[](size_t index);
+    std::vector<vertex_t> &operator[](std::size_t index);
 };
 
 // ========================================== LinKernighanHeuristic class ==============================================
@@ -88,8 +88,8 @@ public:
 
 class LinKernighanHeuristic {
 private:
-    const size_t backtrackingDepth = 5;
-    const size_t infeasibilityDepth = 2;
+    const std::size_t backtrackingDepth = 5;
+    const std::size_t infeasibilityDepth = 2;
 
     // The TsplibProblem that should be solved
     TsplibProblem tsplibProblem;
@@ -113,7 +113,7 @@ public:
 
     explicit LinKernighanHeuristic(TsplibProblem &tsplibProblem, CandidateEdges candidateEdges);
 
-    Tour findBestTour(size_t numberOfTrials, distance_t optimumTourLength = 0, double acceptableError = 0,
+    Tour findBestTour(std::size_t numberOfTrials, distance_t optimumTourLength = 0, double acceptableError = 0,
                       bool verboseOutput = true);
 };
 

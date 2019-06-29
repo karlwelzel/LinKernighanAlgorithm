@@ -60,7 +60,7 @@ std::ostream &operator<<(std::ostream &out, const AlternatingWalk &walk) {
 CandidateEdges::CandidateEdges(dimension_t dimension, const std::vector<vertex_t> &fillValue) : edges(dimension,
                                                                                                       fillValue) {}
 
-std::vector<vertex_t> &CandidateEdges::operator[](size_t index) {
+std::vector<vertex_t> &CandidateEdges::operator[](std::size_t index) {
     return edges[index];
 }
 
@@ -77,7 +77,7 @@ CandidateEdges CandidateEdges::allNeighbors(const TsplibProblem &problem) {
 }
 
 CandidateEdges CandidateEdges::rawNearestNeighbors(
-        dimension_t dimension, size_t k, const std::function<bool(vertex_t, vertex_t, vertex_t)> &distCompare) {
+        dimension_t dimension, std::size_t k, const std::function<bool(vertex_t, vertex_t, vertex_t)> &distCompare) {
     std::unordered_set<vertex_t> allVertices{};
     for (vertex_t v = 0; v < dimension; ++v) {
         allVertices.insert(v);
@@ -94,7 +94,7 @@ CandidateEdges CandidateEdges::rawNearestNeighbors(
     return result;
 }
 
-CandidateEdges CandidateEdges::nearestNeighbors(const TsplibProblem &problem, size_t k) {
+CandidateEdges CandidateEdges::nearestNeighbors(const TsplibProblem &problem, std::size_t k) {
     auto distCompare = [&problem](vertex_t v, vertex_t w1, vertex_t w2) {
         return problem.dist(v, w1) < problem.dist(v, w2);
     };
@@ -102,7 +102,7 @@ CandidateEdges CandidateEdges::nearestNeighbors(const TsplibProblem &problem, si
     return rawNearestNeighbors(problem.getDimension(), k, distCompare);
 }
 
-CandidateEdges CandidateEdges::alphaNearestNeighbors(const TsplibProblem &problem, size_t k) {
+CandidateEdges CandidateEdges::alphaNearestNeighbors(const TsplibProblem &problem, std::size_t k) {
     auto dist = [&problem](vertex_t i, vertex_t j) { return problem.dist(i, j); };
 
     // Compute the alpha distances
@@ -115,7 +115,7 @@ CandidateEdges CandidateEdges::alphaNearestNeighbors(const TsplibProblem &proble
     return rawNearestNeighbors(problem.getDimension(), k, distCompare);
 }
 
-CandidateEdges CandidateEdges::optimizedAlphaNearestNeighbors(const TsplibProblem &problem, size_t k) {
+CandidateEdges CandidateEdges::optimizedAlphaNearestNeighbors(const TsplibProblem &problem, std::size_t k) {
     auto dist = [&problem](vertex_t i, vertex_t j) { return problem.dist(i, j); };
 
     // Compute the optimized alpha distances
@@ -129,7 +129,7 @@ CandidateEdges CandidateEdges::optimizedAlphaNearestNeighbors(const TsplibProble
 }
 
 CandidateEdges CandidateEdges::create(const TsplibProblem &problem, CandidateEdges::Type candidateEdgeType,
-                                      size_t k) {
+                                      std::size_t k) {
     switch (candidateEdgeType) {
         case Type::ALL_NEIGHBORS:
             return CandidateEdges::allNeighbors(problem);
@@ -151,7 +151,7 @@ LinKernighanHeuristic::LinKernighanHeuristic(TsplibProblem &tsplibProblem, Candi
 
 vertex_t LinKernighanHeuristic::chooseRandomElement(const std::vector<vertex_t> &elements) {
     std::random_device randomNumberGenerator;
-    std::uniform_int_distribution<size_t> distribution(0, elements.size() - 1);
+    std::uniform_int_distribution<std::size_t> distribution(0, elements.size() - 1);
     return elements[distribution(randomNumberGenerator)];
 }
 
@@ -225,7 +225,7 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
         currentWalk.clear();
         bestAlternatingWalk.clear();
         highestGain = 0;
-        size_t i = 0;
+        std::size_t i = 0;
         while (true) {
             if (vertexChoices[i].empty()) {
                 if (highestGain > 0) {
@@ -312,8 +312,9 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
     }
 }
 
-Tour LinKernighanHeuristic::findBestTour(size_t numberOfTrials, distance_t optimumTourLength, double acceptableError,
-                                         bool verboseOutput) {
+Tour
+LinKernighanHeuristic::findBestTour(std::size_t numberOfTrials, distance_t optimumTourLength, double acceptableError,
+                                    bool verboseOutput) {
     if (numberOfTrials < 1) {
         throw std::runtime_error("The number of trials can not be lower than 1.");
     }
@@ -321,7 +322,7 @@ Tour LinKernighanHeuristic::findBestTour(size_t numberOfTrials, distance_t optim
     Tour startTour;
     Tour currentTour;
     distance_t currentBestLength = std::numeric_limits<distance_t>::max();
-    size_t trialCount = 0;
+    std::size_t trialCount = 0;
 
     while (trialCount++ < numberOfTrials) {
         if (verboseOutput) std::cout << "Trial " << trialCount << " | " << std::flush;

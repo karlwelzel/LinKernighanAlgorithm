@@ -2,6 +2,7 @@
 // Created by Karl Welzel on 25.03.19.
 //
 
+#include <cstddef>
 #include <cstring>
 #include <iostream>
 #include <sstream>
@@ -9,8 +10,6 @@
 #include "LinKernighanHeuristic.h"
 #include "Tour.h"
 #include "TsplibUtils.h"
-
-// TODO: Replace all size_t by std::size_t because the latter is the C++ way
 
 int main(int argc, char *argv[]) {
     const std::string helpString = R""(
@@ -58,9 +57,9 @@ Restrictions:
         std::cout << helpString;
     }
 
-    size_t numberOfTrials = 50;
+    std::size_t numberOfTrials = 50;
     CandidateEdges::Type candidateEdgeType = CandidateEdges::OPTIMIZED_ALPHA_NEAREST_NEIGHBORS;
-    size_t numberOfCandidateEdges = 5;
+    std::size_t numberOfCandidateEdges = 5;
     bool storeAllDistances = true;
     distance_t optimumTourLength = 0;
     double acceptableError = 0;

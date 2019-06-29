@@ -165,7 +165,7 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
         // Initialize the matrix with zeros
         matrix.assign(dimension, std::vector<distance_t>(dimension, 0));
         try {
-            size_t numbersIndex = 0;
+            std::size_t numbersIndex = 0;
             if (edgeWeightFormat == "FULL_MATRIX") {
                 for (vertex_t i = 0; i < dimension; ++i) {
                     for (vertex_t j = 0; j < dimension; ++j) {
@@ -268,7 +268,7 @@ distance_t TsplibProblem::length(const BaseTour &tour) const {
 
 signed_distance_t TsplibProblem::exchangeGain(std::vector<vertex_t> &alternatingWalk) const {
     signed_distance_t value = 0;
-    for (size_t i = 0; i < alternatingWalk.size() - 1; ++i) {
+    for (std::size_t i = 0; i < alternatingWalk.size() - 1; ++i) {
         if (i % 2 == 0) {
             value += dist(alternatingWalk[i], alternatingWalk[i + 1]);
         } else {

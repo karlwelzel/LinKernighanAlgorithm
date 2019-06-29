@@ -23,17 +23,17 @@ SignedPermutation::SignedPermutation(std::vector<std::pair<number_t, bool>> perm
 
     // Calculate the index of each element
     indices.resize(this->permutation.size());
-    for (size_t i = 0; i < this->permutation.size(); ++i) {
+    for (std::size_t i = 0; i < this->permutation.size(); ++i) {
         indices[this->permutation[i].first] = i;
     }
 }
 
-std::pair<number_t, bool> SignedPermutation::getElementAt(size_t i) const {
+std::pair<number_t, bool> SignedPermutation::getElementAt(std::size_t i) const {
     return permutation[i];
 }
 
 bool SignedPermutation::isIdentityPermutation() const {
-    for (size_t i = 0; i < permutation.size(); ++i) {
+    for (std::size_t i = 0; i < permutation.size(); ++i) {
         // Check that the i-th element is +i
         if (permutation[i].first != i or !permutation[i].second) {
             return false;
@@ -42,11 +42,11 @@ bool SignedPermutation::isIdentityPermutation() const {
     return true;
 }
 
-std::pair<size_t, size_t> SignedPermutation::nextReversal() const {
-    for (size_t i = 0; i < permutation.size(); ++i) {
+std::pair<std::size_t, std::size_t> SignedPermutation::nextReversal() const {
+    for (std::size_t i = 0; i < permutation.size(); ++i) {
         if (permutation[i].first != i) {
             // Return reversal that reverses permutation[i] and i
-            size_t j = indices[i];
+            std::size_t j = indices[i];
             return std::make_pair(i, j);
         }
         if (!permutation[i].second) {
@@ -59,10 +59,10 @@ std::pair<size_t, size_t> SignedPermutation::nextReversal() const {
 }
 
 
-void SignedPermutation::performReversal(std::pair<size_t, size_t> step) {
+void SignedPermutation::performReversal(std::pair<std::size_t, std::size_t> step) {
     number_t i = step.first;
     number_t j = step.second;
-    for (size_t k = 0; k < (j - i + 1) / 2; ++k) {
+    for (std::size_t k = 0; k < (j - i + 1) / 2; ++k) {
         std::swap(permutation[i + k], permutation[j - k]);
         std::swap(indices[permutation[i + k].first], indices[permutation[j - k].first]);
         permutation[i + k].second = !permutation[i + k].second;

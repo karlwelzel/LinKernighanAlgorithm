@@ -118,8 +118,8 @@ alphaDistances(dimension_t dimension, const std::function<signed_distance_t(vert
     std::vector<std::vector<distance_t>> alpha(dimension, std::vector<distance_t>(dimension, 0));
 
     // Compute the alpha values
-    for (size_t i = 0; i < dimension; ++i) {
-        for (size_t j = 0; j < dimension; ++j) {
+    for (std::size_t i = 0; i < dimension; ++i) {
+        for (std::size_t j = 0; j < dimension; ++j) {
             alpha[i][j] = dist(i, j) - beta[i][j];
         }
     }
@@ -149,9 +149,9 @@ optimizedAlphaDistances(dimension_t dimension, const std::function<signed_distan
         return tree.length(modifiedDist) - 2 * penaltiesSum;
     };
 
-    size_t stepSize = 1;
-    size_t periodLength = dimension / 2;
-    size_t iteration = 0; // A counter for the iterations in the current period
+    std::size_t stepSize = 1;
+    std::size_t periodLength = dimension / 2;
+    std::size_t iteration = 0; // A counter for the iterations in the current period
     signed_distance_t currentObjective = objectiveFunction(); // The current value of the objective function
     signed_distance_t previousObjective = currentObjective; // The previous value of the objective function
     // Used to double the step size in the first period until the objective function does not increase
@@ -170,7 +170,7 @@ optimizedAlphaDistances(dimension_t dimension, const std::function<signed_distan
         while (iteration++ < periodLength and !std::all_of(currentSubgradient.begin(), currentSubgradient.end(),
                                                            [](signed_distance_t d) { return d == 0; })) {
             // Update the penalties
-            for (size_t i = 0; i < penalties.size(); ++i) {
+            for (std::size_t i = 0; i < penalties.size(); ++i) {
                 penalties[i] += lround(stepSize * (0.7 * currentSubgradient[i] + 0.3 * previousSubgradient[i]));
             }
 
