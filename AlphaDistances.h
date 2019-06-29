@@ -15,8 +15,9 @@
 // (i, j) is contained in an optimum tour (smaller = more likely)
 
 // This struct represents a 1-tree
+// A 1-tree is a spanning tree in all vertices except the special vertex "1" plus two edges incident to "1"
 struct OneTree {
-    // parent maps each vertex to its parent in the ordinary minimum spanning tree
+    // parent maps each vertex to its parent in an ordinary spanning tree
     std::vector<vertex_t> parent;
 
     // topologicalOrder contains all vertices except special in an order such that parent[v] comes before v for every
@@ -26,9 +27,10 @@ struct OneTree {
     // The special "1" vertex
     vertex_t special;
 
-    // (special, specialNeighbor) is the additional edge added to the tree to form a 1-tree
+    // (special, specialNeighbor) is the additional edge added to the spanning tree to form a 1-tree
     vertex_t specialNeighbor;
 
+    // Computes the length of the 1-tree as the sum of the lengths of all edges in the 1-tree
     signed_distance_t length(const std::function<signed_distance_t(vertex_t, vertex_t)> &dist);
 
     // Computes the degree of each vertex in the minimum 1-tree
@@ -37,8 +39,8 @@ struct OneTree {
 
 // Computes a minimum 1-tree in the complete graph with dimension vertices and edge weights given by dist. This is done
 // by computing a minimum spanning tree in the complete graph, choosing the leaf with the longest second nearest
-// neighbor distance as the special vertex and adding the edge to special's second nearest neighbor to the tree. special
-// is incident to the edges (special, parent[special]) and (special, specialNeighbor)
+// neighbor distance as the special vertex "1" and adding the edge to special's second nearest neighbor to the tree.
+// special is incident to the edges (special, parent[special]) and (special, specialNeighbor)
 // It is guaranteed that dist(special, parent[special]) <= dist(special, specialNeighbor)
 OneTree minimumOneTree(dimension_t dimension, const std::function<signed_distance_t(vertex_t, vertex_t)> &dist);
 

@@ -16,8 +16,8 @@
 signed_distance_t OneTree::length(const std::function<signed_distance_t(vertex_t, vertex_t)> &dist) {
     signed_distance_t result = 0;
 
+    // All edges (v, parent[v])
     for (auto v = topologicalOrder.begin() + 1; v != topologicalOrder.end(); ++v) {
-        // All edges (v, parent[v])
         result += dist(*v, parent[*v]);
     }
 
@@ -30,8 +30,8 @@ signed_distance_t OneTree::length(const std::function<signed_distance_t(vertex_t
 std::vector<signed_distance_t> OneTree::degrees() {
     std::vector<signed_distance_t> result(parent.size(), 0);
 
+    // All edges (v, parent[v])
     for (auto v = topologicalOrder.begin() + 1; v != topologicalOrder.end(); ++v) {
-        // All edges (v, parent[v])
         result[*v]++;
         result[parent[*v]]++;
     }
@@ -90,6 +90,10 @@ alphaDistances(dimension_t dimension, const std::function<signed_distance_t(vert
     // Initialize the beta array
     std::vector<std::vector<signed_distance_t>> beta(dimension, std::vector<signed_distance_t>(dimension, 0));
 
+    // The value of beta[i][j] is the length of the edge in the 1-tree that needs to be removed when (i, j) is
+    // inserted in the 1-tree. This gives the relationship
+    //     alpha[i][j] = dist(i, j) - beta[i][j]
+
     // Set the beta values for edges (special, v)
     for (vertex_t vertex : tree.topologicalOrder) {
         if (vertex == tree.special) {
@@ -129,7 +133,7 @@ alphaDistances(dimension_t dimension, const std::function<signed_distance_t(vert
 
 std::vector<std::vector<distance_t>>
 optimizedAlphaDistances(dimension_t dimension, const std::function<signed_distance_t(vertex_t, vertex_t)> &dist) {
-    // The penalties of each vector
+    // The penalties of each vertex
     std::vector<signed_distance_t> penalties(dimension, 0);
 
     // The modified distance function
