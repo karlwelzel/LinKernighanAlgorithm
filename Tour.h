@@ -20,14 +20,18 @@ using signed_distance_t = long long; // The type used for distances and lengths 
 // ============================================= AlternatingWalk class =================================================
 
 // This class represents an alternating walk.
-// An alternating walk is a walk where every second edge belongs to the tour and the other edges don't. An alternating
-// walk always starts with an edge on the tour
+
+// An alternating walk is a walk in the complete graph where every second edge belongs to the tour and the other edges
+// do not. An alternating walk always starts with an edge on the tour
 
 class AlternatingWalk {
 private:
     std::vector<vertex_t> vertices;
 
-public: // Forward the required functionality of vertices to AlternatingWalk
+public:
+    // Forward the required functionality of the std::vector vertices to AlternatingWalk
+    // Subclassing std::vector<vertex_t> is not possible, because the standard does not allow it
+
     AlternatingWalk() = default;
 
     std::size_t size() const noexcept;
@@ -45,7 +49,9 @@ public: // Forward the required functionality of vertices to AlternatingWalk
 
     void push_back(vertex_t vertex);
 
-public: // Additional functionality custom to an alternating Walk
+public:
+    // Additional functionality custom to an alternating Walk
+
     // Adds the first vertex to the end, to get a closed alternating walk, and returns the result.
     // Expects that the walk contains at least two elements
     AlternatingWalk close() const;
@@ -57,6 +63,7 @@ public: // Additional functionality custom to an alternating Walk
     // Checks if the edge (v, w) is on the alternating walk
     bool containsEdge(vertex_t v, vertex_t w) const;
 };
+
 
 // ================================================= BaseTour class ====================================================
 
