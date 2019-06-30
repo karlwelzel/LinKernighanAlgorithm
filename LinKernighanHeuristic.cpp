@@ -178,7 +178,7 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
     Tour currentTour = startTour;
     // vertexChoices[i] stores all possible choices for vertex x_i. This is used for backtracking
     std::vector<std::vector<vertex_t>> vertexChoices;
-    AlternatingWalk currentWalk; // The i-th element of currentWalk is also reffered to as x_i
+    AlternatingWalk currentWalk; // The i-th element of currentWalk is also referred to as x_i
     AlternatingWalk bestAlternatingWalk;
     signed_distance_t highestGain = 0;
 

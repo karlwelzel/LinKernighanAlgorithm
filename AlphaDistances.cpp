@@ -6,7 +6,6 @@
 #include <cmath>
 #include <cstddef>
 #include <functional>
-#include <tuple>
 #include <vector>
 #include <unordered_set>
 #include "AlphaDistances.h"
@@ -123,7 +122,7 @@ alphaDistances(dimension_t dimension, const std::function<signed_distance_t(vert
     // Compute the alpha values
     for (std::size_t i = 0; i < dimension; ++i) {
         for (std::size_t j = 0; j < dimension; ++j) {
-            alpha[i][j] = dist(i, j) - beta[i][j];
+            alpha[i][j] = static_cast<distance_t>(dist(i, j) - beta[i][j]);
         }
     }
 
