@@ -6,17 +6,17 @@ improvements by Keld Helsgaun as part of a course at the Uni Bonn
 
 Generate build files (only needed once)
 
-    cmake -S . -B cmake-build-debug
+    cmake .
 
-Compile and generate the executable `cmake-build-debug/LinKernighanAlgorithm`
+Build the executable `LinKernighanAlgorithm`
     
-    cmake --build cmake-build-debug
+    cmake --build .
 
-## Usage:
+## Usage
     LinKernighanAlgorithm --help
     LinKernighanAlgorithm tsplib_problem.tsp [options]
 
-## Options:
+## Options
     --number-of-trials=integer
         Sets the maximum number of trials (default: 50)
     --candidate-edges=[ALL|NEAREST|ALPHA_NEAREST|OPT_ALPHA_NEAREST]
@@ -50,8 +50,8 @@ using Tour = ArrayTour;
 ```
 and recompile the source code.
 
-## Example:
+## Example
     LinKernighanAlgorithm ExampleProblems/si1032.tsp --optimum-tour-length=92650 --acceptable-error=0.1 --verbose
 
-## Restrictions:
+## Restrictions
 The dimension of the TSPLIB problem may not be smaller than 3 or the number of candidate edges plus 1.
