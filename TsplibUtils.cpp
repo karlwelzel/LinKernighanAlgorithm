@@ -100,10 +100,8 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
                         return "NODE_COORD_SECTION encountered, but EDGE_WEIGHT_TYPE is not one of: EUC_2D, EUC_3D, "
                                "MAX_2D, MAX_3D, MAN_2D, MAN_3D, CEIL_2D, GEO";
                     }
-                    // Initialize the coordinates vector with empty vectors until coordinates.size() == dimension
-                    while (coordinates.size() < dimension) {
-                        coordinates.emplace_back();
-                    }
+                    // Initialize coordinates with dimension empty vectors
+                    coordinates.resize(dimension);
                 } else if (line == "EDGE_WEIGHT_SECTION") {
                     if (edgeWeightType != "EXPLICIT") {
                         return "EDGE_WEIGHT_SECTION encountered, but EDGE_WEIGHT_TYPE is not EXPLICIT";
@@ -118,7 +116,7 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
                     double x = 0, y = 0;
                     stream >> n >> x >> y;
                     try {
-                        coordinates.at(n - 1) = std::vector<double>{x, y};
+                        coordinates.at(n - 1) = {x, y};
                     } catch (std::out_of_range &error) {
                         return "One of the coordinates has a number outside of the range [1, DIMENSION]";
                     }
@@ -176,16 +174,14 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
             } else if (edgeWeightFormat == "LOWER_DIAG_ROW") {
                 for (vertex_t i = 0; i < dimension; ++i) {
                     for (vertex_t j = 0; j <= i; ++j) {
-                        matrix[i][j] = numbers.at(numbersIndex);
-                        matrix[j][i] = numbers.at(numbersIndex);
+                        matrix[i][j] = matrix[j][i] = numbers.at(numbersIndex);
                         numbersIndex++;
                     }
                 }
             } else if (edgeWeightFormat == "UPPER_DIAG_ROW") {
                 for (vertex_t i = 0; i < dimension; ++i) {
                     for (vertex_t j = i; j < dimension; ++j) {
-                        matrix[i][j] = numbers.at(numbersIndex);
-                        matrix[j][i] = numbers.at(numbersIndex);
+                        matrix[i][j] = matrix[j][i] = numbers.at(numbersIndex);
                         numbersIndex++;
                     }
                 }
@@ -193,8 +189,7 @@ std::string TsplibProblem::readFile(std::ifstream &inputFile) {
                 // The diagonal is never touched, so it is filled with zeros from the initialization
                 for (vertex_t i = 0; i < dimension; ++i) {
                     for (vertex_t j = i + 1; j < dimension; ++j) {
-                        matrix[i][j] = numbers.at(numbersIndex);
-                        matrix[j][i] = numbers.at(numbersIndex);
+                        matrix[i][j] = matrix[j][i] = numbers.at(numbersIndex);
                         numbersIndex++;
                     }
                 }
@@ -256,6 +251,8 @@ distance_t TsplibProblem::dist(const vertex_t i, const vertex_t j) const {
 
 distance_t TsplibProblem::length(const BaseTour &tour) const {
     distance_t sum = 0;
+
+    // Start at the arbitrary vertex 0 and sum up all edge lengths
     vertex_t currentVertex = 0;
     vertex_t nextVertex = tour.successor(currentVertex);
     do {
@@ -269,9 +266,9 @@ distance_t TsplibProblem::length(const BaseTour &tour) const {
 signed_distance_t TsplibProblem::exchangeGain(const AlternatingWalk &alternatingWalk) const {
     signed_distance_t value = 0;
     for (std::size_t i = 0; i < alternatingWalk.size() - 1; ++i) {
-        if (i % 2 == 0) {
+        if (i % 2 == 0) { // The edge {alternatingWalk[i], alternatingWalk[i+1]} is an out-edge
             value += dist(alternatingWalk[i], alternatingWalk[i + 1]);
-        } else {
+        } else { // The edge {alternatingWalk[i], alternatingWalk[i+1]} is an in-edge
             value -= dist(alternatingWalk[i], alternatingWalk[i + 1]);
         }
     }
@@ -370,6 +367,7 @@ std::string TsplibTour::toTsplibTourFile() {
     output += "TOUR_SECTION\n";
     vertex_t currentVertex = 0;
     do {
+        // The vertices are numbered 0, ..., dimension-1 internally so we need to add one for the output
         output += std::to_string(currentVertex + 1) + "\n";
         currentVertex = successor(currentVertex);
     } while (currentVertex != 0);
