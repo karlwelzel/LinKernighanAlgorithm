@@ -129,12 +129,12 @@ Tour LinKernighanHeuristic::generateRandomTour() {
     std::iota(remainingVertices.begin(), remainingVertices.end(), 0);
 
     // This variable stores the order of the vertices on the tour
-    std::vector<vertex_t> tourOrder;
+    std::vector<vertex_t> tourSequence;
 
     // Start with a random vertex
     vertex_t currentVertex = chooseRandomElement(remainingVertices);
     remainingVertices.erase(remainingVertices.begin() + currentVertex); // The index of currentVertex is currentVertex
-    tourOrder.push_back(currentVertex);
+    tourSequence.push_back(currentVertex);
 
     // In each step, decide for each vertex otherVertex if it is an element in one or more of these categories
     // (1) otherVertex was not already chosen and {currentVertex, otherVertex} is a candidate edge and on the
@@ -168,10 +168,10 @@ Tour LinKernighanHeuristic::generateRandomTour() {
         }
         remainingVertices.erase(std::remove(remainingVertices.begin(), remainingVertices.end(), currentVertex),
                                 remainingVertices.end());
-        tourOrder.push_back(currentVertex);
+        tourSequence.push_back(currentVertex);
     }
 
-    return Tour(tourOrder);
+    return Tour(tourSequence);
 }
 
 Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {

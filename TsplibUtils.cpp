@@ -307,7 +307,7 @@ std::string TsplibTour::readFile(std::ifstream &inputFile) {
     std::string line;
     std::string lastDataKeyword;
     std::string::size_type delimiterIndex;
-    std::vector<vertex_t> tourList;
+    std::vector<vertex_t> tourSequence;
 
     while (inputFile) {
         getline(inputFile, line);
@@ -338,7 +338,7 @@ std::string TsplibTour::readFile(std::ifstream &inputFile) {
                     if (line == "-1") {
                         lastDataKeyword.clear(); // The TOUR_SECTION is over
                     } else if (stream >> number and number >= 1) {
-                        tourList.push_back(number - 1);
+                        tourSequence.push_back(number - 1);
                     } else {
                         return "Expected a vertex or -1 in TOUR_SECTION, but got '" + line + "'";
                     }
@@ -354,10 +354,10 @@ std::string TsplibTour::readFile(std::ifstream &inputFile) {
     // Error checking
     if (dimension == 0) {
         return "The dimension cannot be 0";
-    } else if (dimension != tourList.size()) {
+    } else if (dimension != tourSequence.size()) {
         return "The dimension does not fit to the number of vertices";
     }
-    setVertices(tourList);
+    setVertices(tourSequence);
 
     return "";
 }

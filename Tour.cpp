@@ -251,8 +251,8 @@ void ArrayTour::setVertices(const std::vector<vertex_t> &vertexList) {
     indices = inversePermutation(sequence);
 }
 
-ArrayTour::ArrayTour(const std::vector<vertex_t> &vertexList) {
-    setVertices(vertexList);
+ArrayTour::ArrayTour(const std::vector<vertex_t> &tourSequence) {
+    setVertices(tourSequence);
 }
 
 vertex_t ArrayTour::predecessor(vertex_t vertex) const {
@@ -371,12 +371,12 @@ TwoLevelTreeTour &TwoLevelTreeTour::operator=(const TwoLevelTreeTour &otherTour)
 }
 
 
-void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
-    dimension = vertexList.size();
+void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &tourSequence) {
+    dimension = tourSequence.size();
     // TODO: Test different values
-    if (vertexList.size() <= 1000) {
+    if (tourSequence.size() <= 1000) {
         groupSize = 2 * dimension; // Only one segment, essentially like ArrayTour
-    } else if (vertexList.size() <= 100000) {
+    } else if (tourSequence.size() <= 100000) {
         groupSize = 100;
     } else {
         groupSize = 500;
@@ -389,15 +389,15 @@ void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
     }
      */
 
-    iterators.resize(vertexList.size());
+    iterators.resize(tourSequence.size());
 
     dimension_t segmentLength = groupSize;
     std::size_t parentIndex = 0;
     std::size_t vertexIndex = 0;
     while (vertexIndex < dimension) {
         // The last segment should have a length between groupSize and 2*groupSize
-        if (vertexList.size() - vertexIndex < 2 * groupSize) {
-            segmentLength = vertexList.size() - vertexIndex;
+        if (tourSequence.size() - vertexIndex < 2 * groupSize) {
+            segmentLength = tourSequence.size() - vertexIndex;
         }
 
         parents.emplace_back(); // Create an empty SegmentParent
@@ -407,8 +407,8 @@ void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
         parent.sequenceNumber = parentIndex;
         for (std::size_t i = vertexIndex; i < vertexIndex + segmentLength; ++i) {
             // Create a new SegmentVertex and append it to parent.vertices
-            parent.vertices.push_back(SegmentVertex{vertexList[i], parentIterator, static_cast<long>(i)});
-            iterators[vertexList[i]] = std::prev(parent.vertices.end());
+            parent.vertices.push_back(SegmentVertex{tourSequence[i], parentIterator, static_cast<long>(i)});
+            iterators[tourSequence[i]] = std::prev(parent.vertices.end());
         }
 
         parentIndex++;
@@ -416,8 +416,8 @@ void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &vertexList) {
     }
 }
 
-TwoLevelTreeTour::TwoLevelTreeTour(const std::vector<vertex_t> &vertexList) {
-    setVertices(vertexList);
+TwoLevelTreeTour::TwoLevelTreeTour(const std::vector<vertex_t> &tourSequence) {
+    setVertices(tourSequence);
 }
 
 
@@ -686,18 +686,3 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
     }
     flip(a, b, c, d); // Now a-b and c-d are the boundaries of segments, so it can be handled by case 1
 }
-
-
-// =============================================== TourWalker class ====================================================
-
-std::ostream &operator<<(std::ostream &out, const BaseTour &tour) {
-    std::string output;
-    vertex_t currentVertex = 0;
-    do {
-        output += std::to_string(currentVertex) + ", ";
-        currentVertex = tour.successor(currentVertex);
-    } while (currentVertex != 0);
-    out << output.substr(0, output.length() - 2);
-    return out;
-}
-

@@ -76,8 +76,8 @@ public: // pure virtual functions that need to be implemented by subclasses
     virtual dimension_t getDimension() const = 0;
 
     // Initialize the tour with a sequence of vertices
-    // This function expects a vector containing the numbers from 0 to tour.size()-1 and overrides all data
-    virtual void setVertices(const std::vector<vertex_t> &vertexList) = 0;
+    // Expects a vector containing each vertex 0 to tourSequence.size()-1 exactly once and overrides all data
+    virtual void setVertices(const std::vector<vertex_t> &tourSequence) = 0;
 
     // Returns the predecessor of vertex in the current tour
     virtual vertex_t predecessor(vertex_t vertex) const = 0;
@@ -89,7 +89,6 @@ public: // pure virtual functions that need to be implemented by subclasses
     virtual bool isBetween(vertex_t before, vertex_t vertex, vertex_t after) const = 0;
 
     // Performs a 2-opt exchange: Replaces {a, b} and {c, d} by {b, c} and {d, a}
-    // The new tour is a-c, b-d
     // Expects successor(b) = a and successor(c) = d
     virtual void flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) = 0;
 
@@ -97,10 +96,10 @@ public: // functions that all Tour classes have in common and that only depend o
 
     // Compute the inverse permutation to a permutation of the numbers 0 to n-1, i.e. a vector inv such that
     // permutation[inv[i]] == i for all 0 <= i < n
-    // Expects that permutation contains every number 0 to n-1 exactly once
+    // Expects that permutation contains every number 0 to permutation.size()-1 exactly once
     static std::vector<dimension_t> inversePermutation(const std::vector<dimension_t> &permutation);
 
-    // Returns the neighbors of vertex in the tour
+    // Returns the two neighbors of vertex in the tour
     std::vector<vertex_t> getNeighbors(vertex_t vertex);
 
     // Checks whether the tour contains the edge {vertex1, vertex2}
@@ -109,22 +108,19 @@ public: // functions that all Tour classes have in common and that only depend o
     // Computes the cyclic permutation of the vertices in an alternating walk, i.e. a vector permutation such that
     // the elements in alternatingWalk appear on the tour in the order
     //   alternatingWalk[permutation[0]], alternatingWalk[permutation[1]], ..., alternatingWalk[permutation[n-1]]
-    // Expects a closed alternating walk that starts with an edge on the tour
+    // Expects a closed alternating walk and returns a permutation that has one element fewer than alternatingWalk
     std::vector<dimension_t> cyclicPermutation(const AlternatingWalk &alternatingWalk) const;
 
     // Checks if the tour after exchanging all edges of alternatingWalk on the tour by edges not on the tour is still
-    // a hamiltonian tour, does not change the tour itself
-    // Expects a closed alternating walk that starts with an edge on the tour
+    // a hamiltonian tour, but does not change the tour itself
+    // Expects a closed alternating walk
     bool isTourAfterExchange(const AlternatingWalk &alternatingWalk) const;
 
     // Exchanges all edges of alternatingWalk on the tour by edges not on the tour
-    // Expects a closed alternating walk that starts with an edge on the tour
+    // Expects a closed alternating walk
     // Expects that the exchange will lead to a hamiltonian tour, check with isTourAfterExchange beforehand
     void exchange(const AlternatingWalk &alternatingWalk);
 };
-
-// Output the tour to the stream out, typically used with std::cout
-std::ostream &operator<<(std::ostream &out, const BaseTour &tour);
 
 
 // ================================================ ArrayTour class ====================================================
@@ -135,8 +131,11 @@ std::ostream &operator<<(std::ostream &out, const BaseTour &tour);
 
 class ArrayTour : public BaseTour {
 private:
-    std::vector<vertex_t> sequence; // Stores the sequence of vertices in the tour
-    std::vector<dimension_t> indices; // Stores the index of each vertex in sequence: sequence[indices[i]] = i
+    // Stores the sequence of vertices in the tour
+    std::vector<vertex_t> sequence;
+
+    // Stores the index of each vertex in sequence: sequence[indices[i]] = i
+    std::vector<dimension_t> indices;
 
     // Compute the number of vertices between vertex1 and vertex2 in the successor direction (including vertex1 and
     // excluding vertex2)
@@ -146,12 +145,12 @@ public:
     ArrayTour() = default;
 
     // Initialize the tour with a sequence of vertices
-    // This function expects a vector containing the numbers from 0 to tour.size()-1 and overrides all data
-    void setVertices(const std::vector<vertex_t> &vertexList) override;
+    // Expects a vector containing each vertex 0 to tourSequence.size()-1 exactly once and overrides all data
+    void setVertices(const std::vector<vertex_t> &tourSequence) override;
 
     // Initialize the tour with a sequence of vertices
-    // This function expects a vector containing the numbers from 0 to tour.size()-1 and overrides all data
-    explicit ArrayTour(const std::vector<vertex_t> &vertexList);
+    // Expects a vector containing each vertex 0 to tourSequence.size()-1 exactly once
+    explicit ArrayTour(const std::vector<vertex_t> &tourSequence);
 
     // Returns the number of vertices in the tour
     dimension_t getDimension() const override;
@@ -175,19 +174,22 @@ public:
 
 // This tour implementation uses a tree with two levels to store the vertices. The first level is a list of parent
 // nodes (here: SegmentParent) and the second level is a segment of the tour for every parent node. Each vertex in a
-// segment (here: SegmentVertex) has a pointer to its parent and there is a map that stores a pointer to the
-// SegmentVertex inside one of the segments corresponding to a vertex (of type vertex_t). The advantage over the
-// ArrayTour implementation is that each parent node stores a reversal bit, which indicates if the complete segment
-// should be traversed in the opposite direction. So, when the complete segment needs to be reversed, it takes only
-// O(1) time instead of a linear running time in the segment length.
+// segment (here: SegmentVertex) has a pointer to its parent and there is a map that maps each vertex (of type vertex_t)
+// to a pointer to its corresponding SegmentVertex inside one of the segments.
+// The advantage over the ArrayTour implementation is that each parent node stores a reversal bit, which indicates if
+// the complete segment should be traversed in the opposite direction. So, when the complete segment needs to be
+// reversed, it takes only O(1) time instead of a linear running time in the segment length.
+// The running times for predecessor, successor and isBetween are O(1). The tight theoretical worst-case bound of
+// O(sqrt(n)) for flip is sacrificed for a simpler and faster implementation, but it is to be expected that the average
+// running time grows proportional to sqrt(n). Therefore the TwoLevelTreeTour implementation will outperform the
+// ArrayTour implementation for large instances.
 
 // The implementation was adapted from the paper
 // Fredman, M.L., Johnson, D.S., McGeoch, L.A., & Ostheimer, G. (1993). Data Structures for Traveling Salesmen. SODA.
 // which is available here: http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.49.570&rep=rep1&type=pdf
-// It sacrifices the tight O(sqrt(n)) worst-case bound for a flip operation for a simpler and faster implementation.
 
-// groupSize is a parameter for how long a single segment should be. The choice in setVertices is similar to the one
-// suggested in the paper.
+// groupSize is a parameter for how long a single segment should be. The choice of groupSize depending on the dimension
+// of the problem (see setVertices) is similar to the one suggested in the paper.
 
 class TwoLevelTreeTour : public BaseTour {
 private:
@@ -197,23 +199,23 @@ private:
         // The represented vertex
         vertex_t vertex;
 
-        // A pointer to its parent
+        // A pointer to the parent of the vertex
         std::list<SegmentParent>::iterator parentIterator;
 
-        // Used to order the elements in the segment (in isBetween). Inside a segment the numbers are consecutive,
-        // but they might start and end with arbitrary numbers.
+        // This variable is used to order the elements in the segment (in isBetween). Inside a segment the numbers are
+        // consecutive, but they might start and end with arbitrary numbers.
         long sequenceNumber;
     };
 
     struct SegmentParent {
-        // A list of the vertices in this segment
+        // A doubly linked list of the vertices in this segment
         std::list<SegmentVertex> vertices;
 
         // The reversal bit, indicates whether this segments orientation is opposite to the tour
         bool reversed = false;
 
-        // Used to order the parent nodes (in isBetween). The numbers are consecutive between 0 and the number of
-        // segments
+        // This variable is used to order the parent nodes (in isBetween). The numbers are consecutive between 0 and
+        // the number of segments
         dimension_t sequenceNumber = 0;
 
         // Counts the number of elements in this parent (= vertices.size())
@@ -231,10 +233,10 @@ private:
         void reverseVertices(std::list<SegmentVertex>::iterator first, std::list<SegmentVertex>::iterator last);
     };
 
-    // Stores the number of vertices
+    // The number of vertices of the complete tour
     dimension_t dimension = 0;
 
-    // The average size the segments should have. The parameter is described in more detail in the paper above
+    // The average size the segments should have. The parameter is described in more detail in the paper linked above
     dimension_t groupSize = 0;
 
     // A list of the parents in the order their segments appear on the tour
@@ -274,12 +276,12 @@ public:
     TwoLevelTreeTour &operator=(const TwoLevelTreeTour &otherTour);
 
     // Initialize the tour with a sequence of vertices
-    // This function expects a vector containing the numbers from 0 to tour.size()-1 and overrides all data
-    void setVertices(const std::vector<vertex_t> &vertexList) override;
+    // Expects a vector containing each vertex 0 to tourSequence.size()-1 exactly once and overrides all data
+    void setVertices(const std::vector<vertex_t> &tourSequence) override;
 
     // Initialize the tour with a sequence of vertices
-    // This function expects a vector containing the numbers from 0 to tour.size()-1 and overrides all data
-    explicit TwoLevelTreeTour(const std::vector<vertex_t> &vertexList);
+    // Expects a vector containing each vertex 0 to tourSequence.size()-1 exactly once
+    explicit TwoLevelTreeTour(const std::vector<vertex_t> &tourSequence);
 
     // Returns the number of vertices in the tour
     dimension_t getDimension() const override;
