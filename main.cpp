@@ -57,6 +57,7 @@ Restrictions:
         std::cout << helpString;
     }
 
+    // Set the default option values
     std::size_t numberOfTrials = 50;
     CandidateEdges::Type candidateEdgeType = CandidateEdges::OPTIMIZED_ALPHA_NEAREST_NEIGHBORS;
     std::size_t numberOfCandidateEdges = 5;
@@ -66,6 +67,7 @@ Restrictions:
     bool outputToFile = false;
     bool verboseOutput = false;
 
+    // Read the command line options
     std::stringstream stringStream;
     std::string option;
     for (int i = 2; i < argc; ++i) {
@@ -117,9 +119,8 @@ Restrictions:
         stringStream.clear();
     }
 
+    // Try to open the TSPLIB file
     std::ifstream problemFile(argv[1]);
-
-    // Check whether the problem file could be opened
     if (!problemFile.is_open() or !problemFile.good()) {
         std::cerr << "Could not open the TSPLIB file '" << argv[1] << "'" << std::endl;
         return 1;
