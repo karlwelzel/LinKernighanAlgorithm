@@ -11,8 +11,6 @@
 #include "Tour.h"
 #include "PrimsAlgorithm.h"
 
-// TODO: priority queue
-
 std::tuple<std::vector<vertex_t>, std::vector<vertex_t>>
 primsAlgorithm(dimension_t dimension, const std::function<signed_distance_t(vertex_t, vertex_t)> &dist) {
     signed_distance_t infiniteDistance = std::numeric_limits<signed_distance_t>::max();
@@ -25,7 +23,11 @@ primsAlgorithm(dimension_t dimension, const std::function<signed_distance_t(vert
     // Fill remainingVertices with all vertices
     std::vector<vertex_t> remainingVertices(dimension);
     std::iota(remainingVertices.begin(), remainingVertices.end(), 0);
+
+    // cheapestNeighborInTree maps each vertex outside the tree to the nearest vertex inside the tree
     std::vector<vertex_t> cheapestNeighborInTree(dimension, noNeighbor);
+
+    // cheapestEdgeCost[v] stores dist(v, cheapestNeighborInTree[v])
     std::vector<signed_distance_t> cheapestEdgeCost(dimension, infiniteDistance);
 
     while (!remainingVertices.empty()) {
@@ -41,7 +43,7 @@ primsAlgorithm(dimension_t dimension, const std::function<signed_distance_t(vert
         topologicalOrder.push_back(currentVertex);
 
         // Add the appropriate edge to the tree
-        // parentVertex may be no vertex, this indicates that currentVertex has no parent
+        // parentVertex may be noVertex, this indicates that currentVertex has no parent
         vertex_t parentVertex = cheapestNeighborInTree[currentVertex];
         parent[currentVertex] = parentVertex;
 
@@ -49,7 +51,7 @@ primsAlgorithm(dimension_t dimension, const std::function<signed_distance_t(vert
         for (vertex_t otherVertex : remainingVertices) {
             if (dist(currentVertex, otherVertex) < cheapestEdgeCost[otherVertex]) {
                 cheapestNeighborInTree[otherVertex] = currentVertex;
-                cheapestEdgeCost[otherVertex] = dist(currentVertex, otherVertex);
+                cheapestEdgeCost[otherVertex] = dist(otherVertex, currentVertex);
             }
         }
     }
