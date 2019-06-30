@@ -2,8 +2,8 @@
 // Created by Karl Welzel on 13.06.19.
 //
 
-#ifndef LINKERNINGHANALGORITHM_PRIMSALGORITHM_H
-#define LINKERNINGHANALGORITHM_PRIMSALGORITHM_H
+#ifndef LINKERNIGHANALGORITHM_PRIMSALGORITHM_H
+#define LINKERNIGHANALGORITHM_PRIMSALGORITHM_H
 
 #include <functional>
 #include <tuple>
@@ -18,4 +18,4 @@
 std::tuple<std::vector<vertex_t>, std::vector<vertex_t>>
 primsAlgorithm(dimension_t dimension, const std::function<signed_distance_t(vertex_t, vertex_t)> &dist);
 
-#endif //LINKERNINGHANALGORITHM_PRIMSALGORITHM_H
+#endif //LINKERNIGHANALGORITHM_PRIMSALGORITHM_H

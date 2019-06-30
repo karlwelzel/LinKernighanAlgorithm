@@ -2,8 +2,8 @@
 // Created by Karl Welzel on 19.04.2019.
 //
 
-#ifndef LINKERNINGHANALGORITHM_TOUR_H
-#define LINKERNINGHANALGORITHM_TOUR_H
+#ifndef LINKERNIGHANALGORITHM_TOUR_H
+#define LINKERNIGHANALGORITHM_TOUR_H
 
 #include <cstddef>
 #include <iostream>
@@ -294,4 +294,4 @@ public:
 
 using Tour = TwoLevelTreeTour;
 
-#endif //LINKERNINGHANALGORITHM_TOUR_H
+#endif //LINKERNIGHANALGORITHM_TOUR_H

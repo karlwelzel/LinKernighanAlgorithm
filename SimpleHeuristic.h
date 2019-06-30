@@ -2,8 +2,8 @@
 // Created by Karl Welzel on 29.03.2019.
 //
 
-#ifndef LINKERNINGHANALGORITHM_SIMPLEHEURISTIC_H
-#define LINKERNINGHANALGORITHM_SIMPLEHEURISTIC_H
+#ifndef LINKERNIGHANALGORITHM_SIMPLEHEURISTIC_H
+#define LINKERNIGHANALGORITHM_SIMPLEHEURISTIC_H
 
 #include <utility>
 #include <vector>
@@ -128,4 +128,4 @@ Tour simpleHeuristic(const TsplibProblem &tsplibProblem);
 
 Tour ascendingVerticesHeuristic(const TsplibProblem &tsplibProblem);
 
-#endif //LINKERNINGHANALGORITHM_SIMPLEHEURISTIC_H
+#endif //LINKERNIGHANALGORITHM_SIMPLEHEURISTIC_H

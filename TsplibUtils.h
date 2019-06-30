@@ -2,8 +2,8 @@
 // Created by Karl Welzel on 19.04.2019.
 //
 
-#ifndef LINKERNINGHANALGORITHM_TSPLIBUTILS_H
-#define LINKERNINGHANALGORITHM_TSPLIBUTILS_H
+#ifndef LINKERNIGHANALGORITHM_TSPLIBUTILS_H
+#define LINKERNIGHANALGORITHM_TSPLIBUTILS_H
 
 #include <fstream>
 #include <string>
@@ -118,4 +118,4 @@ public:
     const std::string &getType() const;
 };
 
-#endif //LINKERNINGHANALGORITHM_TSPLIBUTILS_H
+#endif //LINKERNIGHANALGORITHM_TSPLIBUTILS_H

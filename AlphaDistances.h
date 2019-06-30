@@ -2,8 +2,8 @@
 // Created by Karl Welzel on 26.06.19.
 //
 
-#ifndef LINKERNINGHANALGORITHM_ALPHADISTANCES_H
-#define LINKERNINGHANALGORITHM_ALPHADISTANCES_H
+#ifndef LINKERNIGHANALGORITHM_ALPHADISTANCES_H
+#define LINKERNIGHANALGORITHM_ALPHADISTANCES_H
 
 
 #include <functional>
@@ -55,4 +55,4 @@ alphaDistances(dimension_t dimension, const std::function<signed_distance_t(vert
 std::vector<std::vector<distance_t>>
 optimizedAlphaDistances(dimension_t dimension, const std::function<signed_distance_t(vertex_t, vertex_t)> &dist);
 
-#endif //LINKERNINGHANALGORITHM_ALPHADISTANCES_H
+#endif //LINKERNIGHANALGORITHM_ALPHADISTANCES_H
