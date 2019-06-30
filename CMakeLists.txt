@@ -10,7 +10,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall -Wextra -pedantic -pedantic-er
 add_executable(LinKernighanAlgorithm main.cpp
         Tour.cpp Tour.h
         TsplibUtils.cpp TsplibUtils.h
-        SimpleHeuristic.cpp SimpleHeuristic.h
         LinKernighanHeuristic.cpp LinKernighanHeuristic.h
         SignedPermutation.cpp SignedPermutation.h
         PrimsAlgorithm.cpp PrimsAlgorithm.h
