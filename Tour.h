@@ -236,7 +236,8 @@ private:
     // The number of vertices of the complete tour
     dimension_t dimension = 0;
 
-    // The average size the segments should have. The parameter is described in more detail in the paper linked above
+    // The average size the segments should have. The parameter is described in more detail in the paper linked above.
+    // The number of segments is floor(dimension/groupSize)
     dimension_t groupSize = 0;
 
     // A list of the parents in the order their segments appear on the tour

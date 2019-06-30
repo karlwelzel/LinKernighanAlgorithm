@@ -50,21 +50,21 @@ void AlternatingWalk::push_back(vertex_t vertex) {
 
 AlternatingWalk AlternatingWalk::close() const {
     AlternatingWalk result(*this);
-    result.push_back(vertices[0]);
+    result.push_back(vertices[0]); // Add the first vertex to the end to close the walk
     return result;
 }
 
 AlternatingWalk AlternatingWalk::appendAndClose(vertex_t vertex) const {
     AlternatingWalk result(*this);
-    result.push_back(vertex);
-    result.push_back(vertices[0]);
+    result.push_back(vertex); // Add vertex to the end
+    result.push_back(vertices[0]); // Close the walk as in close
     return result;
 }
 
 bool AlternatingWalk::containsEdge(vertex_t v, vertex_t w) const {
     for (dimension_t i = 0; i < vertices.size() - 1; ++i) {
-        if ((vertices[i] == v and vertices[i + 1] == w) or
-            (vertices[i] == w and vertices[i + 1] == v)) {
+        // Check if the edge {vertices[i], vertices[i+1]} is the same as (v, w)
+        if ((vertices[i] == v and vertices[i + 1] == w) or (vertices[i] == w and vertices[i + 1] == v)) {
             return true;
         }
     }
@@ -83,7 +83,7 @@ std::vector<dimension_t> BaseTour::inversePermutation(const std::vector<dimensio
 }
 
 std::vector<vertex_t> BaseTour::getNeighbors(vertex_t vertex) {
-    return std::vector<vertex_t>({predecessor(vertex), successor(vertex)});
+    return {predecessor(vertex), successor(vertex)};
 }
 
 bool BaseTour::containsEdge(vertex_t vertex1, vertex_t vertex2) const {
@@ -108,6 +108,7 @@ std::vector<dimension_t> BaseTour::cyclicPermutation(const AlternatingWalk &alte
     }
 
     // Sort these vertices by the order the appear on the tour
+    // The vertex 0 is chosen as an arbitrary starting point on the tour
     std::sort(outEdges.begin(), outEdges.end(),
               [this, alternatingWalk](dimension_t i, dimension_t j) {
                   return isBetween(0, alternatingWalk[i], alternatingWalk[j]);
@@ -124,26 +125,27 @@ std::vector<dimension_t> BaseTour::cyclicPermutation(const AlternatingWalk &alte
 }
 
 bool BaseTour::isTourAfterExchange(const AlternatingWalk &alternatingWalk) const {
+    // Compute the cyclic permutation and its inverse
     std::vector<dimension_t> permutation = cyclicPermutation(alternatingWalk);
     std::vector<dimension_t> indices = inversePermutation(permutation);
-    // {alternatingWalk[permutation[2i]], alternatingWalk[permutation[2i+1]]} are the out-edges in alternatingWalk
 
     dimension_t size = permutation.size();
     dimension_t i = permutation[1]; // index for alternatingWalk
     dimension_t j;                  // index for permutation
     dimension_t count = 0;
 
-    // Traverse the in-edges on the tour and skip the segments in between
-    // Count is a counter for the number of in-edges that are visited. The exchange produces a tour if and only if
+    // Traverse the in-edges of alternatingWalk and skip the segments of the tour in between the in-edges to simulate
+    // a traversal of the tour after exchanging out-edges by in-edges
+    // count is a counter for the number of in-edges that are visited. The exchange produces a tour if and only if
     // count is half as big as the number of edges in alternatingWalk.
+
+    // {alternatingWalk[permutation[2i]], alternatingWalk[permutation[2i+1]]} are the out-edges in alternatingWalk
     do {
         j = ((indices[i] % 2 == 0) ? indices[i] + size - 1 : indices[i] + 1) % size;
         // alternatingWalk[i] -> alternatingWalk[permutation[j]] is a segment on the tour
-        // because with k = (indices[i] % 2 == 0) ? indices[i] + 1 : indices[i] - 1
-        // {alternatingWalk[i], alternatingWalk[permutation[k]]} would be an out-edge
 
         i = ((permutation[j] % 2 == 0) ? permutation[j] + size - 1 : permutation[j] + 1) % size;
-        // {alternatingWalk[permutation[j]], alternatingWalk[i]} is an in-edge on the tour
+        // {alternatingWalk[permutation[j]], alternatingWalk[i]} is an in-edge
 
         count++;
     } while (i != permutation[1]);
@@ -152,24 +154,32 @@ bool BaseTour::isTourAfterExchange(const AlternatingWalk &alternatingWalk) const
 }
 
 void BaseTour::exchange(const AlternatingWalk &alternatingWalk) {
+    // The "new" tour is the tour after exchanging all out-edges by in-edges, while the "old" tour is the current one
+    // before this exchange.
+
+    // Compute the cyclic permutation and its inverse
     std::vector<dimension_t> permutation = cyclicPermutation(alternatingWalk);
     std::vector<dimension_t> indices = inversePermutation(permutation);
     // {alternatingWalk[permutation[2i]], alternatingWalk[permutation[2i+1]]} are the out-edges in alternatingWalk
 
+    // The completely unchanged segments v -> w of the tour between the out-edges as pairs (v, w)
     std::vector<std::pair<vertex_t, vertex_t>> segments;
-    std::unordered_map<vertex_t, number_t> segmentNumber;
+
+    // A signed permutation corresponding to reordering and reversing of segments by the exchange
+    // The new tour corresponds to the identity permutation and the current tour to segmentPermutation
     std::vector<std::pair<number_t, bool>> segmentPermutation;
+
+    // Maps the first vertex of each such segment to its corresponding number in segmentPermutation
+    std::unordered_map<vertex_t, number_t> segmentNumber;
 
     dimension_t size = permutation.size();
     dimension_t i = permutation[1]; // index for alternatingWalk
     dimension_t j;                  // index for permutation
 
-    // Traverse the segments on the new tour and number them
+    // Traverse the segments in the order they appear on the new tour (as in isTourAfterExchange) and number them
     do {
         j = ((indices[i] % 2 == 0) ? indices[i] + size - 1 : indices[i] + 1) % size;
         // alternatingWalk[i] -> alternatingWalk[permutation[j]] is a segment on the tour
-        // because with k = (indices[i] % 2 == 0) ? indices[i] + 1 : indices[i] - 1
-        // {alternatingWalk[i], alternatingWalk[permutation[k]]} would be an out-edge
 
         segments.emplace_back(alternatingWalk[i], alternatingWalk[permutation[j]]);
         segmentNumber[alternatingWalk[i]] = segments.size() - 1;
@@ -179,9 +189,10 @@ void BaseTour::exchange(const AlternatingWalk &alternatingWalk) {
         // {alternatingWalk[permutation[j]], alternatingWalk[i]} is an in-edge on the tour
     } while (i != permutation[1]);
 
-    // Traverse the segments on the current tour and create a signed permutation
+    // Traverse the segments on the current tour and create segmentPermutation
     for (j = 1; j < size; j += 2) {
         // alternatingWalk[permutation[j]] -> alternatingWalk[permutation[j+1]] is a segment on the tour
+        // Now we need to check the direction of the segment and append its number to segmentPermutation
         std::unordered_map<vertex_t, number_t>::const_iterator it = segmentNumber.find(alternatingWalk[permutation[j]]);
         if (it != segmentNumber.end()) { // The segment on the new tour has successor direction
             segmentPermutation.emplace_back(it->second, true);
@@ -189,9 +200,11 @@ void BaseTour::exchange(const AlternatingWalk &alternatingWalk) {
             it = segmentNumber.find(alternatingWalk[permutation[(j + 1) % size]]);
             segmentPermutation.emplace_back(it->second, false);
         }
+
         // {alternatingWalk[permutation[j+1]], alternatingWalk[permutation[j+2]]} is an out-edge on the tour
     }
 
+    // Construct a SignedPermutation from segmentPermutation
     SignedPermutation signedPermutation(segmentPermutation);
     dimension_t segmentsSize = segments.size();
 
@@ -200,26 +213,40 @@ void BaseTour::exchange(const AlternatingWalk &alternatingWalk) {
 
     // preStartVertex and postStartVertex are needed, because the reversal of the signed permutation does not have to
     // be in the successor direction on the tour
+
     std::pair<number_t, bool> preStartElement, startElement, endElement, postEndElement;
     std::pair<vertex_t, vertex_t> preStartSegment, startSegment, endSegment, postEndSegment;
     vertex_t preStartVertex, startVertex, endVertex, postEndVertex;
+
     while (!signedPermutation.isIdentityPermutation()) {
+        // Compute the next reversal step
         std::pair<std::size_t, std::size_t> reversal = signedPermutation.nextReversal();
+
+        // The reversal reverses the elements with indices in [reversal.first, reversal.last]
+        // Get the bounding elements of this reversal:
+        //     preStartElement, [startElement, ..., endElement], postElement
+        // where [ and ] indicate the reversal range
         preStartElement = signedPermutation.getElementAt((reversal.first + segmentsSize - 1) % segmentsSize);
         startElement = signedPermutation.getElementAt(reversal.first);
         endElement = signedPermutation.getElementAt(reversal.second);
         postEndElement = signedPermutation.getElementAt((reversal.second + 1) % segmentsSize);
 
+        // Get the corresponding bounding segments of this reversal
         preStartSegment = segments[preStartElement.first];
         startSegment = segments[startElement.first];
         endSegment = segments[endElement.first];
         postEndSegment = segments[postEndElement.first];
 
+        // Get the bounding vertices of this reversal which correspond to the start or end of a segment
+        // The edges {preStartVertex, startVertex} and {endVertex, postEndVertex} should be replaced by two edges that
+        // connect these vertices and form a tour. In this new tour the vertices between startVertex and endVertex
+        // or the other half of the tour is reversed and this matches the reversal in the signed permutation.
         preStartVertex = preStartElement.second ? preStartSegment.second : preStartSegment.first;
         startVertex = startElement.second ? startSegment.first : startSegment.second;
         endVertex = endElement.second ? endSegment.second : endSegment.first;
         postEndVertex = postEndElement.second ? postEndSegment.first : postEndSegment.second;
 
+        // Swap vertices if necessary to conform with the expectation of flip
         if (preStartVertex != predecessor(startVertex)) {
             std::swap(preStartVertex, startVertex);
         }
@@ -229,6 +256,7 @@ void BaseTour::exchange(const AlternatingWalk &alternatingWalk) {
 
         flip(startVertex, preStartVertex, endVertex, postEndVertex);
 
+        // Perform the reversal on the signed permutation to reflect the flip.
         signedPermutation.performReversal(reversal);
     }
 }
@@ -273,6 +301,7 @@ void ArrayTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
     // Calculate the length of the two segments to decide which of them will be reversed
     dimension_t acDistance = distance(a, c);
     dimension_t dbDistance = distance(d, b);
+
     dimension_t segmentStartIndex, segmentEndIndex;
     dimension_t segmentLength;
     if (acDistance <= dbDistance) {
@@ -373,36 +402,38 @@ TwoLevelTreeTour &TwoLevelTreeTour::operator=(const TwoLevelTreeTour &otherTour)
 
 void TwoLevelTreeTour::setVertices(const std::vector<vertex_t> &tourSequence) {
     dimension = tourSequence.size();
-    // TODO: Test different values
-    if (tourSequence.size() <= 1000) {
-        groupSize = 2 * dimension; // Only one segment, essentially like ArrayTour
+
+    // For two segments the implementation does not work and for one segment (3/4)*groupSize may not be smaller
+    // than the dimension, so for dimension <= 300 I set the groupSize to twice the dimension. This sets the number of
+    // segments to one and the TwoLevelTreeTour essentially works like an ArrayTour
+
+    // The choices of groupSize for all other cases is taken from the paper linked in Tour.h
+
+    if (tourSequence.size() <= 300) {
+        groupSize = 2 * dimension;
     } else if (tourSequence.size() <= 100000) {
         groupSize = 100;
     } else {
-        groupSize = 500;
+        groupSize = 200;
     }
-    /*
-    if (vertexList.size() <= 1000) {
-        groupSize = 2 * dimension; // Only one segment, essentially like ArrayTour
-    } else {
-        groupSize = std::lround(std::sqrt(vertexList.size()));
-    }
-     */
 
     iterators.resize(tourSequence.size());
+    dimension_t segmentLength = groupSize; // The first segments should have groupSize elements
+    std::size_t parentIndex = 0; // The index for tourSequence
+    std::size_t vertexIndex = 0; // The index for parents
 
-    dimension_t segmentLength = groupSize;
-    std::size_t parentIndex = 0;
-    std::size_t vertexIndex = 0;
     while (vertexIndex < dimension) {
         // The last segment should have a length between groupSize and 2*groupSize
         if (tourSequence.size() - vertexIndex < 2 * groupSize) {
             segmentLength = tourSequence.size() - vertexIndex;
         }
 
-        parents.emplace_back(); // Create an empty SegmentParent
+        // Create an empty SegmentParent and get a pointer to it
+        parents.emplace_back();
         auto parentIterator = std::prev(parents.end());
         SegmentParent &parent = *parentIterator;
+
+        // Initialize the parent values and fill parent.vertices
         parent.reversed = false;
         parent.sequenceNumber = parentIndex;
         for (std::size_t i = vertexIndex; i < vertexIndex + segmentLength; ++i) {
@@ -534,17 +565,16 @@ void TwoLevelTreeTour::mergeHalfSegment(vertex_t v, bool mergeToTheRight) {
     // Determine where to insert the half-segment in the other segment and update sequenceNumber and parentIterator for
     // all elements in halfSegment
     std::list<SegmentVertex>::iterator insertIterator;
-    std::list<SegmentVertex>::iterator countStartIterator;
     long sequenceNumber;
     if (mergeToTheRight != otherParent.reversed) {
-        insertIterator = otherParent.vertices.begin();
+        insertIterator = otherParent.vertices.begin(); // Insert at the front of otherParent.vertices
         sequenceNumber = otherParent.vertices.front().sequenceNumber;
         for (auto it = halfSegment.rbegin(); it != halfSegment.rend(); ++it) {
             it->sequenceNumber = --sequenceNumber;
             it->parentIterator = otherParentIterator;
         }
     } else {
-        insertIterator = otherParent.vertices.end();
+        insertIterator = otherParent.vertices.end(); // Insert at the back of otherParent.vertices
         sequenceNumber = otherParent.vertices.back().sequenceNumber;
         for (auto &it : halfSegment) {
             it.sequenceNumber = ++sequenceNumber;
@@ -552,7 +582,7 @@ void TwoLevelTreeTour::mergeHalfSegment(vertex_t v, bool mergeToTheRight) {
         }
     }
 
-    // Merge
+    // Insert the halfSegment in otherParent.vertices
     otherParent.vertices.splice(insertIterator, halfSegment);
 }
 
@@ -583,10 +613,7 @@ void TwoLevelTreeTour::reverseParents(std::list<SegmentParent>::iterator first,
 
 
 void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
-    if (!(successor(b) == a and successor(c) == d)) {
-        throw std::runtime_error("Illegal call to flip");
-    }
-
+    // Get the segment vertices and parents corresponding to a, b, c and d
     SegmentVertex &aVertex = *iterators[a];
     SegmentVertex &bVertex = *iterators[b];
     SegmentVertex &cVertex = *iterators[c];
@@ -598,6 +625,7 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
     SegmentParent &dParent = *(dVertex.parentIterator);
 
     // Case 1: The paths a-c and d-b are made up of segments
+    // Reverse a range of consecutive parents that correspond to a-c or d-b
     if (aParent.firstVertex() == a and cParent.lastVertex() == c) {
         // Reverse one of these paths
         if (cParent.sequenceNumber >= aParent.sequenceNumber) {
@@ -610,6 +638,9 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
     }
 
     // Case 2: One of the paths a-c and d-b is contained in a single segment
+    // Reverse the paths inside the segment just as in ArrayTour when the path length is smaller than (3/4)*groupSize
+    // otherwise split off and merge the ends of the segment with the adjacent segments, so that the path itself
+    // becomes a segment and can be reversed by changing the reversal bit
     bool acInOneSegment = aParent == cParent and
                           ((!aParent.reversed and aVertex.sequenceNumber <= cVertex.sequenceNumber) or
                            (aParent.reversed and aVertex.sequenceNumber >= cVertex.sequenceNumber));
@@ -617,6 +648,7 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
                           ((!dParent.reversed and dVertex.sequenceNumber <= bVertex.sequenceNumber) or
                            (dParent.reversed and dVertex.sequenceNumber >= bVertex.sequenceNumber));
     if (acInOneSegment or dbInOneSegment) {
+        // Determine which path will be reversed
         vertex_t start, end;
         if (acInOneSegment) {
             start = a;
@@ -650,11 +682,12 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
             }
             parent.reverseVertices(iterators[start], iterators[end]);
         }
+
         return;
     }
 
     // Case 3: None of the above
-    // Split up the segments so that case 1 is applicable
+    // Split up the segments so that case 1 or 2 is applicable
     if (aParent == bParent) {
         // Split the segment of aParent and merge one half into the neighboring segment
         long frontSequenceNumber = aParent.vertices.front().sequenceNumber;
@@ -684,5 +717,10 @@ void TwoLevelTreeTour::flip(vertex_t a, vertex_t b, vertex_t c, vertex_t d) {
             mergeHalfSegment(c, false);
         }
     }
-    flip(a, b, c, d); // Now a-b and c-d are the boundaries of segments, so it can be handled by case 1
+
+    // Normally, a-b and c-d now are the boundaries of segments, so it can be handled by case 1
+    // If cParent (= dParent) was the neighboring segment of aParent (= bParent) it can happen that a half of aParent
+    // gets merged to cParent and then the half that contains the newly merged vertices gets merged back to aParent. In
+    // this case, the flip can now be handled by case 2.
+    flip(a, b, c, d);
 }

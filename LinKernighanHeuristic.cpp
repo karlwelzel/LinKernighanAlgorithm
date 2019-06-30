@@ -222,7 +222,7 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
             currentWalk.push_back(xi);
 
             if (i % 2 == 1 and i >= 3) {
-                // Check if the exchange of the current walk after closing it leads to a tour and update
+                // Check if the exchange of the current walk after closing it produces a tour and update
                 // bestAlternatingWalk if necessary
                 AlternatingWalk closedWalk = currentWalk.close(); // closedWalk = (x_0, x_1, ..., x_i, x_0)
                 signed_distance_t gain = tsplibProblem.exchangeGain(closedWalk);
@@ -252,7 +252,7 @@ Tour LinKernighanHeuristic::improveTour(const Tour &startTour) {
                 // Determine possible out-edges (xi, neighbor)
 
                 // For i > infeasibilityDepth the out-edges must be chosen in way that the exchange of the current walk
-                // after appending the edge and closing the walk (currentWalk.appendAndClose(neighbor)) leads to tour
+                // after appending the edge and closing the walk (currentWalk.appendAndClose(neighbor)) produces tour
 
                 // Special caution is needed because:
                 // (1) No out-edge should connect back to x_0, because at this point currentWalk is not a valid
