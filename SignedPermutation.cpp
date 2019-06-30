@@ -10,17 +10,8 @@
 #include <vector>
 #include "SignedPermutation.h"
 
-SignedPermutation::SignedPermutation(std::vector<std::pair<number_t, bool>> permutation) : permutation(
-        std::move(permutation)) {
-    // DEBUG: Check whether the permutation is valid
-    std::vector<bool> found(this->permutation.size(), false);
-    for (std::pair<number_t, bool> element : this->permutation) {
-        found[element.first] = true;
-    }
-    if (!std::all_of(found.begin(), found.end(), [](bool v) { return v; })) {
-        throw std::runtime_error("permutation is not a permutation");
-    }
-
+SignedPermutation::SignedPermutation(std::vector<std::pair<number_t, bool>> permutation) :
+        permutation(std::move(permutation)) {
     // Calculate the index of each element
     indices.resize(this->permutation.size());
     for (std::size_t i = 0; i < this->permutation.size(); ++i) {
@@ -35,7 +26,7 @@ std::pair<number_t, bool> SignedPermutation::getElementAt(std::size_t i) const {
 bool SignedPermutation::isIdentityPermutation() const {
     for (std::size_t i = 0; i < permutation.size(); ++i) {
         // Check that the i-th element is +i
-        if (permutation[i].first != i or !permutation[i].second) {
+        if (permutation[i] != std::make_pair(i, true)) {
             return false;
         }
     }
@@ -45,12 +36,13 @@ bool SignedPermutation::isIdentityPermutation() const {
 std::pair<std::size_t, std::size_t> SignedPermutation::nextReversal() const {
     for (std::size_t i = 0; i < permutation.size(); ++i) {
         if (permutation[i].first != i) {
-            // Return reversal that reverses permutation[i] and i
-            std::size_t j = indices[i];
-            return std::make_pair(i, j);
+            // Return reversal that swaps permutation[i] and i
+            // This corresponds to the reversal (indices[permutation[i]], indices[i]) = (i, indices[i])
+            return std::make_pair(i, indices[i]);
         }
         if (!permutation[i].second) {
-            // Return reversal that reverses i to change the sign (permutation[i] = i)
+            // Return reversal that reverses only i to change the sign
+            // This corresponds to the reversal (indices[i], indices[i]) = (i, i)
             return std::make_pair(i, i);
         }
     }
@@ -63,13 +55,16 @@ void SignedPermutation::performReversal(std::pair<std::size_t, std::size_t> step
     number_t i = step.first;
     number_t j = step.second;
     for (std::size_t k = 0; k < (j - i + 1) / 2; ++k) {
+        // Swap elements and update indices
         std::swap(permutation[i + k], permutation[j - k]);
         std::swap(indices[permutation[i + k].first], indices[permutation[j - k].first]);
+
+        // Change the signs
         permutation[i + k].second = !permutation[i + k].second;
         permutation[j - k].second = !permutation[j - k].second;
     }
     if ((j - i) % 2 == 0) {
-        // Change sign for the element in the middle, that does not change its position
+        // Change sign of the element in the middle that does not change its position
         permutation[(i + j) / 2].second = !permutation[(i + j) / 2].second;
     }
 

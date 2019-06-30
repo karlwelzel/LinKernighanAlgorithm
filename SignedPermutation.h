@@ -11,6 +11,7 @@
 
 using number_t = size_t; // The data type used for numbers in permutations
 
+
 // ============================================ SignedPermutation class ================================================
 
 // This class represents a signed permutation and provides algorithms to sort it by reversals.
@@ -21,13 +22,20 @@ using number_t = size_t; // The data type used for numbers in permutations
 // A signed reversal reverses the order of consecutive elements in the permutation and changes their signs. The goal is
 // to find a number of signed reversals that transform a given signed permutation into the signed identity permutation
 // +0, +1, +2, ..., +n. A signed reversal is represented by a pair of indices i <= j that indicate that the part of
-// permutation between i and j should be reversed.
+// permutation between index i and index j (including both ends) should be reversed.
 
-// The algorithm implemented here is an naive greedy approach:
-// The permutation is sorted in a way such that after the i-th step the i first elements are +1 to +i in the correct
-// order. To do this the reversal (permutation[i], i) is applied (disregarding the sign) and then the reversal (i, i)
-// is used to make the sign of i positive, if necessary. Obviously at worst 2n reversals are used and the number of
-// reversal steps is not minimal.
+// The algorithm implemented here is a naive greedy approach:
+// The permutation is sorted in a way such that after the i-th step the i first elements are +0 to +i in the correct
+// order. To do this the reversal of elements from permutation[i] to i is applied (disregarding the sign) and then the
+// reversal of i is used to make the sign of i positive, if necessary. Obviously at worst 2n reversals are used and the
+// number of reversal steps is not necessarily minimal.
+// Example: (the underscores mark start and end of the reversal)
+//     _-0_  +1   -3   +2
+//  ->  +0   +1   -3   +2  (after step 0)
+//  ->  +0   +1  _-3   +2_ (after step 1)
+//  ->  +0   +1  _-2_  +3
+//  ->  +0   +1   +2   +3  (after step 2)
+//  ->  +0   +1   +2   +3  (after step 3)
 
 class SignedPermutation {
 private:

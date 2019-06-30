@@ -11,6 +11,9 @@
 #include "Tour.h"
 #include "TsplibUtils.h"
 
+// TODO: Search for "DEBUG" in every file
+// TODO: Use IWYU again to check all includes (after clean)
+
 int main(int argc, char *argv[]) {
     const std::string helpString = R""(
 Usage:
