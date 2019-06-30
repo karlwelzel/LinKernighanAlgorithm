@@ -23,6 +23,7 @@ private:
     // The delimiter between a keyword and its value, used in the TSPLIB format
     static const char DELIMITER = ':';
 
+    // The variables corresponding to keywords in the TSPLIB file
     std::string name;
     std::string type;
     dimension_t dimension = 0;
@@ -30,16 +31,15 @@ private:
     std::string edgeWeightFormat;
     std::string nodeCoordType = "TWOD_COORDS";
 
-    // if EDGE_WEIGHT_TYPE is EXPLICIT or ALWAYS_STORE_IN_MATRIX is true
-    // The matrix that contains all pairs of distances
+    // If EDGE_WEIGHT_TYPE is EXPLICIT or storeAllDistances is true this matrix contains all pairs of distances
     std::vector<std::vector<distance_t>> matrix;
 
-    // if EDGE_WEIGHT_TYPE is *_2D
-    std::vector<std::vector<double>> coordinates; // Every entry is a 2d coordinate
+    // If EDGE_WEIGHT_TYPE is *_2D this vector stores all 2D coordinates
+    std::vector<std::vector<double>> coordinates;
 
     // When the EDGE_WEIGHT_TYPE is not EXPLICIT, this parameter specifies whether all distances should be computed
-    // and stored in a matrix or only the coordinates should be saved and the distances will be computed on every call
-    // to TsplibProblem::dist. This is a trade-off between running time and memory usage
+    // and stored in a matrix or only the coordinates should be saved. In the latter case the distances will be computed
+    // on every call to TsplibProblem::dist. This is a trade-off between running time and memory usage
     bool storeAllDistances = true;
 
     // Interpret a single keyword value pair from the specification part of a TSPLIB file
@@ -47,14 +47,14 @@ private:
     // Returns an error message if an error occurred and an empty string otherwise
     std::string interpretKeyword(const std::string &keyword, const std::string &value);
 
-    // Returns the distance of vertex i and vertex j and ignores ALWAYS_STORE_IN_MATRIX
+    // Computes the distance of vertex i and vertex j even if storeAllDistances is true
     // Expects that i and j are in [0, dimension)
     distance_t trueDistance(vertex_t i, vertex_t j) const;
 
 public:
     explicit TsplibProblem(bool storeAllDistances = true);
 
-    // Interpret the file "inputFile" as a TSPLIB file and store the information given there
+    // Interpret the file inputFile as a TSPLIB file and store the information given there
     // Returns an error message if an error occurred and an empty string otherwise
     std::string readFile(std::ifstream &inputFile);
 
@@ -87,8 +87,10 @@ public:
 
 class TsplibTour : public Tour {
 private:
+    // The delimiter between a keyword and its value, used in the TSPLIB format
     const char DELIMITER = ':';
 
+    // The variables corresponding to keywords in the TSPLIB tour file
     std::string name = "";
     std::string type = "";
     dimension_t dimension = 0;
@@ -104,7 +106,7 @@ public:
     // Construct a TsplibTour from the tour and the name
     TsplibTour(std::string name, const Tour &tour);
 
-    // Interpret the file "inputFile" as a TSPLIB tour file and store the information given there
+    // Interpret the file inputFile as a TSPLIB tour file and store the information given there
     // Returns an error message if an error occurred and an empty string otherwise
     std::string readFile(std::ifstream &inputFile);
 
