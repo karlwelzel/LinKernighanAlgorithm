@@ -4,7 +4,13 @@ improvements by Keld Helsgaun as part of a course at the Uni Bonn
 
 ## Compiling
 
-    cmake --build cmake-build-debug --target LinKernighanAlgorithm -- -j 6
+Generate build files (only needed once)
+
+    cmake -S . -B cmake-build-debug
+
+Compile and generate the executable `cmake-build-debug/LinKernighanAlgorithm`
+    
+    cmake --build cmake-build-debug
 
 ## Usage:
     LinKernighanAlgorithm --help
