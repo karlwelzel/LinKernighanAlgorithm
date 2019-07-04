@@ -155,7 +155,7 @@ optimizedAlphaDistances(dimension_t dimension, const std::function<signed_distan
     std::size_t periodLength = dimension / 2;
     std::size_t iteration = 0; // A counter for the iterations in the current period
     signed_distance_t currentObjective = objectiveFunction(); // The current value of the objective function
-    signed_distance_t previousObjective = currentObjective; // The previous value of the objective function
+    signed_distance_t maxObjective = currentObjective; // The maximum value of the objective function
     // Used to double the step size in the first period until the objective function does not increase
     bool doubleStepSize = true;
 
@@ -186,7 +186,7 @@ optimizedAlphaDistances(dimension_t dimension, const std::function<signed_distan
 
             // In the first period the step size is doubled until the objective function does not increase
             if (doubleStepSize) {
-                if (currentObjective > previousObjective) {
+                if (currentObjective > maxObjective) {
                     stepSize *= 2;
                 } else {
                     doubleStepSize = false;
@@ -195,11 +195,11 @@ optimizedAlphaDistances(dimension_t dimension, const std::function<signed_distan
 
             // If the last iteration in the period leads to an increase of the objective function the period length is
             // doubled
-            if (iteration + 1 == periodLength and currentObjective > previousObjective) {
+            if (iteration + 1 == periodLength and currentObjective > maxObjective) {
                 periodLength *= 2;
             }
 
-            previousObjective = currentObjective;
+            maxObjective = std::max(maxObjective, currentObjective);
         }
 
         // End of the period
@@ -210,4 +210,3 @@ optimizedAlphaDistances(dimension_t dimension, const std::function<signed_distan
 
     return alphaDistances(dimension, modifiedDist);
 }
-
